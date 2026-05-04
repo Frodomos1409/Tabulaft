@@ -1,0 +1,73 @@
+<app-navbar />
+
+<main class="profile-page">
+
+  <!-- Cover -->
+  <div class="profile-cover">
+    <div class="profile-cover__gradient"></div>
+  </div>
+
+  <div class="container profile-body">
+
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="profile-header__left">
+        <img class="profile-avatar" [src]="user.avatar" [alt]="user.name" />
+        <div class="profile-info">
+          <h1 class="profile-info__name">{{ user.name }}</h1>
+          <p class="profile-info__role">{{ user.role }}</p>
+          <p class="profile-info__bio">{{ user.bio }}</p>
+        </div>
+      </div>
+      <div class="profile-header__actions">
+        <button
+          class="btn"
+          [class.btn--primary]="!following()"
+          [class.btn--outline]="following()"
+          (click)="toggleFollow()">
+          {{ following() ? '✓ Siguiendo' : '+ Seguir' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="profile-stats">
+      <div class="profile-stat"><strong>{{ user.projectCount }}</strong><span>Proyectos</span></div>
+      <div class="profile-stat"><strong>{{ user.followers + (following() ? 1 : 0) }}</strong><span>Seguidores</span></div>
+      <div class="profile-stat"><strong>{{ user.following }}</strong><span>Siguiendo</span></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <button class="profile-tab" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
+        Proyectos <span class="profile-tab__count">{{ projects.length }}</span>
+      </button>
+      <button class="profile-tab" [class.active]="activeTab() === 'saved'" (click)="activeTab.set('saved')">
+        Guardados
+      </button>
+    </div>
+
+    @if (activeTab() === 'projects') {
+      @if (projects.length > 0) {
+        <div class="masonry-grid">
+          @for (project of projects; track project.id) {
+            <app-project-card [project]="project" />
+          }
+        </div>
+      } @else {
+        <div class="profile-empty">
+          <p>No hay proyectos publicados aún.</p>
+        </div>
+      }
+    }
+
+    @if (activeTab() === 'saved') {
+      <div class="profile-empty">
+        <p>No hay proyectos guardados.</p>
+      </div>
+    }
+
+  </div>
+</main>
+
+<app-footer />

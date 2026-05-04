@@ -1,0 +1,152 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.card {
+  display: block;
+  background: var(--bg-card);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  break-inside: avoid;
+  margin-bottom: $space-5;
+  transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba($violet, 0.12);
+    border-color: rgba($violet, 0.2);
+
+    .card__image { transform: scale(1.04); }
+    .card__overlay { opacity: 1; }
+  }
+
+  // ─── Image ──────────────────────────────────────────────────────────────
+  &__image-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: unset;
+  }
+
+  &__image {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  // ─── Overlay ────────────────────────────────────────────────────────────
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.1) 50%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity $transition-base;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: $space-3;
+  }
+
+  &__overlay-actions {
+    display: flex;
+    gap: $space-2;
+    justify-content: flex-end;
+  }
+
+  &__action-btn {
+    @include flex-center;
+    gap: 5px;
+    padding: $space-2 $space-3;
+    border-radius: $radius-pill;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: $text-xs;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+
+    &.active {
+      background: rgba($hot-pink, 0.8);
+      border-color: transparent;
+      color: white;
+    }
+
+    &.active-save {
+      background: rgba($violet, 0.8);
+      border-color: transparent;
+    }
+  }
+
+  &__category {
+    align-self: flex-start;
+    padding: 4px $space-3;
+    background: rgba($violet, 0.85);
+    backdrop-filter: blur(8px);
+    border-radius: $radius-pill;
+    color: white;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  // ─── Body ────────────────────────────────────────────────────────────────
+  &__body {
+    padding: $space-4;
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-md;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: $space-3;
+    @include truncate;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: $radius-md;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  &__author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  &__author-name {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--text);
+    @include truncate;
+  }
+
+  &__author-role {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    @include truncate;
+  }
+}

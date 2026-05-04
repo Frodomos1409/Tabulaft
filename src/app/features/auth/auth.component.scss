@@ -1,0 +1,312 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+
+  @include mobile { grid-template-columns: 1fr; }
+
+  // ─── Form Side ────────────────────────────────────────────────────────
+  &__form-side {
+    background: var(--bg);
+    padding: $space-8 $space-6;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-secondary);
+    font-size: $text-sm;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color $transition-fast;
+    margin-bottom: $space-8;
+    &:hover { color: var(--text); }
+  }
+
+  &__form-inner {
+    max-width: 400px;
+    width: 100%;
+    margin: auto;
+  }
+
+  &__toggle {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: $radius-xl;
+    padding: 4px;
+    margin-bottom: $space-8;
+
+    button {
+      flex: 1;
+      padding: $space-3;
+      border-radius: $radius-lg;
+      font-size: $text-sm;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all $transition-base;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+
+      &.active {
+        background: $gradient-primary;
+        color: white;
+        box-shadow: 0 4px 12px rgba($violet, 0.35);
+      }
+    }
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-3xl;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: $space-2;
+  }
+
+  &__subtitle {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin-bottom: $space-8;
+    line-height: 1.5;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    label {
+      font-size: $text-sm;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input {
+      padding: $space-3 $space-4;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: $radius-lg;
+      color: var(--text);
+      font-size: $text-base;
+      transition: border-color $transition-fast;
+      outline: none;
+
+      &::placeholder { color: var(--text-tertiary); }
+
+      &:focus {
+        border-color: $violet;
+        box-shadow: 0 0 0 3px rgba($violet, 0.12);
+      }
+    }
+  }
+
+  &__forgot {
+    font-size: $text-sm;
+    color: $violet-light;
+    text-decoration: none;
+    text-align: right;
+    margin-top: -$space-2;
+    &:hover { text-decoration: underline; }
+  }
+
+  &__divider {
+    position: relative;
+    text-align: center;
+    margin: $space-6 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border);
+    }
+
+    span {
+      position: relative;
+      background: var(--bg);
+      padding: 0 $space-4;
+      font-size: $text-xs;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  &__socials {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-3;
+    margin-bottom: $space-6;
+  }
+
+  &__social-btn {
+    @include flex-center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    color: var(--text);
+    font-size: $text-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { border-color: var(--border-hover); background: var(--bg-hover); transform: translateY(-1px); }
+  }
+
+  &__switch {
+    text-align: center;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+
+    button {
+      color: $violet-light;
+      font-weight: 600;
+      font-size: $text-sm;
+      cursor: pointer;
+      border: none;
+      background: none;
+      margin-left: 4px;
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  // ─── Visual Side ──────────────────────────────────────────────────────
+  &__visual {
+    position: relative;
+    background: linear-gradient(135deg, #1a0630, #0d0a2e, #0A0A0F);
+    border-radius: 40px 0 0 40px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-12;
+
+    @include mobile { display: none; }
+  }
+
+  &__visual-bg {
+    position: absolute;
+    inset: 0;
+    background: $gradient-primary;
+    opacity: 0.08;
+  }
+
+  &__visual-blobs {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.18;
+
+    &--1 {
+      width: 300px;
+      height: 300px;
+      background: $violet;
+      top: -60px;
+      right: -40px;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    &--2 {
+      width: 200px;
+      height: 200px;
+      background: $hot-pink;
+      bottom: -40px;
+      left: -20px;
+      animation: float 9s ease-in-out infinite reverse;
+    }
+  }
+
+  &__visual-content {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+  }
+
+  &__visual-logo {
+    font-family: $font-heading;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: white;
+    margin-bottom: $space-3;
+    span { color: $hot-pink; }
+  }
+
+  &__visual-tagline {
+    font-size: $text-md;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: $space-8;
+    line-height: 1.5;
+  }
+
+  &__mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-3;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  &__mini-card {
+    border-radius: $radius-xl;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+
+    img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+
+    &--1 {
+      width: 300px;
+      height: 300px;
+      bottom: -100px;
+      right: -100px;
+      animation: rotateSlow 20s linear infinite;
+    }
+
+    &--2 {
+      width: 180px;
+      height: 180px;
+      top: -60px;
+      left: -60px;
+      animation: rotateSlow 15s linear infinite reverse;
+    }
+  }
+}

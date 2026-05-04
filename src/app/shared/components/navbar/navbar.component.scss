@@ -1,0 +1,289 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: $navbar-height;
+  background: var(--bg-nav);
+  border-bottom: 2px solid $hot-pink;
+  transition: background $transition-base, box-shadow $transition-base;
+
+  &.scrolled {
+    background: var(--bg-nav);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.18), 0 2px 0 $hot-pink;
+  }
+
+  // ─── Inner ───────────────────────────────────────────────────────────────
+  &__inner {
+    @include flex-between;
+    height: 100%;
+    padding: 0 $space-6;
+    max-width: 1440px;
+    margin: 0 auto;
+    @include mobile { padding: 0 $space-4; }
+  }
+
+  // ─── Logo ────────────────────────────────────────────────────────────────
+  &__logo {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+    font-family: $font-heading;
+    font-size: $text-xl;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+  }
+  &__logo-text  { color: var(--text); }
+  &__logo-accent { color: var(--text); }
+  &__logo-dot   { color: $hot-pink; font-size: $text-2xl; line-height: 0; margin-left: 1px; }
+
+  // ─── Links ───────────────────────────────────────────────────────────────
+  &__links {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    @include mobile { display: none; }
+
+    a {
+      padding: $space-2 $space-4;
+      border-radius: $radius-lg;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all $transition-fast;
+
+      &:hover { color: var(--text); background: var(--hover-surface-md); }
+      &.active { color: $hot-pink; background: rgba($hot-pink, 0.1); }
+    }
+  }
+
+  // ─── Actions ─────────────────────────────────────────────────────────────
+  &__actions { display: flex; align-items: center; gap: $space-2; }
+
+  &__icon-btn {
+    @include flex-center;
+    width: 36px; height: 36px;
+    border-radius: $radius-lg;
+    color: var(--text-secondary);
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    transition: all $transition-fast;
+    position: relative;
+
+    &:hover { color: var(--text); background: var(--hover-surface-md); }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: $hot-pink;
+    color: white;
+    font-size: 10px; font-weight: 700;
+    @include flex-center;
+    border: 2px solid var(--bg-nav);
+  }
+
+  // ─── Search Button ───────────────────────────────────────────────────────
+  &__search-btn {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    background: var(--hover-surface-md);
+    border: 1px solid var(--border-light);
+    border-radius: $radius-lg;
+    color: var(--text-tertiary);
+    font-size: $text-sm;
+    cursor: pointer;
+    transition: all $transition-fast;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: rgba($hot-pink, 0.5);
+      color: var(--text);
+      background: rgba($hot-pink, 0.08);
+    }
+    @include mobile { display: none; }
+  }
+
+  &__search-label { @include tablet { display: none; } }
+
+  &__search-kbd {
+    font-size: 10px; font-weight: 700;
+    color: var(--text-tertiary);
+    background: var(--hover-surface);
+    border: 1px solid var(--border-light);
+    border-radius: $radius-sm;
+    padding: 1px 5px;
+    font-family: monospace;
+    @include tablet { display: none; }
+  }
+
+  // ─── Notifications ───────────────────────────────────────────────────────
+  &__notif-wrapper { position: relative; }
+
+  &__notif-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 340px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid $hot-pink;
+    border-radius: $radius-xl;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+    animation: fadeIn 0.18s ease;
+    z-index: 100;
+    @include mobile { right: -60px; width: 300px; }
+  }
+
+  &__notif-header {
+    @include flex-between;
+    padding: $space-4 $space-5;
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: $font-heading;
+    font-weight: 700;
+    font-size: $text-md;
+    color: var(--text);
+  }
+
+  &__notif-item {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-4 $space-5;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background $transition-fast;
+    cursor: pointer;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--hover-surface); }
+    &.unread { background: rgba($hot-pink, 0.05); }
+  }
+
+  &__notif-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: transparent;
+    &.visible { background: $hot-pink; }
+  }
+
+  &__notif-text {
+    flex: 1;
+    font-size: $text-sm;
+    color: var(--text-on-surface);
+    line-height: 1.4;
+  }
+
+  &__notif-time {
+    font-size: $text-xs;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  // ─── Hamburger ───────────────────────────────────────────────────────────
+  &__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: $space-2;
+    cursor: pointer;
+    background: none;
+    border: none;
+    @include mobile { display: flex; }
+
+    span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--text-secondary);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      transform-origin: center;
+
+      &.open:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+      &.open:nth-child(2) { opacity: 0; transform: scaleX(0); }
+      &.open:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    }
+  }
+
+  // ─── Mobile Menu ─────────────────────────────────────────────────────────
+  &__mobile-menu {
+    position: absolute;
+    top: $navbar-height; left: 0; right: 0;
+    background: var(--bg-nav);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba($hot-pink, 0.3);
+    padding: $space-4 $space-4 $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    animation: slideUp 0.25s ease;
+
+    a, button {
+      padding: $space-3 $space-4;
+      border-radius: $radius-lg;
+      color: var(--text-secondary);
+      font-size: $text-md;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all $transition-fast;
+      &:hover { background: var(--hover-surface-md); color: var(--text); }
+    }
+    .btn--primary {
+      margin-top: $space-2;
+      justify-content: center;
+      background: $hot-pink !important;
+    }
+  }
+
+  &__mobile-search {
+    @include flex-between;
+    justify-content: flex-start;
+    gap: $space-3;
+    padding: $space-3 $space-4;
+    border-radius: $radius-lg;
+    color: var(--text-secondary);
+    font-size: $text-md;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: all $transition-fast;
+    &:hover { background: var(--hover-surface-md); color: var(--text); }
+  }
+
+  // ─── Override btn inside navbar ───────────────────────────────────────────
+  .btn--primary {
+    background: $hot-pink !important;
+    box-shadow: 0 4px 16px rgba($hot-pink, 0.35) !important;
+    &:hover { box-shadow: 0 6px 24px rgba($hot-pink, 0.5) !important; }
+  }
+}
+
+// ─── Notif mark-read button ────────────────────────────────────────────────
+.notif-mark-btn {
+  font-size: $text-xs;
+  color: $hot-pink;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity $transition-fast;
+  &:hover { opacity: 0.7; }
+}

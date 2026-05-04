@@ -1,0 +1,135 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.profile-cover {
+  height: 280px;
+  background: $gradient-primary;
+  position: relative;
+  margin-top: $navbar-height;
+
+  &__gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba($violet, 0.8), rgba($purple, 0.9), rgba($hot-pink, 0.4));
+  }
+}
+
+.profile-body { padding-top: 0; }
+
+.profile-header {
+  @include flex-between;
+  align-items: flex-end;
+  padding: 0 0 $space-8;
+  flex-wrap: wrap;
+  gap: $space-4;
+
+  &__left {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-5;
+  }
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: $radius-2xl;
+  object-fit: cover;
+  border: 4px solid var(--bg);
+  box-shadow: $shadow-dark;
+  margin-top: -60px;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  padding-bottom: $space-2;
+
+  &__name {
+    font-family: $font-heading;
+    font-size: $text-3xl;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: $space-1;
+  }
+
+  &__role {
+    font-size: $text-sm;
+    color: $violet-light;
+    font-weight: 600;
+    margin-bottom: $space-2;
+  }
+
+  &__bio {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    max-width: 400px;
+  }
+}
+
+.profile-stats {
+  display: flex;
+  gap: $space-8;
+  padding: $space-5 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: $space-8;
+  flex-wrap: wrap;
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  strong {
+    font-family: $font-heading;
+    font-size: $text-2xl;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  span {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.profile-tabs {
+  display: flex;
+  gap: $space-2;
+  margin-bottom: $space-8;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-tab {
+  padding: $space-3 $space-5;
+  font-size: $text-sm;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all $transition-fast;
+
+  &:hover { color: var(--text); }
+
+  &.active {
+    color: $violet-light;
+    border-bottom-color: $violet;
+  }
+}
+
+.masonry-grid {
+  columns: 3;
+  column-gap: $space-5;
+  padding-bottom: $space-16;
+
+  @include tablet { columns: 2; }
+  @include mobile { columns: 1; }
+}

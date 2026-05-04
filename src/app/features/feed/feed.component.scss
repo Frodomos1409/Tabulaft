@@ -1,0 +1,73 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.feed-page {
+  padding-top: calc(#{$navbar-height} + #{$space-8});
+  padding-bottom: $space-20;
+
+  &__header {
+    margin-bottom: $space-8;
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-4xl;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: $space-2;
+  }
+
+  &__subtitle {
+    font-size: $text-md;
+    color: var(--text-tertiary);
+  }
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    margin-bottom: $space-8;
+  }
+
+  &__categories {
+    display: flex;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__sort {
+    display: flex;
+    gap: $space-2;
+  }
+}
+
+.masonry-grid {
+  columns: 4;
+  column-gap: $space-5;
+
+  @include tablet { columns: 3; }
+  @include mobile { columns: 2; }
+  @include small  { columns: 1; }
+}
+
+.sort-btn {
+  padding: $space-2 $space-4;
+  border-radius: $radius-lg;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: $text-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover { border-color: var(--border-hover); color: var(--text); }
+
+  &.active {
+    background: rgba($violet, 0.12);
+    border-color: rgba($violet, 0.3);
+    color: $violet-light;
+    font-weight: 600;
+  }
+}

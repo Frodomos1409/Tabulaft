@@ -1,0 +1,506 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ─── Layout ──────────────────────────────────────────────────────────────
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+
+  &.collapsed {
+    grid-template-columns: 64px 1fr;
+
+    .admin-sidebar__label,
+    .admin-nav-item__label { display: none; }
+
+    .admin-sidebar__logo span:not(.dot) { display: none; }
+    .admin-sidebar__logo .grad { display: none; }
+  }
+
+  @include tablet { grid-template-columns: 64px 1fr; }
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────
+.admin-sidebar {
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: $space-4 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  transition: width $transition-slow;
+
+  &__top {
+    @include flex-between;
+    padding: $space-3 $space-4;
+    margin-bottom: $space-4;
+  }
+
+  &__logo {
+    font-family: $font-heading;
+    font-weight: 800;
+    font-size: $text-lg;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    color: var(--text);
+    white-space: nowrap;
+
+    .grad {
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dot { color: $hot-pink; }
+  }
+
+  &__toggle {
+    @include flex-center;
+    width: 30px;
+    height: 30px;
+    border-radius: $radius-md;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all $transition-fast;
+    border: none;
+    background: none;
+    flex-shrink: 0;
+
+    &:hover { background: var(--bg-hover); color: var(--text); }
+  }
+
+  &__label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
+    padding: 0 $space-4;
+    margin-bottom: $space-2;
+    white-space: nowrap;
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 $space-3;
+    flex: 1;
+  }
+
+  &__bottom {
+    padding: $space-3;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-3;
+  border-radius: $radius-lg;
+  color: var(--text-secondary);
+  font-size: $text-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+
+  svg { flex-shrink: 0; }
+
+  &:hover { background: var(--bg-hover); color: var(--text); }
+
+  &.active {
+    background: rgba($violet, 0.12);
+    color: $violet-light;
+    font-weight: 600;
+  }
+
+  &__label { overflow: hidden; text-overflow: ellipsis; }
+}
+
+// ─── Main ────────────────────────────────────────────────────────────────
+.admin-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.admin-topbar {
+  @include flex-between;
+  padding: $space-5 $space-8;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  @include mobile { padding: $space-4; }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-xl;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  &__user {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+}
+
+.admin-content {
+  padding: $space-8;
+  flex: 1;
+
+  @include mobile { padding: $space-4; }
+}
+
+// ─── Dashboard ───────────────────────────────────────────────────────────
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-5;
+  margin-bottom: $space-8;
+
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr 1fr; }
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+  &__top {
+    @include flex-between;
+    margin-bottom: $space-4;
+  }
+
+  &__label {
+    font-size: $text-xs;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__change {
+    font-size: $text-xs;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: $radius-pill;
+
+    &.up { background: rgba($success, 0.12); color: $success; }
+    &.down { background: rgba($error, 0.12); color: $error; }
+  }
+
+  &__value {
+    font-family: $font-heading;
+    font-size: $text-3xl;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+}
+
+// ─── Chart ───────────────────────────────────────────────────────────────
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  padding: $space-6;
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-md;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: $space-6;
+  }
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: $space-3;
+  height: 160px;
+  padding-bottom: $space-6;
+  border-bottom: 1px solid var(--border);
+
+  &__col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-2;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  &__bar {
+    width: 100%;
+    max-width: 40px;
+    border-radius: $radius-md $radius-md 0 0;
+    background: $gradient-primary;
+    transition: height 0.6s ease;
+    opacity: 0.85;
+    min-height: 4px;
+
+    &:hover { opacity: 1; }
+  }
+
+  &__label {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    margin-top: $space-2;
+  }
+}
+
+// ─── Table ───────────────────────────────────────────────────────────────
+.admin-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  overflow: auto;
+  @include custom-scrollbar;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: $space-4 $space-5;
+    text-align: left;
+    font-size: $text-xs;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $space-4 $space-5;
+    border-bottom: 1px solid var(--border);
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg-hover); }
+}
+
+.table-user {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  &__name {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    font-size: $text-sm;
+  }
+
+  &__email {
+    display: block;
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+  }
+}
+
+.table-role {
+  font-size: $text-xs;
+  color: var(--text-secondary);
+}
+
+.table-num {
+  font-weight: 700;
+  color: var(--text);
+  font-family: $font-heading;
+}
+
+.table-actions {
+  display: flex;
+  gap: $space-2;
+
+  &__danger { color: $error !important; }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  &.active  { background: rgba($success, 0.12); color: $success; }
+  &.pending { background: rgba($warning, 0.12); color: $warning; }
+}
+
+// ─── Review Cards ────────────────────────────────────────────────────────
+.project-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.review-card {
+  display: flex;
+  align-items: center;
+  gap: $space-5;
+  padding: $space-5;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  transition: border-color $transition-fast;
+
+  &:hover { border-color: rgba($violet, 0.2); }
+
+  @include mobile { flex-wrap: wrap; }
+
+  &__thumb {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: $radius-lg;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-md;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    @include truncate;
+  }
+
+  &__author {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    display: block;
+    margin-bottom: $space-2;
+  }
+
+  &__meta {
+    display: flex;
+    gap: $space-3;
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+}
+
+.report-reason {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $text-xs;
+  color: $warning;
+  background: rgba($warning, 0.08);
+  padding: 4px $space-3;
+  border-radius: $radius-pill;
+  font-weight: 600;
+}
+
+// ─── Config ──────────────────────────────────────────────────────────────
+.config-form { max-width: 560px; }
+
+.config-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  padding: $space-8;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-lg;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: $space-2;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $text-sm;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  input {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    color: var(--text);
+    font-size: $text-base;
+    font-family: $font-body;
+    padding: $space-3 $space-4;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+    outline: none;
+
+    &::placeholder { color: var(--text-tertiary); }
+    &:focus { border-color: $violet; box-shadow: 0 0 0 3px rgba($violet, 0.12); }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: $space-16;
+  color: var(--text-tertiary);
+  font-size: $text-lg;
+}

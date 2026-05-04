@@ -1,0 +1,90 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.not-found {
+  position: relative;
+  min-height: calc(100vh - #{$navbar-height});
+  margin-top: $navbar-height;
+  @include flex-center;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+  text-align: center;
+  padding: $space-8;
+
+  &__bg { position: absolute; inset: 0; pointer-events: none; }
+
+  &__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+
+    &--1 {
+      width: 400px; height: 400px;
+      background: $hot-pink; opacity: 0.07;
+      top: -80px; right: 10%;
+      animation: float 9s ease-in-out infinite;
+    }
+    &--2 {
+      width: 300px; height: 300px;
+      background: $violet; opacity: 0.08;
+      bottom: -60px; left: 10%;
+      animation: float 11s ease-in-out infinite reverse;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+  }
+
+  &__code {
+    font-family: $font-heading;
+    font-size: clamp(100px, 18vw, 180px);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    background: linear-gradient(135deg, $hot-pink, $violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: $space-4;
+    opacity: 0.9;
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-4xl;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    margin-bottom: $space-4;
+    @include mobile { font-size: $text-3xl; }
+  }
+
+  &__subtitle {
+    font-size: $text-lg;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .btn--primary {
+      background: $hot-pink;
+      box-shadow: 0 6px 24px rgba($hot-pink, 0.4);
+      &:hover { box-shadow: 0 10px 32px rgba($hot-pink, 0.55); transform: translateY(-2px); }
+    }
+    .btn--outline {
+      border-color: var(--border);
+      color: var(--text-secondary);
+      &:hover { border-color: var(--border-hover); background: var(--bg-hover); color: var(--text); }
+    }
+  }
+}

@@ -1,0 +1,98 @@
+// ─── Brand Colors ───────────────────────────────────────────────────────────
+$violet: #6754F8;
+$violet-light: #8B7CFA;
+$violet-dark: #5243C6;
+$purple: #8014C4;
+$purple-light: #9B3ED6;
+$pink: #F6A0AF;
+$hot-pink: #E91E8C;
+
+// ─── Dark Theme ─────────────────────────────────────────────────────────────
+$dark-bg: #0A0A0F;
+$dark-bg-card: #14141F;
+$dark-bg-elevated: #1A1A2A;
+$dark-bg-hover: #1F1F32;
+$dark-bg-input: #14141F;
+$dark-border: rgba(255, 255, 255, 0.08);
+$dark-border-hover: rgba(255, 255, 255, 0.15);
+$dark-text: #FFFFFF;
+$dark-text-secondary: rgba(255, 255, 255, 0.6);
+$dark-text-tertiary: rgba(255, 255, 255, 0.35);
+
+// ─── Light Theme ────────────────────────────────────────────────────────────
+$light-bg: #FAFAFE;
+$light-bg-card: #FFFFFF;
+$light-bg-elevated: #FFFFFF;
+$light-bg-hover: #F0F0F8;
+$light-bg-input: #F5F5FA;
+$light-border: rgba(0, 0, 0, 0.08);
+$light-border-hover: rgba(0, 0, 0, 0.15);
+$light-text: #0A0A0F;
+$light-text-secondary: rgba(10, 10, 15, 0.6);
+$light-text-tertiary: rgba(10, 10, 15, 0.35);
+
+// ─── Semantic ────────────────────────────────────────────────────────────────
+$success: #34d399;
+$error: #f87171;
+$warning: #fbbf24;
+
+// ─── Gradients ───────────────────────────────────────────────────────────────
+$gradient-primary:    linear-gradient(135deg, $violet, $purple);
+$gradient-brand:      linear-gradient(135deg, $hot-pink, $violet);
+$gradient-hero:       linear-gradient(135deg, $hot-pink 0%, $violet 55%, $purple 100%);
+$gradient-navbar:     linear-gradient(90deg, #0A0A0F 0%, #1a0820 40%, #0f0520 100%);
+$gradient-soft-dark:  linear-gradient(135deg, rgba($violet, 0.12), rgba($purple, 0.12));
+$gradient-soft-light: linear-gradient(135deg, rgba($violet, 0.08), rgba($purple, 0.08));
+$gradient-pink-glow:  linear-gradient(135deg, rgba($hot-pink, 0.15), rgba($violet, 0.1));
+
+// ─── Shadows ─────────────────────────────────────────────────────────────────
+$shadow-dark: 0 4px 24px rgba(0, 0, 0, 0.4);
+$shadow-dark-lg: 0 12px 48px rgba(0, 0, 0, 0.5);
+$shadow-glow: 0 8px 32px rgba($violet, 0.25);
+$shadow-light: 0 4px 24px rgba(0, 0, 0, 0.06);
+$shadow-light-lg: 0 12px 48px rgba(0, 0, 0, 0.1);
+
+// ─── Typography ──────────────────────────────────────────────────────────────
+$font-heading: 'Space Grotesk', sans-serif;
+$font-body: 'DM Sans', sans-serif;
+
+$text-xs: 12px;
+$text-sm: 13px;
+$text-base: 14px;
+$text-md: 15px;
+$text-lg: 16px;
+$text-xl: 18px;
+$text-2xl: 22px;
+$text-3xl: 28px;
+$text-4xl: 36px;
+$text-5xl: 44px;
+$text-hero: clamp(40px, 5vw, 72px);
+
+// ─── Spacing ─────────────────────────────────────────────────────────────────
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+$space-16: 64px;
+$space-20: 80px;
+
+// ─── Radii ───────────────────────────────────────────────────────────────────
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 20px;
+$radius-pill: 9999px;
+
+// ─── Transitions ─────────────────────────────────────────────────────────────
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s ease;
+$transition-slow: 0.35s ease;
+
+// ─── Navbar ──────────────────────────────────────────────────────────────────
+$navbar-height: 68px;

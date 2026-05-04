@@ -1,0 +1,77 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.footer {
+  background: var(--bg-footer);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: $space-12;
+
+  &__inner {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr;
+    gap: $space-12;
+    padding-bottom: $space-12;
+    @include mobile { grid-template-columns: 1fr; gap: $space-8; }
+  }
+
+  &__brand {}
+
+  &__logo {
+    font-family: $font-heading;
+    font-size: $text-2xl;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    display: inline-block;
+    margin-bottom: $space-3;
+    color: var(--text);
+    text-decoration: none;
+
+    span { color: var(--text); }
+  }
+
+  &__dot { color: $hot-pink !important; }
+
+  &__tagline {
+    font-size: $text-sm;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  &__links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-8;
+    @include mobile { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    h5 {
+      font-family: $font-heading;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: $space-1;
+    }
+
+    a {
+      font-size: $text-sm;
+      color: var(--text-on-surface);
+      text-decoration: none;
+      transition: color $transition-fast;
+      &:hover { color: #fff; }
+    }
+  }
+
+  &__bottom {
+    border-top: 1px solid var(--border-subtle);
+    padding: $space-5 0;
+    span { font-size: $text-xs; color: var(--text-tertiary); }
+  }
+}

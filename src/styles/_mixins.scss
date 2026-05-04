@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+// ─── Breakpoints ─────────────────────────────────────────────────────────────
+@mixin tablet { @media (max-width: 1024px) { @content; } }
+@mixin mobile { @media (max-width: 768px) { @content; } }
+@mixin small  { @media (max-width: 480px) { @content; } }
+
+// ─── Gradient Text ───────────────────────────────────────────────────────────
+@mixin gradient-text($gradient: $gradient-primary) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// ─── Hover Lift ──────────────────────────────────────────────────────────────
+@mixin hover-lift($y: -4px) {
+  transition: transform $transition-base, box-shadow $transition-base;
+  &:hover {
+    transform: translateY($y);
+    box-shadow: $shadow-glow;
+  }
+}
+
+// ─── Glass Card ──────────────────────────────────────────────────────────────
+@mixin glass($blur: 20px, $bg: rgba(20, 20, 31, 0.8)) {
+  background: $bg;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+// ─── Flex Center ─────────────────────────────────────────────────────────────
+@mixin flex-center { display: flex; align-items: center; justify-content: center; }
+@mixin flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+// ─── Truncate ────────────────────────────────────────────────────────────────
+@mixin truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+// ─── Scrollbar ───────────────────────────────────────────────────────────────
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba($violet, 0.4);
+    border-radius: $radius-pill;
+    &:hover { background: rgba($violet, 0.7); }
+  }
+}
+
+// ─── Theme vars helper ───────────────────────────────────────────────────────
+@mixin themed($prop, $dark-val, $light-val) {
+  [data-theme="dark"] & { #{$prop}: $dark-val; }
+  [data-theme="light"] & { #{$prop}: $light-val; }
+}

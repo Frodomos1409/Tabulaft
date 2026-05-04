@@ -1,0 +1,435 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.upload-page {
+  padding-top: calc(#{$navbar-height} + #{$space-8});
+  padding-bottom: $space-20;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+// ─── Centered wrapper ────────────────────────────────────────────────────
+.upload-center {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────
+.upload-header {
+  margin-bottom: $space-8;
+}
+
+.upload-back {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  color: var(--text-secondary);
+  font-size: $text-sm;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: $space-4;
+  transition: color $transition-fast;
+  &:hover { color: var(--text); }
+}
+
+.upload-title {
+  font-family: $font-heading;
+  font-size: $text-4xl;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+
+  @include mobile { font-size: $text-3xl; }
+}
+
+// ─── Progress Bar ────────────────────────────────────────────────────────
+.upload-progress {
+  display: flex;
+  gap: $space-3;
+  margin-bottom: $space-10;
+  max-width: 540px;
+}
+
+.upload-progress__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  .upload-progress__bar {
+    height: 4px;
+    background: var(--bg-card);
+    border-radius: $radius-pill;
+    transition: background $transition-slow;
+  }
+
+  .upload-progress__label {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color $transition-fast;
+  }
+
+  &.active .upload-progress__bar { background: $gradient-primary; }
+  &.current .upload-progress__label { color: $violet-light; }
+  &.active .upload-progress__label { color: var(--text-secondary); }
+}
+
+// ─── Step Wrapper ────────────────────────────────────────────────────────
+.upload-step {
+  max-width: 720px;
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-2xl;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: $space-2;
+  }
+
+  &__subtitle {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin-bottom: $space-8;
+    line-height: 1.5;
+  }
+}
+
+// ─── Drop Zone ───────────────────────────────────────────────────────────
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: $radius-xl;
+  padding: $space-12 $space-8;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-base;
+  background: var(--bg-card);
+  margin-bottom: $space-6;
+
+  &:hover, &.drag-over {
+    border-color: $violet;
+    background: rgba($violet, 0.04);
+  }
+
+  &.drag-over {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px rgba($violet, 0.1);
+  }
+
+  &.has-images {
+    padding: $space-5 $space-6;
+    border-style: solid;
+    border-color: var(--border);
+  }
+
+  &__empty {}
+
+  &__icon {
+    @include flex-center;
+    width: 72px;
+    height: 72px;
+    background: rgba($violet, 0.08);
+    border-radius: $radius-xl;
+    margin: 0 auto $space-4;
+    color: $violet-light;
+    transition: all $transition-base;
+
+    .dropzone:hover & { background: rgba($violet, 0.14); transform: scale(1.05); }
+  }
+
+  &__text {
+    font-size: $text-md;
+    color: var(--text-secondary);
+    margin-bottom: $space-2;
+
+    span {
+      color: $violet-light;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  }
+
+  &__hint {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+  }
+
+  &__add-more {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    color: $violet-light;
+    font-size: $text-sm;
+    font-weight: 600;
+  }
+}
+
+// ─── Thumbnails ──────────────────────────────────────────────────────────
+.thumbs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-3;
+  margin-bottom: $space-3;
+
+  @include mobile { grid-template-columns: repeat(3, 1fr); }
+  @include small  { grid-template-columns: repeat(2, 1fr); }
+}
+
+.thumb {
+  position: relative;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all $transition-fast;
+  aspect-ratio: 1;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &:hover { border-color: rgba($violet, 0.4); }
+
+  &.is-cover {
+    border-color: $violet;
+    box-shadow: 0 0 0 3px rgba($violet, 0.2);
+  }
+
+  &__badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: $gradient-primary;
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: $radius-pill;
+    letter-spacing: 0.05em;
+  }
+
+  &__remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    @include flex-center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity $transition-fast;
+    border: none;
+
+    .thumb:hover & { opacity: 1; }
+
+    &:hover { background: rgba(248, 113, 113, 0.9); }
+  }
+}
+
+.thumbs-hint {
+  font-size: $text-xs;
+  color: var(--text-tertiary);
+  margin-bottom: $space-4;
+}
+
+// ─── Form ────────────────────────────────────────────────────────────────
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  position: relative;
+
+  label {
+    font-size: $text-sm;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .required { color: $hot-pink; }
+
+  input, textarea, select {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    color: var(--text);
+    font-size: $text-base;
+    font-family: $font-body;
+    padding: $space-3 $space-4;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+    outline: none;
+    resize: vertical;
+
+    &::placeholder { color: var(--text-tertiary); }
+
+    &:focus {
+      border-color: $violet;
+      box-shadow: 0 0 0 3px rgba($violet, 0.12);
+    }
+  }
+
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+  &__count {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    text-align: right;
+    margin-top: -$space-1;
+  }
+
+  &__hint {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+  }
+}
+
+// ─── Tags Input ──────────────────────────────────────────────────────────
+.tags-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-3;
+  transition: border-color $transition-fast;
+  cursor: text;
+
+  &:focus-within {
+    border-color: $violet;
+    box-shadow: 0 0 0 3px rgba($violet, 0.12);
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    align-items: center;
+  }
+
+  input {
+    border: none !important;
+    background: transparent !important;
+    padding: $space-1 $space-2 !important;
+    min-width: 140px;
+    flex: 1;
+    box-shadow: none !important;
+    outline: none;
+    font-size: $text-sm;
+    color: var(--text);
+
+    &::placeholder { color: var(--text-tertiary); }
+  }
+}
+
+.tags-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: 4px $space-3 4px $space-3;
+  background: rgba($violet, 0.12);
+  color: $violet-light;
+  border-radius: $radius-pill;
+  font-size: $text-xs;
+  font-weight: 600;
+  border: 1px solid rgba($violet, 0.25);
+
+  button {
+    @include flex-center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba($violet, 0.3);
+    color: $violet-light;
+    cursor: pointer;
+    transition: background $transition-fast;
+    border: none;
+    padding: 0;
+
+    &:hover { background: rgba($hot-pink, 0.6); color: white; }
+  }
+}
+
+// ─── Preview ─────────────────────────────────────────────────────────────
+.preview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  max-width: 480px;
+  margin-bottom: $space-8;
+
+  &__cover {
+    img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__body { padding: $space-6; }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: $text-2xl;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: $space-3;
+  }
+
+  &__desc {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: $space-4;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    margin-bottom: $space-4;
+  }
+
+  &__meta {
+    display: flex;
+    gap: $space-2;
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+  }
+}
+
+.publish-btn {
+  margin-bottom: $space-4;
+}
+
+// ─── Navigation ──────────────────────────────────────────────────────────
+.upload-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $space-10;
+  padding-top: $space-6;
+  border-top: 1px solid var(--border);
+  max-width: 720px;
+
+  .btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

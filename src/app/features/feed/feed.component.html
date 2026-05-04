@@ -1,0 +1,45 @@
+<app-navbar />
+
+<main class="feed-page">
+  <div class="container">
+
+    <div class="feed-page__header">
+      <h1 class="feed-page__title">Explorar <span class="gradient-text">proyectos</span></h1>
+      <p class="feed-page__subtitle">{{ projects().length }} proyectos encontrados</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="feed-page__filters">
+      <div class="feed-page__categories">
+        @for (cat of allCategories; track cat) {
+          <button class="tag" [class.active]="activeCategory() === cat" (click)="setCategory(cat)">
+            {{ cat }}
+          </button>
+        }
+      </div>
+      <div class="feed-page__sort">
+        <button class="sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">🔥 Tendencia</button>
+        <button class="sort-btn" [class.active]="sortBy() === 'recent'"   (click)="setSort('recent')">🕐 Recientes</button>
+        <button class="sort-btn" [class.active]="sortBy() === 'popular'"  (click)="setSort('popular')">⭐ Popular</button>
+      </div>
+    </div>
+
+    <!-- Skeleton while loading -->
+    @if (loading()) {
+      <div class="masonry-grid">
+        @for (item of skeletonItems; track $index) {
+          <app-project-card-skeleton />
+        }
+      </div>
+    } @else {
+      <div class="masonry-grid">
+        @for (project of projects(); track project.id) {
+          <app-project-card [project]="project" />
+        }
+      </div>
+    }
+
+  </div>
+</main>
+
+<app-footer />

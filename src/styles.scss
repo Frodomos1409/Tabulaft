@@ -1,0 +1,188 @@
+@use 'styles/variables' as *;
+@use 'styles/reset';
+@use 'styles/animations';
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+// ─── CSS Custom Properties (theme-aware) ─────────────────────────────────────
+// Default to dark (SSR-safe fallback)
+:root {
+  --bg: #{$dark-bg};
+  --bg-card: #{$dark-bg-card};
+  --bg-elevated: #{$dark-bg-elevated};
+  --bg-hover: #{$dark-bg-hover};
+  --bg-input: #{$dark-bg-input};
+  --border: #{$dark-border};
+  --border-hover: #{$dark-border-hover};
+  --text: #{$dark-text};
+  --text-secondary: #{$dark-text-secondary};
+  --text-tertiary: #{$dark-text-tertiary};
+  --shadow: #{$shadow-dark};
+  --shadow-lg: #{$shadow-dark-lg};
+
+  // Extended: surfaces used in panels & nav
+  --bg-nav: #{$dark-bg};
+  --bg-panel: #{$dark-bg-card};
+  --bg-footer: #080810;
+  --text-on-surface: rgba(255, 255, 255, 0.65);
+  --text-dim: rgba(255, 255, 255, 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --hover-surface: rgba(255, 255, 255, 0.04);
+  --hover-surface-md: rgba(255, 255, 255, 0.07);
+  --text-inverse: #{$dark-text};
+}
+
+[data-theme="dark"] {
+  --bg: #{$dark-bg};
+  --bg-card: #{$dark-bg-card};
+  --bg-elevated: #{$dark-bg-elevated};
+  --bg-hover: #{$dark-bg-hover};
+  --bg-input: #{$dark-bg-input};
+  --border: #{$dark-border};
+  --border-hover: #{$dark-border-hover};
+  --text: #{$dark-text};
+  --text-secondary: #{$dark-text-secondary};
+  --text-tertiary: #{$dark-text-tertiary};
+  --shadow: #{$shadow-dark};
+  --shadow-lg: #{$shadow-dark-lg};
+
+  --bg-nav: #{$dark-bg};
+  --bg-panel: #{$dark-bg-card};
+  --bg-footer: #080810;
+  --text-on-surface: rgba(255, 255, 255, 0.65);
+  --text-dim: rgba(255, 255, 255, 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --hover-surface: rgba(255, 255, 255, 0.04);
+  --hover-surface-md: rgba(255, 255, 255, 0.07);
+  --text-inverse: #{$dark-text};
+}
+
+[data-theme="light"] {
+  --bg: #{$light-bg};
+  --bg-card: #{$light-bg-card};
+  --bg-elevated: #{$light-bg-elevated};
+  --bg-hover: #{$light-bg-hover};
+  --bg-input: #{$light-bg-input};
+  --border: #{$light-border};
+  --border-hover: #{$light-border-hover};
+  --text: #{$light-text};
+  --text-secondary: #{$light-text-secondary};
+  --text-tertiary: #{$light-text-tertiary};
+  --shadow: #{$shadow-light};
+  --shadow-lg: #{$shadow-light-lg};
+
+  --bg-nav: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-footer: #f0f0f5;
+  --text-on-surface: rgba(10, 10, 15, 0.65);
+  --text-dim: rgba(10, 10, 15, 0.35);
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.12);
+  --hover-surface: rgba(0, 0, 0, 0.03);
+  --hover-surface-md: rgba(0, 0, 0, 0.06);
+  --text-inverse: #ffffff;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+// ─── Global Utility Classes ──────────────────────────────────────────────────
+.gradient-text {
+  background: $gradient-primary;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $space-6;
+
+  @media (max-width: 768px) { padding: 0 $space-4; }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-5;
+  border-radius: $radius-lg;
+  font-family: $font-body;
+  font-size: $text-base;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+
+  &--primary {
+    background: $gradient-primary;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba($violet, 0.35);
+    &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba($violet, 0.45); }
+    &:active { transform: translateY(0); }
+  }
+
+  &--outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    &:hover { border-color: var(--border-hover); background: var(--bg-hover); }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    &:hover { color: var(--text); background: var(--bg-hover); }
+  }
+
+  &--sm { padding: $space-2 $space-4; font-size: $text-sm; border-radius: $radius-md; }
+  &--lg { padding: $space-4 $space-8; font-size: $text-lg; border-radius: $radius-xl; }
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px $space-3;
+  border-radius: $radius-pill;
+  font-size: $text-sm;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover, &.active {
+    background: rgba($violet, 0.15);
+    color: $violet-light;
+    border-color: rgba($violet, 0.35);
+  }
+}
+
+// ─── View Transitions (Route Animations) ────────────────────────────────
+@keyframes view-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes view-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+
+::view-transition-old(root) {
+  animation: 200ms ease view-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 300ms ease view-fade-in;
+}

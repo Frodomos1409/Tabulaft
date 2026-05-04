@@ -1,0 +1,203 @@
+<app-navbar />
+
+<main class="landing">
+
+  <!-- ─── Hero ─────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__bg">
+      <div class="hero__blob hero__blob--1"></div>
+      <div class="hero__blob hero__blob--2"></div>
+      <div class="hero__blob hero__blob--3"></div>
+    </div>
+
+    <div class="container hero__inner">
+      <div class="hero__content animate-fade-in">
+        <div class="hero__badge">
+          <span class="hero__badge-dot"></span>
+          Plataforma universitaria UNIVALLE
+        </div>
+
+        <h1 class="hero__title">
+          Descubre los<br>
+          <span class="gradient-text">mejores trabajos</span><br>
+          de diseño
+        </h1>
+
+        <p class="hero__subtitle">
+          Explora el talento de los estudiantes de Diseño Gráfico.<br>
+          Proyectos reales, creatividad sin límites.
+        </p>
+
+        <div class="hero__ctas">
+          <a routerLink="/explorar" class="btn btn--primary btn--lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Explorar proyectos
+          </a>
+          <a routerLink="/auth" class="btn btn--outline btn--lg">
+            Publicar mi trabajo
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="hero__stats">
+          @for (stat of stats; track stat.label) {
+            <div class="hero__stat">
+              <span class="hero__stat-value">{{ stat.value }}</span>
+              <span class="hero__stat-label">{{ stat.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Visual Grid -->
+      <div class="hero__visual animate-fade-in stagger-2">
+        <div class="hero__grid">
+          @for (img of heroImages; track img; let i = $index) {
+            <div class="hero__grid-item" [style.--i]="i">
+              <img [src]="img" alt="proyecto" />
+            </div>
+          }
+        </div>
+        <div class="hero__isotipo">
+          <svg viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 4 L108 40 L108 160 L60 196 L12 160 L12 40 Z" fill="url(#grad)" opacity="0.15"/>
+            <path d="M60 4 L108 40 L108 160 L60 196 L12 160 L12 40 Z" stroke="url(#grad)" stroke-width="1.5" fill="none"/>
+            <circle cx="60" cy="100" r="18" fill="url(#grad)" opacity="0.8"/>
+            <polygon points="60,40 70,60 50,60" fill="white" opacity="0.6"/>
+            <polygon points="60,160 70,140 50,140" fill="white" opacity="0.6"/>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#E91E8C"/>
+                <stop offset="50%" stop-color="#6754F8"/>
+                <stop offset="100%" stop-color="#8014C4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Featured Projects ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Proyectos <span class="gradient-text">destacados</span></h2>
+          <p class="section__subtitle">Los trabajos más vistos y valorados esta semana</p>
+        </div>
+        <a routerLink="/explorar" class="btn btn--outline btn--sm">Ver todos →</a>
+      </div>
+
+      <div class="masonry-grid">
+        @for (project of featuredProjects; track project.id) {
+          <app-project-card [project]="project" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Categories ───────────────────────────────────────────────── -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Explora por <span class="gradient-text">categoría</span></h2>
+          <p class="section__subtitle">Encuentra inspiración en tu disciplina favorita</p>
+        </div>
+      </div>
+
+      <div class="categories-grid">
+        @for (cat of categories; track cat.name; let i = $index) {
+          <a routerLink="/explorar" class="cat-card animate-fade-in" [class]="'stagger-' + (i + 1)">
+            <span class="cat-card__icon">{{ cat.icon }}</span>
+            <span class="cat-card__name">{{ cat.name }}</span>
+            <span class="cat-card__count">{{ cat.count }} proyectos</span>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Featured Creators ────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Creadores <span class="gradient-text">destacados</span></h2>
+          <p class="section__subtitle">Los diseñadores más activos de la comunidad</p>
+        </div>
+      </div>
+
+      <div class="creators-grid">
+        @for (user of featuredCreators; track user.id) {
+          <a [routerLink]="['/perfil', user.id]" class="creator-card">
+            <img class="creator-card__avatar" [src]="user.avatar" [alt]="user.name" />
+            <div class="creator-card__info">
+              <h4 class="creator-card__name">{{ user.name }}</h4>
+              <span class="creator-card__role">{{ user.role }}</span>
+              <div class="creator-card__stats">
+                <span><strong>{{ user.projectCount }}</strong> proyectos</span>
+                <span><strong>{{ user.followers }}</strong> seguidores</span>
+              </div>
+            </div>
+            <button class="btn btn--outline btn--sm creator-card__follow">Seguir</button>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA Final ─────────────────────────────────────────────────── -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-card__bg"></div>
+        <h2 class="cta-card__title">¿Listo para <span class="gradient-text">compartir</span> tu trabajo?</h2>
+        <p class="cta-card__subtitle">Únete a la comunidad de diseñadores de UNIVALLE y muestra tu talento al mundo.</p>
+        <a routerLink="/auth" class="btn btn--primary btn--lg">Crear mi cuenta gratis</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ───────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="footer__logo">TABU<span class="gradient-text">LAFT</span><span style="color:#E91E8C">.</span></span>
+        <p class="footer__tagline">Plataforma de exposición de proyectos de diseño gráfico · UNIVALLE</p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h5>Explorar</h5>
+          <a routerLink="/explorar">Proyectos</a>
+          <a routerLink="/explorar">Categorías</a>
+          <a routerLink="/explorar">Destacados</a>
+        </div>
+        <div class="footer__col">
+          <h5>Comunidad</h5>
+          <a routerLink="/">Diseñadores</a>
+          <a routerLink="/">Colecciones</a>
+          <a routerLink="/">Tendencias</a>
+        </div>
+        <div class="footer__col">
+          <h5>Plataforma</h5>
+          <a routerLink="/auth">Iniciar sesión</a>
+          <a routerLink="/auth">Registrarse</a>
+          <a routerLink="/publicar">Publicar</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="container">
+        <span>© 2024 Tabulaft · Universidad del Valle</span>
+      </div>
+    </div>
+  </footer>
+
+</main>

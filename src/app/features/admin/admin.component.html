@@ -18,7 +18,6 @@
     <nav class="admin-sidebar__nav">
       @for (item of navItems; track item.id) {
         <button class="admin-nav-item" [class.active]="activeSection() === item.id" (click)="setSection(item.id)">
-          <!-- Icons inline -->
           @if (item.icon === 'home') {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           }
@@ -30,6 +29,9 @@
           }
           @if (item.icon === 'flag') {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          }
+          @if (item.icon === 'book') {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           }
           @if (item.icon === 'settings') {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -47,16 +49,13 @@
     </div>
   </aside>
 
-  <!-- ─── Main Content ──────────────────────────────────────────────── -->
+  <!-- ─── Main ─────────────────────────────────────────────────────── -->
   <main class="admin-main">
 
-    <!-- Top Bar -->
     <header class="admin-topbar">
-      <h1 class="admin-topbar__title">
-        {{ navItems.find(n => n.id === activeSection())?.label }}
-      </h1>
+      <h1 class="admin-topbar__title">{{ navItems.find(n => n.id === activeSection())?.label }}</h1>
       <div class="admin-topbar__actions">
-        <span class="admin-topbar__user">Admin · Camila Vargas</span>
+        <span class="admin-topbar__user">Admin · {{ auth.currentUser()?.name }}</span>
       </div>
     </header>
 
@@ -65,23 +64,16 @@
       <!-- ─── Dashboard ──────────────────────────────────────────── -->
       @if (activeSection() === 'dashboard') {
         <div class="dashboard">
-
-          <!-- Stats Cards -->
           <div class="stats-grid">
-            @for (stat of stats; track stat.label) {
+            @for (stat of stats(); track stat.label) {
               <div class="stat-card">
                 <div class="stat-card__top">
                   <span class="stat-card__label">{{ stat.label }}</span>
-                  <span class="stat-card__change" [class.up]="stat.up" [class.down]="!stat.up">
-                    {{ stat.up ? '↑' : '↓' }} {{ stat.change }}
-                  </span>
                 </div>
                 <div class="stat-card__value">{{ stat.value }}</div>
               </div>
             }
           </div>
-
-          <!-- Chart -->
           <div class="chart-card">
             <h3 class="chart-card__title">Actividad semanal</h3>
             <div class="chart">
@@ -100,38 +92,29 @@
       @if (activeSection() === 'usuarios') {
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Proyectos</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody>
-              @for (user of users; track user.id; let i = $index) {
+              @for (user of users(); track user.id) {
                 <tr>
                   <td>
                     <div class="table-user">
-                      <img [src]="user.avatar" [alt]="user.name" class="table-user__avatar" />
-                      <div>
-                        <span class="table-user__name">{{ user.name }}</span>
-                        <span class="table-user__email">{{ user.email }}</span>
-                      </div>
+                      <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name" [alt]="user.name" class="table-user__avatar" />
+                      <span class="table-user__name">{{ user.name }}</span>
                     </div>
                   </td>
                   <td><span class="table-role">{{ user.role }}</span></td>
                   <td>
-                    <span class="status-badge" [class.active]="getStatusLabel(i) === 'Active'" [class.pending]="getStatusLabel(i) === 'Pending'">
-                      {{ getStatusLabel(i) }}
+                    <span class="status-badge" [class.active]="!user.banned" [class.pending]="user.banned">
+                      {{ user.banned ? 'Suspendido' : 'Activo' }}
                     </span>
                   </td>
-                  <td class="table-num">{{ user.projectCount }}</td>
                   <td>
                     <div class="table-actions">
-                      <button class="btn btn--ghost btn--sm">Editar</button>
-                      <button class="btn btn--ghost btn--sm table-actions__danger">Suspender</button>
+                      @if (user.banned) {
+                        <button class="btn btn--ghost btn--sm" (click)="unbanUser(user.id)">Reactivar</button>
+                      } @else {
+                        <button class="btn btn--ghost btn--sm table-actions__danger" (click)="banUser(user.id)">Suspender</button>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -144,21 +127,27 @@
       <!-- ─── Proyectos ──────────────────────────────────────────── -->
       @if (activeSection() === 'proyectos') {
         <div class="project-review-list">
-          @for (project of projects; track project.id) {
+          @for (project of projects(); track project.id) {
             <div class="review-card">
-              <img [src]="project.coverImage" [alt]="project.title" class="review-card__thumb" />
+              <img [src]="project.cover_image" [alt]="project.title" class="review-card__thumb" />
               <div class="review-card__info">
                 <h4 class="review-card__title">{{ project.title }}</h4>
-                <span class="review-card__author">{{ project.author.name }} · {{ project.category }}</span>
+                <span class="review-card__author">{{ project.author?.name }} · {{ project.category }}</span>
                 <div class="review-card__meta">
-                  <span>{{ project.likes }} likes</span>
-                  <span>·</span>
-                  <span>{{ project.views }} vistas</span>
+                  <span class="status-badge" [class.active]="project.status === 'active'">{{ getStatusLabel(project.status) }}</span>
+                  @if (project.semester) { <span class="tag">Sem. {{ project.semester }}</span> }
+                  @if (project.subject)  { <span class="tag">{{ project.subject }}</span> }
+                  @if (project.featured) { <span class="tag" style="color:#f59e0b">⭐ Destacado</span> }
                 </div>
               </div>
               <div class="review-card__actions">
                 <button class="btn btn--primary btn--sm" (click)="approveProject(project.id)">✓ Aprobar</button>
                 <button class="btn btn--outline btn--sm" (click)="rejectProject(project.id)">✗ Rechazar</button>
+                <button class="btn btn--ghost btn--sm" (click)="featureProject(project.id, project.featured)" [title]="project.featured ? 'Quitar destacado' : 'Destacar'">
+                  {{ project.featured ? '☆' : '⭐' }}
+                </button>
+                <button class="btn btn--ghost btn--sm" (click)="openEditProject(project)" title="Editar sem/materia">✏️</button>
+                <button class="btn btn--ghost btn--sm table-actions__danger" (click)="deleteProject(project.id)">Eliminar</button>
               </div>
             </div>
           }
@@ -168,53 +157,241 @@
       <!-- ─── Reportes ───────────────────────────────────────────── -->
       @if (activeSection() === 'reportes') {
         <div class="project-review-list">
-          @if (reports.length === 0) {
-            <div class="empty-state">
-              <p>No hay reportes pendientes 🎉</p>
-            </div>
+          @if (reports().length === 0) {
+            <div class="empty-state"><p>No hay reportes pendientes 🎉</p></div>
           }
-          @for (report of reports; track report.project.id; let i = $index) {
+          @for (report of reports(); track report.id) {
             <div class="review-card">
-              <img [src]="report.project.coverImage" [alt]="report.project.title" class="review-card__thumb" />
+              <img [src]="report.project?.cover_image" [alt]="report.project?.title" class="review-card__thumb" />
               <div class="review-card__info">
-                <h4 class="review-card__title">{{ report.project.title }}</h4>
-                <span class="review-card__author">{{ report.project.author.name }}</span>
+                <h4 class="review-card__title">{{ report.project?.title }}</h4>
+                <span class="review-card__author">Reportado por: {{ report.reporter?.name }}</span>
                 <div class="report-reason">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   {{ report.reason }}
                 </div>
               </div>
               <div class="review-card__actions">
-                <button class="btn btn--outline btn--sm">Revisar</button>
-                <button class="btn btn--ghost btn--sm" (click)="dismissReport(i)">Descartar</button>
+                <button class="btn btn--outline btn--sm" (click)="resolveReport(report.id)">Resolver</button>
               </div>
             </div>
           }
         </div>
       }
 
+      <!-- ─── Académico ──────────────────────────────────────────── -->
+      @if (activeSection() === 'academico') {
+        <div class="academic-admin">
+
+          <!-- Semestres -->
+          <div class="academic-section">
+            <div class="academic-section__header">
+              <h2 class="academic-section__title">Semestres</h2>
+              <span class="academic-section__count">{{ semesters().length }} configurados</span>
+            </div>
+
+            <!-- Tabla de semestres -->
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Clave</th><th>Etiqueta</th><th>Orden</th><th>Activo</th><th>Acciones</th></tr></thead>
+                <tbody>
+                  @for (sem of semesters(); track sem.id) {
+                    <tr [class.row-inactive]="!sem.active">
+                      <td style="opacity:.4;font-size:.8rem">{{ sem.id }}</td>
+                      @if (editSem()?.id === sem.id) {
+                        <td><input class="admin-inline-input" [(ngModel)]="editSem()!.name" /></td>
+                        <td><input class="admin-inline-input" [(ngModel)]="editSem()!.label" /></td>
+                        <td><input class="admin-inline-input" type="number" [(ngModel)]="editSem()!.sort_order" style="width:60px" /></td>
+                        <td>
+                          <input type="checkbox" [(ngModel)]="editSem()!.active" />
+                        </td>
+                        <td>
+                          <div class="table-actions">
+                            <button class="btn btn--primary btn--sm" (click)="saveSemester()">Guardar</button>
+                            <button class="btn btn--ghost btn--sm" (click)="cancelEditSem()">Cancelar</button>
+                          </div>
+                        </td>
+                      } @else {
+                        <td><code>{{ sem.name }}</code></td>
+                        <td>{{ sem.label }}</td>
+                        <td style="text-align:center">{{ sem.sort_order }}</td>
+                        <td>
+                          <button class="toggle-btn" [class.on]="sem.active" (click)="toggleSemesterActive(sem)">
+                            {{ sem.active ? 'Activo' : 'Inactivo' }}
+                          </button>
+                        </td>
+                        <td>
+                          <div class="table-actions">
+                            <button class="btn btn--ghost btn--sm" (click)="startEditSem(sem)">Editar</button>
+                            <button class="btn btn--ghost btn--sm table-actions__danger" (click)="deleteSemester(sem.id)">Eliminar</button>
+                          </div>
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Agregar semestre -->
+            <div class="academic-add-form">
+              <h4 class="academic-add-form__title">Agregar semestre</h4>
+              <div class="academic-add-row">
+                <input class="form-input" [(ngModel)]="newSemName" placeholder="Clave (ej. XI)" />
+                <input class="form-input" [(ngModel)]="newSemLabel" placeholder="Etiqueta (ej. Semestre XI)" />
+                <input class="form-input" type="number" [(ngModel)]="newSemOrder" placeholder="Orden" style="width:80px" />
+                <button class="btn btn--primary btn--sm" (click)="addSemester()" [disabled]="!newSemName.trim() || !newSemLabel.trim()">
+                  + Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Materias -->
+          <div class="academic-section">
+            <div class="academic-section__header">
+              <h2 class="academic-section__title">Materias</h2>
+              <span class="academic-section__count">{{ subjects().length }} configuradas</span>
+            </div>
+
+            <!-- Agrupadas por categoría -->
+            @for (cat of categories; track cat) {
+              <div class="subject-group">
+                <h4 class="subject-group__title">{{ cat }}</h4>
+                <div class="subject-list">
+                  @for (sub of (subjectsByCategory()[cat] || []); track sub.id) {
+                    <div class="subject-row" [class.row-inactive]="!sub.active">
+                      @if (editSub()?.id === sub.id) {
+                        <input class="admin-inline-input" [(ngModel)]="editSub()!.name" style="flex:1" />
+                        <input class="admin-inline-input" type="number" [(ngModel)]="editSub()!.sort_order" style="width:60px" />
+                        <input type="checkbox" [(ngModel)]="editSub()!.active" title="Activo" />
+                        <button class="btn btn--primary btn--sm" (click)="saveSubject()">✓</button>
+                        <button class="btn btn--ghost btn--sm" (click)="cancelEditSub()">✕</button>
+                      } @else {
+                        <span class="subject-name" [class.inactive]="!sub.active">{{ sub.name }}</span>
+                        <span class="subject-order">{{ sub.sort_order }}</span>
+                        <button class="toggle-btn" [class.on]="sub.active" (click)="toggleSubjectActive(sub)">
+                          {{ sub.active ? 'Activo' : 'Inactivo' }}
+                        </button>
+                        <button class="btn btn--ghost btn--sm" (click)="startEditSub(sub)">Editar</button>
+                        <button class="btn btn--ghost btn--sm table-actions__danger" (click)="deleteSubject(sub.id)">✕</button>
+                      }
+                    </div>
+                  }
+                  @if (!(subjectsByCategory()[cat]?.length)) {
+                    <p class="subject-empty">Sin materias configuradas</p>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Agregar materia -->
+            <div class="academic-add-form">
+              <h4 class="academic-add-form__title">Agregar materia</h4>
+              <div class="academic-add-row">
+                <select class="form-input" [(ngModel)]="newSubCat">
+                  <option value="">Selecciona categoría</option>
+                  @for (cat of categories; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+                <input class="form-input" [(ngModel)]="newSubName" placeholder="Nombre de la materia" />
+                <input class="form-input" type="number" [(ngModel)]="newSubOrder" placeholder="Orden" style="width:80px" />
+                <button class="btn btn--primary btn--sm" (click)="addSubject()" [disabled]="!newSubCat || !newSubName.trim()">
+                  + Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+
       <!-- ─── Configuración ──────────────────────────────────────── -->
       @if (activeSection() === 'configuracion') {
-        <div class="config-form">
-          <div class="config-section">
-            <h3 class="config-section__title">Información de la plataforma</h3>
-            <div class="form-group">
-              <label>Nombre de la plataforma</label>
-              <input type="text" [value]="platformName()" (input)="platformName.set($any($event.target).value)" />
+        @if (config()) {
+          <div class="config-form">
+            <div class="config-section">
+              <h3 class="config-section__title">Información de la plataforma</h3>
+              <div class="form-group">
+                <label>Nombre de la plataforma</label>
+                <input type="text" [value]="config()!.platform_name"
+                  (input)="config.update(c => c ? {...c, platform_name: $any($event.target).value} : c)" />
+              </div>
+              <div class="form-group">
+                <label>URL</label>
+                <input type="text" [value]="config()!.platform_url"
+                  (input)="config.update(c => c ? {...c, platform_url: $any($event.target).value} : c)" />
+              </div>
+              <div class="form-group">
+                <label>Email de soporte</label>
+                <input type="email" [value]="config()!.support_email"
+                  (input)="config.update(c => c ? {...c, support_email: $any($event.target).value} : c)" />
+              </div>
+              <div class="form-group">
+                <label>Permitir nuevos registros</label>
+                <input type="checkbox" [checked]="config()!.allow_register"
+                  (change)="config.update(c => c ? {...c, allow_register: $any($event.target).checked} : c)" />
+              </div>
+              <div class="form-group">
+                <label>Máximo de imágenes por proyecto</label>
+                <input type="number" [value]="config()!.max_images"
+                  (input)="config.update(c => c ? {...c, max_images: +$any($event.target).value} : c)" />
+              </div>
+              <button class="btn btn--primary" (click)="saveConfig()">Guardar cambios</button>
             </div>
-            <div class="form-group">
-              <label>URL</label>
-              <input type="text" [value]="platformUrl()" (input)="platformUrl.set($any($event.target).value)" />
-            </div>
-            <div class="form-group">
-              <label>Email de soporte</label>
-              <input type="email" [value]="supportEmail()" (input)="supportEmail.set($any($event.target).value)" />
-            </div>
-            <button class="btn btn--primary" (click)="saveConfig()">Guardar cambios</button>
           </div>
-        </div>
+        }
       }
 
     </div>
   </main>
 </div>
+
+<!-- ─── Modal editar semestre/materia de proyecto ──────────────────────────── -->
+@if (editingProject()) {
+  <div class="modal-backdrop" (click)="closeEditProject()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width:480px">
+      <div class="modal__header">
+        <h3 class="modal__title">Clasificación académica</h3>
+        <button class="modal__close" (click)="closeEditProject()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p style="font-size:.85rem;opacity:.6;margin-bottom:.5rem">
+          <strong>{{ editingProject()!.title }}</strong> · {{ editingProject()!.category }}
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Semestre</label>
+          <select class="form-input" [(ngModel)]="editingProject()!.semester">
+            <option [ngValue]="null">Sin especificar</option>
+            @for (sem of projectSemesters(); track sem) {
+              <option [value]="sem">Semestre {{ sem }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem">
+          <label class="form-label">Materia</label>
+          <select class="form-input" [(ngModel)]="editingProject()!.subject">
+            <option [ngValue]="null">Sin especificar</option>
+            @for (sub of projectSubjects(); track sub) {
+              <option [value]="sub">{{ sub }}</option>
+            }
+          </select>
+          @if (projectSubjects().length === 0) {
+            <span style="font-size:.8rem;opacity:.5">Primero configura materias para esta categoría en la sección Académico</span>
+          }
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--outline" (click)="closeEditProject()">Cancelar</button>
+        <button class="btn btn--primary" (click)="saveProjectAcademic()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}

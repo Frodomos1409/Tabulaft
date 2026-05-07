@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CATEGORIES, Category } from '../../core/models/models';
 import { ProjectService } from '../../core/services/project.service';
-import { AcademicService, AcademicSubject } from '../../core/services/academic.service';
+import { AcademicService, AcademicSemester, AcademicSubject } from '../../core/services/academic.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 
@@ -57,7 +57,7 @@ export class UploadComponent implements OnInit {
       this.router.navigate(['/auth']);
       return;
     }
-    const [sems, subs] = await Promise.all([
+    const [sems, subs]: [AcademicSemester[], AcademicSubject[]] = await Promise.all([
       this.academicService.getSemesters(true),
       this.academicService.getSubjects(true),
     ]);

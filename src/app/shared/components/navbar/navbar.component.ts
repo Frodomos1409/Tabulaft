@@ -1,7 +1,9 @@
-import { Component, inject, signal, HostListener, ElementRef } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal, computed, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { SearchModalComponent } from '../search-modal/search-modal.component';
 
 @Component({
@@ -11,19 +13,32 @@ import { SearchModalComponent } from '../search-modal/search-modal.component';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   theme = inject(ThemeService);
+  auth = inject(AuthService);
+  notifService = inject(NotificationService);
+  private router = inject(Router);
   private el = inject(ElementRef);
 
-  scrolled      = signal(false);
+  scrolled = signal(false);
   mobileMenuOpen = signal(false);
-  notifOpen     = signal(false);
-  searchOpen    = signal(false);
+  notifOpen = signal(false);
+  searchOpen = signal(false);
+
+  notifications = this.notifService.notifications;
+  unreadCount = this.notifService.unreadCount;
+
+  ngOnInit() {
+    const user = this.auth.currentUser();
+    if (user) {
+      this.notifService.loadNotifications(user.id);
+      this.notifService.subscribeToRealtime(user.id);
+    }
+  }
 
   @HostListener('window:scroll')
   onScroll() { this.scrolled.set(window.scrollY > 20); }
 
-  // Close notif panel when clicking outside the navbar
   @HostListener('document:click', ['$event'])
   onDocClick(e: MouseEvent) {
     if (this.notifOpen() && !this.el.nativeElement.contains(e.target)) {
@@ -44,23 +59,22 @@ export class NavbarComponent {
 
   toggleMobile() { this.mobileMenuOpen.update(v => !v); this.notifOpen.set(false); }
   toggleNotif(e: Event) {
-    e.stopPropagation(); // prevent document:click from immediately closing
+    e.stopPropagation();
     this.notifOpen.update(v => !v);
     this.mobileMenuOpen.set(false);
   }
-  openSearch()  { this.searchOpen.set(true); }
+  openSearch() { this.searchOpen.set(true); }
   closeSearch() { this.searchOpen.set(false); }
 
-  notifications = signal([
-    { text: 'Valentina Ríos le dio like a tu proyecto', time: '2m',  read: false },
-    { text: 'Sebastián Mora comenzó a seguirte',        time: '15m', read: false },
-    { text: 'Tu proyecto fue destacado esta semana',    time: '1h',  read: true  },
-    { text: 'Camila Vargas comentó en tu proyecto',     time: '3h',  read: true  },
-  ]);
-
-  get unreadCount() { return this.notifications().filter(n => !n.read).length; }
-
   markAllRead() {
-    this.notifications.update(ns => ns.map(n => ({ ...n, read: true })));
+    const user = this.auth.currentUser();
+    if (user) this.notifService.markAllAsRead(user.id);
+  }
+
+  markRead(id: string) { this.notifService.markAsRead(id); }
+
+  async logout() {
+    await this.auth.signOut();
+    this.router.navigate(['/']);
   }
 }

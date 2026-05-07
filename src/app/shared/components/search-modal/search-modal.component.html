@@ -45,7 +45,7 @@
         </div>
         @for (project of results(); track project.id) {
           <a class="search-result" [routerLink]="['/proyecto', project.id]" (click)="onResultClick()">
-            <img class="search-result__thumb" [src]="project.coverImage" [alt]="project.title" />
+            <img class="search-result__thumb" [src]="project.cover_image" [alt]="project.title" />
             <div class="search-result__info">
               <span class="search-result__title">{{ project.title }}</span>
               <span class="search-result__meta">{{ project.author.name }} · {{ project.category }}</span>

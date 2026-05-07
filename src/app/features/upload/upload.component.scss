@@ -433,3 +433,12 @@
     pointer-events: none;
   }
 }
+
+// ─── Form row (semestre + materia lado a lado) ────────────────────────────────
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+
+  @include mobile { grid-template-columns: 1fr; }
+}

@@ -1,11 +1,13 @@
 import {
-  Component, signal, computed, Output, EventEmitter,
+  Component, signal, Output, EventEmitter,
   HostListener, ElementRef, ViewChild, OnInit, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
-import { MOCK_PROJECTS, CATEGORIES, Project } from '../../../core/models/models';
+import { CATEGORIES } from '../../../core/models/models';
+import { ProjectRow, ProjectService } from '../../../core/services/project.service';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-search-modal',
@@ -18,49 +20,50 @@ export class SearchModalComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
-  query         = signal('');
-  activeFilter  = signal<string>('Todos');
-  isSearching   = signal(false);
+  private projectService = inject(ProjectService);
+
+  query        = signal('');
+  activeFilter = signal<string>('Todos');
+  isSearching  = signal(false);
+  results      = signal<ProjectRow[]>([]);
 
   categories = ['Todos', ...CATEGORIES];
 
   private querySubject = new Subject<string>();
   private destroy$     = new Subject<void>();
 
-  results = computed<Project[]>(() => {
-    const q   = this.query().toLowerCase().trim();
-    const cat = this.activeFilter();
-    let list  = [...MOCK_PROJECTS];
-
-    if (cat !== 'Todos') list = list.filter(p => p.category === cat);
-
-    if (q.length < 1) return list.slice(0, 6);
-
-    return list.filter(p =>
-      p.title.toLowerCase().includes(q)       ||
-      p.description.toLowerCase().includes(q) ||
-      p.tags.some(t => t.toLowerCase().includes(q)) ||
-      p.author.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q)
-    ).slice(0, 8);
-  });
-
   ngOnInit() {
     setTimeout(() => this.searchInput?.nativeElement.focus(), 60);
 
     this.querySubject.pipe(
-      debounceTime(200),
+      debounceTime(250),
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(val => {
       this.query.set(val);
-      this.isSearching.set(false);
+      this.search(val, this.activeFilter());
     });
+
+    this.search('', 'Todos');
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private async search(q: string, cat: string) {
+    this.isSearching.set(true);
+    try {
+      const data = await this.projectService.getProjects({
+        search: q || undefined,
+        category: cat !== 'Todos' ? cat : undefined,
+        sort: 'recent',
+      });
+      this.results.set(data.slice(0, 8));
+    } finally {
+      this.isSearching.set(false);
+    }
   }
 
   onInput(e: Event) {
@@ -77,12 +80,16 @@ export class SearchModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  setFilter(f: string) { this.activeFilter.set(f); }
+  setFilter(f: string) {
+    this.activeFilter.set(f);
+    this.search(this.query(), f);
+  }
 
   clearQuery() {
     this.query.set('');
     if (this.searchInput) this.searchInput.nativeElement.value = '';
     this.searchInput?.nativeElement.focus();
+    this.search('', this.activeFilter());
   }
 
   onResultClick() { this.close.emit(); }

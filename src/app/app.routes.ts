@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { LandingComponent } from './features/landing/landing.component';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -17,10 +19,12 @@ export const routes: Routes = [
   },
   {
     path: 'publicar',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/upload/upload.component').then(m => m.UploadComponent)
   },
   {
     path: 'admin',
+    canActivate: [adminGuard],
     loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent)
   },
   {

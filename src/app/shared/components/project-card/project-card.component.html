@@ -1,6 +1,6 @@
 <a class="card" [routerLink]="['/proyecto', project.id]">
   <div class="card__image-wrap">
-    <img class="card__image" [src]="project.coverImage" [alt]="project.title" loading="lazy" />
+    <img class="card__image" [src]="project.cover_image || project.coverImage" [alt]="project.title" loading="lazy" />
 
     <!-- Hover overlay -->
     <div class="card__overlay">
@@ -9,7 +9,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="liked() ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
-          <span>{{ project.likes + (liked() ? 1 : 0) }}</span>
+          <span>{{ likeCount() }}</span>
         </button>
         <button class="card__action-btn" [class.active-save]="saved()" (click)="toggleSave($event)" title="Guardar">
           <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="saved() ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
@@ -24,7 +24,7 @@
   <div class="card__body">
     <h3 class="card__title">{{ project.title }}</h3>
     <div class="card__author">
-      <img class="card__avatar" [src]="project.author.avatar" [alt]="project.author.name" />
+      <img class="card__avatar" [src]="project.author?.avatar_url || project.author?.avatar" [alt]="project.author?.name" />
       <div class="card__author-info">
         <span class="card__author-name">{{ project.author.name }}</span>
         <span class="card__author-role">{{ project.author.role }}</span>

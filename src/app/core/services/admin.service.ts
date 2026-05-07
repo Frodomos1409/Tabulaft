@@ -54,7 +54,7 @@ export class AdminService {
   async getAllProjects(): Promise<any[]> {
     const { data } = await supabase
       .from('projects')
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .order('created_at', { ascending: false });
     return data ?? [];
   }
@@ -82,7 +82,7 @@ export class AdminService {
   async getReports(): Promise<any[]> {
     const { data } = await supabase
       .from('reports')
-      .select('*, project:projects(*), reporter:profiles(*)')
+      .select('*, project:projects(*), reporter:profiles!reports_reporter_id_fkey(*)')
       .eq('resolved', false)
       .order('created_at', { ascending: false });
     return data ?? [];

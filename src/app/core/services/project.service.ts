@@ -66,7 +66,7 @@ export class ProjectService {
 
     let query = supabase
       .from('projects')
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .eq('status', 'active');
 
     if (filters?.category && filters.category !== 'Todos') {
@@ -99,7 +99,7 @@ export class ProjectService {
   async getProjectById(id: string): Promise<ProjectRow | null> {
     const { data, error } = await supabase
       .from('projects')
-      .select('*, author:profiles(*), comments(*, user:profiles(*))')
+      .select('*, author:profiles!projects_author_id_fkey(*), comments(*, user:profiles!comments_user_id_fkey(*))')
       .eq('id', id)
       .single();
     if (error) return null;
@@ -109,7 +109,7 @@ export class ProjectService {
   async getProjectsByUser(userId: string): Promise<ProjectRow[]> {
     const { data, error } = await supabase
       .from('projects')
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .eq('author_id', userId)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
@@ -145,7 +145,7 @@ export class ProjectService {
         images: imageUrls,
         cover_image: imageUrls[0] ?? null,
       })
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .single();
 
     if (error) throw error;
@@ -234,7 +234,7 @@ export class ProjectService {
     const ids = likeRows.map((r: any) => r.project_id);
     const { data } = await supabase
       .from('projects')
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .in('id', ids)
       .eq('status', 'active');
     return (data ?? []) as ProjectRow[];
@@ -249,7 +249,7 @@ export class ProjectService {
     const ids = saveRows.map((r: any) => r.project_id);
     const { data } = await supabase
       .from('projects')
-      .select('*, author:profiles(*)')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
       .in('id', ids)
       .eq('status', 'active');
     return (data ?? []) as ProjectRow[];

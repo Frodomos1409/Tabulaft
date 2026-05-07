@@ -54,14 +54,28 @@ export class AuthService {
   }
 
   async signUp(email: string, password: string, name: string): Promise<void> {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } }
     });
     if (error) throw error;
+    if (data.user) {
+      // Esperar a que el trigger cree el perfil
+      await new Promise(r => setTimeout(r, 800));
+      await this.loadProfile(data.user.id);
+    }
     this.toast.show('Cuenta creada', 'success', '🎉');
   }
+
+  async signInWithGoogle(): Promise<void> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/explorar` }
+    });
+    if (error) throw error;
+  }
+
 
   async signIn(email: string, password: string): Promise<void> {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });

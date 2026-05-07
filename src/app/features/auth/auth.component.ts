@@ -35,6 +35,17 @@ export class AuthComponent {
     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80',
   ];
 
+  async onGoogleSignIn(): Promise<void> {
+    this.isLoading.set(true);
+    this.errorMsg.set('');
+    try {
+      await this.auth.signInWithGoogle();
+    } catch (e: any) {
+      this.errorMsg.set(e.message ?? 'Error con Google');
+      this.isLoading.set(false);
+    }
+  }
+
   async onSubmit(): Promise<void> {
     this.isLoading.set(true);
     this.errorMsg.set('');

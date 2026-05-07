@@ -23,16 +23,20 @@ export class AuthService {
   isLoggedIn = computed(() => !!this.currentUser());
   isAdmin = computed(() => this.currentUser()?.is_admin === true);
 
+  // Promesa que se resuelve cuando la sesión inicial fue verificada
+  sessionReady: Promise<void>;
+  private sessionReadyResolve!: () => void;
+
   constructor() {
+    this.sessionReady = new Promise(resolve => {
+      this.sessionReadyResolve = resolve;
+    });
     this.loadSession();
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
       } else if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        // Sincroniza si el perfil aún no está cargado (p.ej. otra pestaña)
-        if (!this.currentUser()) {
-          await this.loadProfile(session.user.id);
-        }
+        await this.loadProfile(session.user.id);
       }
     });
   }
@@ -42,6 +46,7 @@ export class AuthService {
     if (session?.user) {
       await this.loadProfile(session.user.id);
     }
+    this.sessionReadyResolve();
   }
 
   private async loadProfile(userId: string): Promise<void> {
@@ -61,7 +66,6 @@ export class AuthService {
     });
     if (error) throw error;
     if (data.user) {
-      // Esperar a que el trigger cree el perfil
       await new Promise(r => setTimeout(r, 800));
       await this.loadProfile(data.user.id);
     }
@@ -76,16 +80,21 @@ export class AuthService {
     if (error) throw error;
   }
 
-
   async signIn(email: string, password: string): Promise<void> {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-    if (!profile) throw new Error('Perfil no encontrado');
+    // Reintentar hasta 3 veces si el perfil aún no fue creado por el trigger
+    let profile = null;
+    for (let i = 0; i < 3; i++) {
+      const { data: p } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+      if (p) { profile = p; break; }
+      await new Promise(r => setTimeout(r, 600));
+    }
+    if (!profile) throw new Error('Perfil no encontrado. Intenta de nuevo.');
     if ((profile as Profile).banned) {
       await supabase.auth.signOut();
       throw new Error('Cuenta suspendida');

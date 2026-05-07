@@ -1,5 +1,106 @@
-<app-navbar />
+<!-- ══════════════════════════════════════════════════════════════════
+     MOBILE LAYOUT
+     ══════════════════════════════════════════════════════════════════ -->
+@if (device.isMobile()) {
+<main class="landing home-m__page">
 
+  <!-- Hero mobile -->
+  <section class="home-m__hero">
+    <div class="home-m__hero-bg">
+      <div class="hero__blob hero__blob--1"></div>
+      <div class="hero__blob hero__blob--2"></div>
+    </div>
+    <div class="home-m__hero-content animate-fade-in">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Plataforma universitaria UNIVALLE
+      </div>
+      <h1 class="home-m__title">
+        Descubre los<br>
+        <span class="gradient-text">mejores trabajos</span><br>
+        de diseño
+      </h1>
+      <p class="home-m__subtitle">Explora el talento de los estudiantes de Diseño Gráfico.</p>
+      <div class="home-m__ctas">
+        <a routerLink="/explorar" class="btn btn--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Explorar
+        </a>
+        <a routerLink="/auth" class="btn btn--outline">Publicar</a>
+      </div>
+      <!-- Stats row -->
+      <div class="home-m__stats">
+        @for (stat of stats(); track stat.label) {
+          <div class="home-m__stat">
+            <span class="home-m__stat-value">{{ stat.value }}</span>
+            <span class="home-m__stat-label">{{ stat.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Categorías scroll horizontal -->
+  <section class="home-m__section">
+    <div class="home-m__section-header">
+      <h2 class="home-m__section-title">Categorías</h2>
+      <a routerLink="/explorar" class="home-m__see-all">Ver todas</a>
+    </div>
+    <div class="home-m__cats-scroll">
+      @for (cat of categories(); track cat.name) {
+        <a routerLink="/explorar" [queryParams]="{cat: cat.name}" class="home-m__cat-chip">
+          <span>{{ cat.icon }}</span> {{ cat.name }}
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- Proyectos destacados lista vertical -->
+  <section class="home-m__section">
+    <div class="home-m__section-header">
+      <h2 class="home-m__section-title">Proyectos <span class="gradient-text">destacados</span></h2>
+      <a routerLink="/explorar" class="home-m__see-all">Ver todos →</a>
+    </div>
+    <div class="home-m__projects-list">
+      @for (project of featuredProjects(); track project.id) {
+        <app-project-card [project]="project" />
+      }
+    </div>
+  </section>
+
+  <!-- Creadores -->
+  <section class="home-m__section">
+    <div class="home-m__section-header">
+      <h2 class="home-m__section-title">Creadores <span class="gradient-text">destacados</span></h2>
+    </div>
+    <div class="home-m__creators">
+      @for (creator of featuredCreators(); track creator.id) {
+        <a [routerLink]="['/perfil', creator.id]" class="home-m__creator">
+          <img [src]="creator.avatar_url || 'https://i.pravatar.cc/150?u=' + creator.id" [alt]="creator.name" />
+          <span class="home-m__creator-name">{{ creator.name }}</span>
+          <span class="home-m__creator-role">{{ creator.role }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="home-m__section home-m__cta-section">
+    <div class="cta-card">
+      <div class="cta-card__bg"></div>
+      <h2 class="cta-card__title">¿Listo para <span class="gradient-text">compartir</span> tu trabajo?</h2>
+      <p class="cta-card__subtitle">Únete a la comunidad de diseñadores de UNIVALLE.</p>
+      <a routerLink="/auth" class="btn btn--primary">Crear mi cuenta gratis</a>
+    </div>
+  </section>
+
+</main>
+} @else {
+<!-- ══════════════════════════════════════════════════════════════════
+     DESKTOP LAYOUT
+     ══════════════════════════════════════════════════════════════════ -->
 <main class="landing">
 
   <!-- ─── Hero ─────────────────────────────────────────────────────── -->
@@ -45,7 +146,7 @@
 
         <!-- Stats -->
         <div class="hero__stats">
-          @for (stat of stats; track stat.label) {
+          @for (stat of stats(); track stat.label) {
             <div class="hero__stat">
               <span class="hero__stat-value">{{ stat.value }}</span>
               <span class="hero__stat-label">{{ stat.label }}</span>
@@ -95,7 +196,7 @@
       </div>
 
       <div class="masonry-grid">
-        @for (project of featuredProjects; track project.id) {
+        @for (project of featuredProjects(); track project.id) {
           <app-project-card [project]="project" />
         }
       </div>
@@ -113,7 +214,7 @@
       </div>
 
       <div class="categories-grid">
-        @for (cat of categories; track cat.name; let i = $index) {
+        @for (cat of categories(); track cat.name; let i = $index) {
           <a routerLink="/explorar" class="cat-card animate-fade-in" [class]="'stagger-' + (i + 1)">
             <span class="cat-card__icon">{{ cat.icon }}</span>
             <span class="cat-card__name">{{ cat.name }}</span>
@@ -135,15 +236,15 @@
       </div>
 
       <div class="creators-grid">
-        @for (user of featuredCreators; track user.id) {
-          <a [routerLink]="['/perfil', user.id]" class="creator-card">
-            <img class="creator-card__avatar" [src]="user.avatar" [alt]="user.name" />
+        @for (creator of featuredCreators(); track creator.id) {
+          <a [routerLink]="['/perfil', creator.id]" class="creator-card">
+            <img class="creator-card__avatar" [src]="creator.avatar_url || 'https://i.pravatar.cc/150?u=' + creator.id" [alt]="creator.name" />
             <div class="creator-card__info">
-              <h4 class="creator-card__name">{{ user.name }}</h4>
-              <span class="creator-card__role">{{ user.role }}</span>
+              <h4 class="creator-card__name">{{ creator.name }}</h4>
+              <span class="creator-card__role">{{ creator.role }}</span>
               <div class="creator-card__stats">
-                <span><strong>{{ user.projectCount }}</strong> proyectos</span>
-                <span><strong>{{ user.followers }}</strong> seguidores</span>
+                <span><strong>{{ creator.project_count }}</strong> proyectos</span>
+                <span><strong>{{ creator.followers }}</strong> seguidores</span>
               </div>
             </div>
             <button class="btn btn--outline btn--sm creator-card__follow">Seguir</button>
@@ -165,39 +266,5 @@
     </div>
   </section>
 
-  <!-- ─── Footer ───────────────────────────────────────────────────── -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <span class="footer__logo">TABU<span class="gradient-text">LAFT</span><span style="color:#E91E8C">.</span></span>
-        <p class="footer__tagline">Plataforma de exposición de proyectos de diseño gráfico · UNIVALLE</p>
-      </div>
-      <div class="footer__links">
-        <div class="footer__col">
-          <h5>Explorar</h5>
-          <a routerLink="/explorar">Proyectos</a>
-          <a routerLink="/explorar">Categorías</a>
-          <a routerLink="/explorar">Destacados</a>
-        </div>
-        <div class="footer__col">
-          <h5>Comunidad</h5>
-          <a routerLink="/">Diseñadores</a>
-          <a routerLink="/">Colecciones</a>
-          <a routerLink="/">Tendencias</a>
-        </div>
-        <div class="footer__col">
-          <h5>Plataforma</h5>
-          <a routerLink="/auth">Iniciar sesión</a>
-          <a routerLink="/auth">Registrarse</a>
-          <a routerLink="/publicar">Publicar</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <div class="container">
-        <span>© 2024 Tabulaft · Universidad del Valle</span>
-      </div>
-    </div>
-  </footer>
-
 </main>
+} <!-- end @else desktop -->

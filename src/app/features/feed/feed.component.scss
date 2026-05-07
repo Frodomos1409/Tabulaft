@@ -71,3 +71,210 @@
     font-weight: 600;
   }
 }
+
+// ─── Sub-filtros ─────────────────────────────────────────────────────────────
+.feed-page__subfilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-3;
+  margin-top: $space-3;
+}
+
+.feed-select-wrap {
+  position: relative;
+}
+
+.feed-select {
+  appearance: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: $radius-pill;
+  padding: $space-2 $space-5 $space-2 $space-3;
+  font-size: $text-sm;
+  color: var(--text);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  transition: border-color $transition-fast;
+
+  &:focus { outline: none; border-color: $violet; }
+  &:hover { border-color: $violet-light; }
+}
+
+// ─── Chips filtros activos ────────────────────────────────────────────────────
+.feed-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-top: $space-2;
+}
+
+.feed-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  background: rgba($violet, .12);
+  border: 1px solid rgba($violet, .3);
+  color: $violet-light;
+  border-radius: $radius-pill;
+  padding: $space-1 $space-3;
+  font-size: $text-xs;
+  font-weight: 500;
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: .7;
+    font-size: .7rem;
+    line-height: 1;
+    padding: 0;
+    &:hover { opacity: 1; }
+  }
+}
+
+// ─── Empty state ─────────────────────────────────────────────────────────────
+.feed-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-16 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+// ─── Cargar más ──────────────────────────────────────────────────────────────
+.feed-load-more {
+  display: flex;
+  justify-content: center;
+  padding: $space-10 0 $space-16;
+}
+
+.feed-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  margin-right: $space-2;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── MOBILE LAYOUT ──────────────────────────────────────────────────
+.cat-m__page { overflow-x: hidden; }
+
+.cat-m__cats-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border-subtle);
+  &::-webkit-scrollbar { display: none; }
+}
+.cat-m__cat-btn {
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  &.active {
+    background: #6754f8;
+    border-color: #6754f8;
+    color: #fff;
+  }
+}
+
+.cat-m__sort-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: center;
+  &::-webkit-scrollbar { display: none; }
+}
+.cat-m__sort-btn {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  &.active { border-color: #6754f8; color: #6754f8; }
+}
+.cat-m__select {
+  padding: 5px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cat-m__chips {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+.cat-m__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(103, 84, 248, 0.15);
+  color: #6754f8;
+  font-size: 0.75rem;
+  font-weight: 500;
+  button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.75rem;
+  }
+}
+
+.cat-m__count {
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.cat-m__list {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cat-m__load-more {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+}

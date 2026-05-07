@@ -1,18 +1,22 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
 import { ThemeService } from './core/services/theme.service';
-import { ToastComponent } from './shared/components/toast/toast.component';
+import { DeviceService } from './core/services/device.service';
+import { DesktopShellComponent } from './shells/desktop/desktop-shell.component';
+import { MobileShellComponent } from './shells/mobile/mobile-shell.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ToastComponent],
+  imports: [DesktopShellComponent, MobileShellComponent],
   template: `
-    <router-outlet />
-    <app-toast />
+    @if (device.isMobile()) {
+      <app-mobile-shell />
+    } @else {
+      <app-desktop-shell />
+    }
   `
 })
-export class App implements OnInit {
+export class App {
   private theme = inject(ThemeService);
-  ngOnInit() {}
+  readonly device = inject(DeviceService);
 }

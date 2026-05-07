@@ -1,5 +1,79 @@
-<app-navbar />
+<!-- ══ MOBILE ════════════════════════════════════════════════════════ -->
+@if (device.isMobile()) {
+<main class="feed-page cat-m__page">
 
+  <!-- Filtro categorías scroll horizontal -->
+  <div class="cat-m__cats-bar">
+    @for (cat of allCategories; track cat) {
+      <button class="cat-m__cat-btn" [class.active]="activeCategory() === cat" (click)="setCategory(cat)">
+        {{ cat }}
+      </button>
+    }
+  </div>
+
+  <!-- Sort pills -->
+  <div class="cat-m__sort-bar">
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">🔥 Tendencia</button>
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'recent'"   (click)="setSort('recent')">🕐 Recientes</button>
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'popular'"  (click)="setSort('popular')">⭐ Popular</button>
+
+    <!-- Semestre select compacto -->
+    <select class="cat-m__select" (change)="setSemester($any($event.target).value)">
+      @for (sem of allSemesters(); track sem) {
+        <option [value]="sem" [selected]="activeSemester() === sem">
+          {{ sem === 'Todos' ? 'Semestres' : 'Sem. ' + sem }}
+        </option>
+      }
+    </select>
+  </div>
+
+  <!-- Chips activos -->
+  @if (activeSemester() !== 'Todos' || activeSubject() !== 'Todas') {
+    <div class="cat-m__chips">
+      @if (activeSemester() !== 'Todos') {
+        <span class="cat-m__chip">Sem. {{ activeSemester() }} <button (click)="setSemester('Todos')">✕</button></span>
+      }
+      @if (activeSubject() !== 'Todas') {
+        <span class="cat-m__chip">{{ activeSubject() }} <button (click)="setSubject('Todas')">✕</button></span>
+      }
+    </div>
+  }
+
+  <!-- Contador -->
+  <div class="cat-m__count">{{ projects().length }} proyectos</div>
+
+  <!-- Lista vertical -->
+  <div class="cat-m__list">
+    @if (loading()) {
+      @for (item of skeletonItems; track $index) {
+        <app-project-card-skeleton />
+      }
+    } @else if (projects().length === 0) {
+      <div class="feed-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3">
+          <rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <p>No hay proyectos con estos filtros</p>
+        <button class="btn btn--outline btn--sm" (click)="setCategory('Todos')">Limpiar filtros</button>
+      </div>
+    } @else {
+      @for (project of projects(); track project.id) {
+        <app-project-card [project]="project" />
+      }
+      @if (hasMore()) {
+        <div class="cat-m__load-more">
+          <button class="btn btn--outline" (click)="loadMore()" [disabled]="loadingMore()">
+            @if (loadingMore()) { <span class="feed-spinner"></span> Cargando… }
+            @else { Cargar más }
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+</main>
+} @else {
+<!-- ══ DESKTOP ══════════════════════════════════════════════════════ -->
 <main class="feed-page">
   <div class="container">
 
@@ -10,6 +84,7 @@
 
     <!-- Filters -->
     <div class="feed-page__filters">
+
       <div class="feed-page__categories">
         @for (cat of allCategories; track cat) {
           <button class="tag" [class.active]="activeCategory() === cat" (click)="setCategory(cat)">
@@ -17,19 +92,62 @@
           </button>
         }
       </div>
-      <div class="feed-page__sort">
-        <button class="sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">🔥 Tendencia</button>
-        <button class="sort-btn" [class.active]="sortBy() === 'recent'"   (click)="setSort('recent')">🕐 Recientes</button>
-        <button class="sort-btn" [class.active]="sortBy() === 'popular'"  (click)="setSort('popular')">⭐ Popular</button>
+
+      <div class="feed-page__subfilters">
+        <div class="feed-select-wrap">
+          <select class="feed-select" (change)="setSemester($any($event.target).value)">
+            @for (sem of allSemesters(); track sem) {
+              <option [value]="sem" [selected]="activeSemester() === sem">
+                {{ sem === 'Todos' ? 'Todos los semestres' : 'Semestre ' + sem }}
+              </option>
+            }
+          </select>
+        </div>
+
+        @if (availableSubjects().length > 0) {
+          <div class="feed-select-wrap">
+            <select class="feed-select" (change)="setSubject($any($event.target).value)">
+              <option value="Todas" [selected]="activeSubject() === 'Todas'">Todas las materias</option>
+              @for (sub of availableSubjects(); track sub) {
+                <option [value]="sub" [selected]="activeSubject() === sub">{{ sub }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <div class="feed-page__sort">
+          <button class="sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">🔥 Tendencia</button>
+          <button class="sort-btn" [class.active]="sortBy() === 'recent'"   (click)="setSort('recent')">🕐 Recientes</button>
+          <button class="sort-btn" [class.active]="sortBy() === 'popular'"  (click)="setSort('popular')">⭐ Popular</button>
+        </div>
       </div>
+
+      @if (activeSemester() !== 'Todos' || activeSubject() !== 'Todas') {
+        <div class="feed-active-filters">
+          @if (activeSemester() !== 'Todos') {
+            <span class="feed-filter-chip">Semestre {{ activeSemester() }} <button (click)="setSemester('Todos')">✕</button></span>
+          }
+          @if (activeSubject() !== 'Todas') {
+            <span class="feed-filter-chip">{{ activeSubject() }} <button (click)="setSubject('Todas')">✕</button></span>
+          }
+        </div>
+      }
+
     </div>
 
-    <!-- Skeleton while loading -->
     @if (loading()) {
       <div class="masonry-grid">
         @for (item of skeletonItems; track $index) {
           <app-project-card-skeleton />
         }
+      </div>
+    } @else if (projects().length === 0) {
+      <div class="feed-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3">
+          <rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <p>No hay proyectos con estos filtros</p>
+        <button class="btn btn--outline btn--sm" (click)="setCategory('Todos')">Limpiar filtros</button>
       </div>
     } @else {
       <div class="masonry-grid">
@@ -37,9 +155,16 @@
           <app-project-card [project]="project" />
         }
       </div>
+      @if (hasMore()) {
+        <div class="feed-load-more">
+          <button class="btn btn--outline" (click)="loadMore()" [disabled]="loadingMore()">
+            @if (loadingMore()) { <span class="feed-spinner"></span> Cargando… }
+            @else { Cargar más proyectos }
+          </button>
+        </div>
+      }
     }
 
   </div>
 </main>
-
-<app-footer />
+} <!-- end @else desktop -->

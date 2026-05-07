@@ -1,5 +1,3 @@
-<app-navbar />
-
 <main class="profile-page">
 
   <!-- Cover -->
@@ -9,65 +7,129 @@
 
   <div class="container profile-body">
 
-    <!-- Header -->
-    <div class="profile-header">
-      <div class="profile-header__left">
-        <img class="profile-avatar" [src]="user.avatar" [alt]="user.name" />
-        <div class="profile-info">
-          <h1 class="profile-info__name">{{ user.name }}</h1>
-          <p class="profile-info__role">{{ user.role }}</p>
-          <p class="profile-info__bio">{{ user.bio }}</p>
+    @if (user()) {
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="profile-header__left">
+          <img class="profile-avatar"
+               [src]="user()!.avatar_url || 'https://ui-avatars.com/api/?name=' + user()!.name"
+               [alt]="user()!.name" />
+          <div class="profile-info">
+            <h1 class="profile-info__name">{{ user()!.name }}</h1>
+            <p class="profile-info__role">{{ user()!.role }}</p>
+            <p class="profile-info__bio">{{ user()!.bio }}</p>
+          </div>
         </div>
-      </div>
-      <div class="profile-header__actions">
-        <button
-          class="btn"
-          [class.btn--primary]="!following()"
-          [class.btn--outline]="following()"
-          (click)="toggleFollow()">
-          {{ following() ? '✓ Siguiendo' : '+ Seguir' }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="profile-stats">
-      <div class="profile-stat"><strong>{{ user.projectCount }}</strong><span>Proyectos</span></div>
-      <div class="profile-stat"><strong>{{ user.followers + (following() ? 1 : 0) }}</strong><span>Seguidores</span></div>
-      <div class="profile-stat"><strong>{{ user.following }}</strong><span>Siguiendo</span></div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="profile-tabs">
-      <button class="profile-tab" [class.active]="activeTab() === 'projects'" (click)="activeTab.set('projects')">
-        Proyectos <span class="profile-tab__count">{{ projects.length }}</span>
-      </button>
-      <button class="profile-tab" [class.active]="activeTab() === 'saved'" (click)="activeTab.set('saved')">
-        Guardados
-      </button>
-    </div>
-
-    @if (activeTab() === 'projects') {
-      @if (projects.length > 0) {
-        <div class="masonry-grid">
-          @for (project of projects; track project.id) {
-            <app-project-card [project]="project" />
+        <div class="profile-header__actions">
+          @if (isOwnProfile()) {
+            <button class="btn btn--outline" (click)="openEditModal()">Editar perfil</button>
+          } @else {
+            <button
+              class="btn"
+              [class.btn--primary]="!following()"
+              [class.btn--outline]="following()"
+              (click)="toggleFollow()">
+              {{ following() ? '✓ Siguiendo' : '+ Seguir' }}
+            </button>
           }
         </div>
-      } @else {
-        <div class="profile-empty">
-          <p>No hay proyectos publicados aún.</p>
-        </div>
-      }
-    }
-
-    @if (activeTab() === 'saved') {
-      <div class="profile-empty">
-        <p>No hay proyectos guardados.</p>
       </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="profile-stat"><strong>{{ projects().length }}</strong><span>Proyectos</span></div>
+        <div class="profile-stat"><strong>{{ user()!.followers }}</strong><span>Seguidores</span></div>
+        <div class="profile-stat"><strong>{{ user()!.following }}</strong><span>Siguiendo</span></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab" [class.active]="activeTab() === 'projects'" (click)="setTab('projects')">
+          Proyectos <span class="profile-tab__count">{{ projects().length }}</span>
+        </button>
+        @if (isOwnProfile()) {
+          <button class="profile-tab" [class.active]="activeTab() === 'saved'" (click)="setTab('saved')">
+            Guardados
+          </button>
+        }
+      </div>
+
+      @if (activeTab() === 'projects') {
+        @if (projects().length > 0) {
+          <div class="masonry-grid">
+            @for (project of projects(); track project.id) {
+              <app-project-card [project]="project" />
+            }
+          </div>
+        } @else {
+          <div class="profile-empty"><p>No hay proyectos publicados aún.</p></div>
+        }
+      }
+
+      @if (activeTab() === 'saved') {
+        @if (savedProjects().length > 0) {
+          <div class="masonry-grid">
+            @for (project of savedProjects(); track project.id) {
+              <app-project-card [project]="project" />
+            }
+          </div>
+        } @else {
+          <div class="profile-empty"><p>No hay proyectos guardados.</p></div>
+        }
+      }
+    } @else if (!loading()) {
+      <p style="text-align:center;padding:4rem;opacity:.5">Perfil no encontrado.</p>
     }
 
   </div>
 </main>
 
-<app-footer />
+<!-- ─── Modal Editar Perfil ─────────────────────────────────────────────── -->
+@if (showEditModal()) {
+  <div class="modal-backdrop" (click)="closeEditModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Editar perfil</h3>
+        <button class="modal__close" (click)="closeEditModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <!-- Avatar -->
+        <div class="edit-avatar-wrap">
+          <img class="edit-avatar"
+               [src]="editAvatarPreview() || 'https://ui-avatars.com/api/?name=' + editForm.name"
+               alt="avatar" />
+          <label class="edit-avatar-btn">
+            Cambiar foto
+            <input type="file" accept="image/*" hidden (change)="onAvatarChange($event)" />
+          </label>
+        </div>
+
+        <!-- Campos -->
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input class="form-input" type="text" [(ngModel)]="editForm.name" placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol / Especialidad</label>
+          <input class="form-input" type="text" [(ngModel)]="editForm.role" placeholder="Ej. Diseñadora Gráfica" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bio</label>
+          <textarea class="form-input form-textarea" [(ngModel)]="editForm.bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--outline" (click)="closeEditModal()">Cancelar</button>
+        <button class="btn btn--primary" (click)="saveProfile()" [disabled]="savingEdit()">
+          {{ savingEdit() ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

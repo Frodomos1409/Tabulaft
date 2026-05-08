@@ -31,17 +31,19 @@ export class AuthService {
     this.sessionReady = new Promise(resolve => {
       this.sessionReadyResolve = resolve;
     });
+    // Carga la sesión existente al iniciar (refresco de página, sesión persistida)
+    this.loadSession();
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
+        this.sessionReadyResolve();
       } else if (
         (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') &&
         session?.user
       ) {
         await this.loadProfile(session.user.id);
+        this.sessionReadyResolve();
       }
-      // Resolver sessionReady en el primer evento recibido
-      this.sessionReadyResolve();
     });
   }
 

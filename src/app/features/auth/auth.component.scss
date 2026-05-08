@@ -274,6 +274,13 @@
     span { color: $hot-pink; }
   }
 
+  &__visual-logo-svg {
+    height: 64px;
+    width: auto;
+    display: block;
+    margin: 0 auto $space-3;
+  }
+
   &__visual-tagline {
     font-size: $text-md;
     color: rgba(255, 255, 255, 0.55);

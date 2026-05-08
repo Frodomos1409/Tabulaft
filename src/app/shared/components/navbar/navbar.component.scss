@@ -30,17 +30,18 @@
   // ─── Logo ────────────────────────────────────────────────────────────────
   &__logo {
     display: flex;
-    align-items: baseline;
-    gap: 1px;
-    font-family: $font-heading;
-    font-size: $text-xl;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    align-items: center;
     text-decoration: none;
+    color: var(--text);
   }
-  &__logo-text  { color: var(--text); }
-  &__logo-accent { color: var(--text); }
-  &__logo-dot   { color: $hot-pink; font-size: $text-2xl; line-height: 0; margin-left: 1px; }
+  &__logo-svg {
+    height: 40px;
+    width: auto;
+    display: block;
+    color: var(--text);
+    transition: color $transition-base;
+    @include mobile { height: 32px; }
+  }
 
   // ─── Links ───────────────────────────────────────────────────────────────
   &__links {

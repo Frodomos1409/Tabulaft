@@ -31,13 +31,17 @@ export class AuthService {
     this.sessionReady = new Promise(resolve => {
       this.sessionReadyResolve = resolve;
     });
-    this.loadSession();
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
-      } else if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+      } else if (
+        (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') &&
+        session?.user
+      ) {
         await this.loadProfile(session.user.id);
       }
+      // Resolver sessionReady en el primer evento recibido
+      this.sessionReadyResolve();
     });
   }
 

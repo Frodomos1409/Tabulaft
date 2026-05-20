@@ -1,30 +1,65 @@
 <!-- ═══════════════════════════════════════════════════════════
      HERO
      ═══════════════════════════════════════════════════════════ -->
-<section class="hero" id="inicio"
-         (mousemove)="onHeroMouseMove($event)"
-         (mouseleave)="onHeroMouseLeave()">
-
-  <img class="hero__spark hero__spark--1" src="assets/hero-spark-1.svg" alt="" #sparkOne />
-  <img class="hero__spark hero__spark--2" src="assets/hero-spark-2.svg" alt="" #sparkTwo />
-  <img class="hero__char hero__char--a" src="assets/hero-character-1.svg" alt="" />
-  <img class="hero__char hero__char--b" src="assets/hero-character-2.svg" alt="" />
-
-  <!-- Card 3D -->
-  <div class="hero__card" #heroCard>
-    <h1 class="hero__title animate-text" data-text="DESCUBRE LOS MEJORES TRABAJOS DE DISEÑO">
-      DESCUBRE LOS<br>MEJORES TRABAJOS
-      <span class="hero__title-line3">DE DISEÑO</span>
-    </h1>
+<section class="hero">
+  <div class="hero__bg">
+    <div class="hero__blob hero__blob--1"></div>
+    <div class="hero__blob hero__blob--2"></div>
+    <div class="hero__blob hero__blob--3"></div>
   </div>
 
-  <p class="hero__subtitle animate-text">
-    Explora el talento de los estudiantes de Diseño Gráfico.
-    Proyectos reales, creatividad sin límites.
-  </p>
-  <div class="hero__ctas">
-    <a class="hero__btn" routerLink="/explorar">Explorar proyectos</a>
-    <a class="hero__btn hero__btn--outline" routerLink="/auth">Publicar mi trabajo</a>
+  <div class="container hero__inner">
+    <div class="hero__content animate-fade-in">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Plataforma universitaria UNIVALLE
+      </div>
+
+      <h1 class="hero__title">
+        Descubre los<br>
+        <span class="gradient-text">mejores trabajos</span><br>
+        de diseño
+      </h1>
+
+      <p class="hero__subtitle">
+        Explora el talento de los estudiantes de Diseño Gráfico.<br>
+        Proyectos reales, creatividad sin límites.
+      </p>
+
+      <div class="hero__ctas">
+        <a routerLink="/explorar" class="btn btn--primary btn--lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Explorar proyectos
+        </a>
+        <a routerLink="/auth" class="btn btn--outline btn--lg">
+          Publicar mi trabajo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="hero__stats">
+        @for (stat of stats(); track stat.label) {
+          <div class="hero__stat">
+            <span class="hero__stat-value">{{ stat.value }}</span>
+            <span class="hero__stat-label">{{ stat.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="hero__visual animate-fade-in stagger-2">
+      <div class="hero__grid">
+        @for (img of heroImages; track img; let i = $index) {
+          <div class="hero__grid-item" [style.--i]="i">
+            <img [src]="img" alt="proyecto" />
+          </div>
+        }
+      </div>
+    </div>
   </div>
 </section>
 

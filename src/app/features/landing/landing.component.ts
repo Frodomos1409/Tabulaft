@@ -24,6 +24,20 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   recentProjects   = signal<ProjectRow[]>([]);
   featuredProjects = signal<ProjectRow[]>([]);
 
+  stats = signal([
+    { value: '–', label: 'Proyectos' },
+    { value: '–', label: 'Diseñadores' },
+    { value: '15K', label: 'Visitas mensuales' },
+    { value: '8',   label: 'Categorías' },
+  ]);
+
+  heroImages = [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80',
+    'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&q=80',
+    'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+  ];
+
   carouselIndex = signal(0);
   private carouselTimer: ReturnType<typeof setInterval> | null = null;
   private destroyFns: (() => void)[] = [];
@@ -94,7 +108,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async ngOnInit() {
-    await Promise.all([this.loadCarousel(), this.loadRecent(), this.loadFeatured()]);
+    await Promise.all([this.loadCarousel(), this.loadRecent(), this.loadFeatured(), this.loadStats()]);
   }
 
   ngAfterViewInit() {
@@ -175,6 +189,19 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
       .order('created_at', { ascending: false })
       .limit(10);
     this.recentProjects.set((data ?? []) as ProjectRow[]);
+  }
+
+  private async loadStats() {
+    const [{ count: projectCount }, { count: userCount }] = await Promise.all([
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    ]);
+    this.stats.set([
+      { value: projectCount ? `${projectCount}+` : '0', label: 'Proyectos' },
+      { value: userCount    ? `${userCount}+`    : '0', label: 'Diseñadores' },
+      { value: '15K', label: 'Visitas mensuales' },
+      { value: '8',   label: 'Categorías' },
+    ]);
   }
 
   private async loadFeatured() {

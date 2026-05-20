@@ -66,25 +66,24 @@
   }
 
   &__char {
-    // Posicionado desde el fondo, altura = 100% del hero = personaje completo
     position: absolute; pointer-events: none; z-index: 2;
-    bottom: 0; top: 0;
     animation: heroCharFloat 5s ease-in-out infinite;
     transform-origin: bottom center;
 
     &--a {
-      // Personaje grande: ocupa toda la altura, pegado a la derecha
-      height: 100%;
+      // Grande: mucho más alto que el hero, anclado abajo — se corta por arriba (intencional)
+      height: 160%;
       width: auto;
-      right: 0;
+      bottom: -5%;
+      right: -2%;
       animation-duration: 5.5s;
     }
     &--b {
-      // Personaje pequeño: a la izquierda del grande
-      height: 64%;
+      // Pequeño: tamaño medio, centrado-derecha
+      height: 75%;
       width: auto;
-      right: clamp(120px, 26vw, 400px);
-      top: auto;
+      bottom: 0;
+      right: clamp(140px, 30vw, 440px);
       animation-duration: 4.2s;
       animation-delay: -1.8s;
     }

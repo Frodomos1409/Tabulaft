@@ -2,8 +2,8 @@
 @use '../../../../styles/mixins' as *;
 
 // ─── Token locales ────────────────────────────────────────────────────────────
-$nav-bg:          rgba(255, 255, 255, 0.72);
-$nav-bg-scrolled: rgba(255, 255, 255, 0.82);
+$nav-bg:          #ffffff;
+$nav-bg-scrolled: #ffffff;
 $nav-border:      rgba(40, 48, 235, 0.10);
 
 .navbar {
@@ -12,8 +12,6 @@ $nav-border:      rgba(40, 48, 235, 0.10);
   z-index: 1000;
   height: $navbar-height;
   background: $nav-bg;
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-bottom: 1px solid $nav-border;
   transition:
     background 0.3s ease,
@@ -42,8 +40,6 @@ $nav-border:      rgba(40, 48, 235, 0.10);
 
   &.scrolled {
     background: $nav-bg-scrolled;
-    backdrop-filter: blur(48px) saturate(200%);
-    -webkit-backdrop-filter: blur(48px) saturate(200%);
     box-shadow: 0 2px 40px rgba(40, 48, 235, 0.10);
     border-color: rgba(40, 48, 235, 0.14);
 

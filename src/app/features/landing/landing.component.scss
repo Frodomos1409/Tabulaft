@@ -39,7 +39,8 @@
 
 .hero {
   position: relative;
-  height: clamp(480px, 56vw, 620px);
+  // Altura que coincide con la referencia: personajes visibles completos
+  height: clamp(500px, 52vw, 680px);
   background: $blue;
   display: flex;
   flex-direction: column;
@@ -47,13 +48,13 @@
   justify-content: center;
   overflow: hidden;
   padding: 0 clamp(24px, 5vw, 80px);
-  // grain texture overlay
+
+  // grain texture
   &::before {
     content: '';
     position: absolute; inset: 0; pointer-events: none; z-index: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    background-size: 180px;
-    opacity: 0.45;
+    background-size: 180px; opacity: 0.45;
   }
 
   &__spark {
@@ -65,20 +66,27 @@
   }
 
   &__char {
-    position: absolute; pointer-events: none; z-index: 2; bottom: 0;
+    // Posicionado desde el fondo, altura = 100% del hero = personaje completo
+    position: absolute; pointer-events: none; z-index: 2;
+    bottom: 0; top: 0;
     animation: heroCharFloat 5s ease-in-out infinite;
+    transform-origin: bottom center;
+
     &--a {
+      // Personaje grande: ocupa toda la altura, pegado a la derecha
       height: 100%;
+      width: auto;
       right: 0;
       animation-duration: 5.5s;
-      transform-origin: bottom center;
     }
     &--b {
-      height: 72%;
-      right: clamp(140px, 28vw, 420px);
+      // Personaje pequeño: a la izquierda del grande
+      height: 64%;
+      width: auto;
+      right: clamp(120px, 26vw, 400px);
+      top: auto;
       animation-duration: 4.2s;
       animation-delay: -1.8s;
-      transform-origin: bottom center;
     }
     @include mobile { display: none; }
   }
@@ -87,8 +95,8 @@
     position: relative; z-index: 3;
     background: #fff;
     border-radius: 24px;
-    padding: clamp(22px, 2.8vw, 36px) clamp(26px, 3.2vw, 44px);
-    max-width: clamp(260px, 34vw, 480px);
+    padding: clamp(20px, 2.6vw, 34px) clamp(24px, 3vw, 42px);
+    max-width: clamp(240px, 32vw, 460px);
     box-shadow: 0 20px 56px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.12);
     transition: transform 0.08s ease-out, box-shadow 0.3s ease;
     will-change: transform;
@@ -100,14 +108,14 @@
 
   &__title {
     font-family: $font-heading;
-    font-size: clamp(26px, 3.8vw, 56px);
+    font-size: clamp(24px, 3.5vw, 52px);
     font-weight: 400;
-    line-height: 0.94;
+    line-height: 0.93;
     letter-spacing: 0.5px;
     color: $blue;
     margin: 0;
     text-transform: uppercase;
-    &-line3 { display: block; margin-top: 0; }
+    &-line3 { display: block; }
   }
 
   &__subtitle {

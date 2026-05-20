@@ -37,14 +37,24 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           }
           <span class="admin-nav-item__label">{{ item.label }}</span>
+          @if (item.id === 'reportes' && reports().length > 0) {
+            <span class="admin-nav-item__badge">{{ reports().length }}</span>
+          }
         </button>
       }
     </nav>
 
     <div class="admin-sidebar__bottom">
-      <a routerLink="/" class="admin-nav-item">
+      <div class="admin-sidebar__profile">
+        <div class="admin-sidebar__avatar">{{ (auth.currentUser()?.name || 'A')[0] }}</div>
+        <div class="admin-sidebar__profile-info">
+          <span class="admin-sidebar__profile-name">{{ auth.currentUser()?.name }}</span>
+          <span class="admin-sidebar__profile-role">Administrador</span>
+        </div>
+      </div>
+      <a routerLink="/" class="admin-nav-item admin-nav-item--exit">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span class="admin-nav-item__label">Salir</span>
+        <span class="admin-nav-item__label">Salir al sitio</span>
       </a>
     </div>
   </aside>
@@ -53,56 +63,138 @@
   <main class="admin-main">
 
     <header class="admin-topbar">
-      <h1 class="admin-topbar__title">{{ navItems.find(n => n.id === activeSection())?.label }}</h1>
+      <div class="admin-topbar__left">
+        <h1 class="admin-topbar__title">{{ navItems.find(n => n.id === activeSection())?.label }}</h1>
+        <span class="admin-topbar__date">{{ today }}</span>
+      </div>
       <div class="admin-topbar__actions">
-        <span class="admin-topbar__user">Admin · {{ auth.currentUser()?.name }}</span>
+        @if (loading()) {
+          <span class="admin-topbar__loading">
+            <span class="spinner-ring"></span> Cargando...
+          </span>
+        }
       </div>
     </header>
 
-    <div class="admin-content animate-fade-in">
+    <div class="admin-content">
 
-      <!-- ─── Dashboard ──────────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           DASHBOARD
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'dashboard') {
         <div class="dashboard">
-          <div class="stats-grid">
+
+          <!-- KPI cards -->
+          <div class="kpi-grid">
             @for (stat of stats(); track stat.label) {
-              <div class="stat-card">
-                <div class="stat-card__top">
-                  <span class="stat-card__label">{{ stat.label }}</span>
+              <div class="kpi-card" [class.kpi-card--alert]="stat.icon === 'flag' && +stat.value > 0">
+                <div class="kpi-card__icon-wrap">
+                  @if (stat.icon === 'users') {
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  }
+                  @if (stat.icon === 'grid') {
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  }
+                  @if (stat.icon === 'eye') {
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  }
+                  @if (stat.icon === 'flag') {
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                  }
                 </div>
-                <div class="stat-card__value">{{ stat.value }}</div>
+                <div class="kpi-card__body">
+                  <span class="kpi-card__label">{{ stat.label }}</span>
+                  <span class="kpi-card__value">{{ stat.value }}</span>
+                </div>
               </div>
             }
           </div>
-          <div class="chart-card">
-            <h3 class="chart-card__title">Actividad semanal</h3>
-            <div class="chart">
-              @for (bar of chartBars; track bar.day) {
-                <div class="chart__col">
-                  <div class="chart__bar" [style.height.%]="bar.height"></div>
-                  <span class="chart__label">{{ bar.day }}</span>
-                </div>
-              }
+
+          <!-- Dos columnas: proyectos recientes + usuarios -->
+          <div class="dash-grid">
+
+            <!-- Últimos proyectos -->
+            <div class="dash-panel">
+              <div class="dash-panel__header">
+                <h3 class="dash-panel__title">Últimos proyectos</h3>
+                <button class="dash-panel__link" (click)="setSection('proyectos')">Ver todos →</button>
+              </div>
+              <div class="dash-panel__list">
+                @for (p of projects().slice(0, 5); track p.id) {
+                  <div class="dash-row">
+                    <img [src]="p.cover_image" [alt]="p.title" class="dash-row__thumb" />
+                    <div class="dash-row__info">
+                      <span class="dash-row__title">{{ p.title }}</span>
+                      <span class="dash-row__sub">{{ p.author?.name }} · {{ p.category }}</span>
+                    </div>
+                    <span class="status-badge" [class.active]="p.status === 'active'" [class.pending]="p.status === 'pending'">
+                      {{ getStatusLabel(p.status) }}
+                    </span>
+                  </div>
+                }
+                @if (projects().length === 0 && !loading()) {
+                  <p class="dash-empty">No hay proyectos aún</p>
+                }
+              </div>
             </div>
+
+            <!-- Usuarios registrados -->
+            <div class="dash-panel">
+              <div class="dash-panel__header">
+                <h3 class="dash-panel__title">Diseñadores</h3>
+                <button class="dash-panel__link" (click)="setSection('usuarios')">Ver todos →</button>
+              </div>
+              <div class="dash-panel__list">
+                @for (u of users().slice(0, 5); track u.id) {
+                  <div class="dash-row">
+                    <div class="dash-row__avatar">{{ (u.name || '?')[0] }}</div>
+                    <div class="dash-row__info">
+                      <span class="dash-row__title">{{ u.name }}</span>
+                      <span class="dash-row__sub">{{ u.role }}</span>
+                    </div>
+                    <span class="status-badge" [class.active]="!u.banned" [class.pending]="u.banned">
+                      {{ u.banned ? 'Suspendido' : 'Activo' }}
+                    </span>
+                  </div>
+                }
+                @if (users().length === 0 && !loading()) {
+                  <p class="dash-empty">No hay usuarios aún</p>
+                }
+              </div>
+            </div>
+
           </div>
         </div>
       }
 
-      <!-- ─── Usuarios ───────────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           USUARIOS
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'usuarios') {
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Registro</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
             <tbody>
               @for (user of users(); track user.id) {
                 <tr>
                   <td>
                     <div class="table-user">
-                      <img [src]="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name" [alt]="user.name" class="table-user__avatar" />
-                      <span class="table-user__name">{{ user.name }}</span>
+                      <div class="table-user__initials">{{ (user.name || '?')[0] }}</div>
+                      <div>
+                        <span class="table-user__name">{{ user.name }}</span>
+                      </div>
                     </div>
                   </td>
                   <td><span class="table-role">{{ user.role }}</span></td>
+                  <td><span class="table-date">{{ user.created_at | date:'dd/MM/yy' }}</span></td>
                   <td>
                     <span class="status-badge" [class.active]="!user.banned" [class.pending]="user.banned">
                       {{ user.banned ? 'Suspendido' : 'Activo' }}
@@ -121,45 +213,84 @@
               }
             </tbody>
           </table>
+          @if (users().length === 0 && !loading()) {
+            <div class="empty-state">No hay usuarios registrados aún</div>
+          }
         </div>
       }
 
-      <!-- ─── Proyectos ──────────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           PROYECTOS
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'proyectos') {
-        <div class="project-review-list">
+        <div class="project-grid">
           @for (project of projects(); track project.id) {
-            <div class="review-card">
-              <img [src]="project.cover_image" [alt]="project.title" class="review-card__thumb" />
-              <div class="review-card__info">
-                <h4 class="review-card__title">{{ project.title }}</h4>
-                <span class="review-card__author">{{ project.author?.name }} · {{ project.category }}</span>
-                <div class="review-card__meta">
-                  <span class="status-badge" [class.active]="project.status === 'active'">{{ getStatusLabel(project.status) }}</span>
-                  @if (project.semester) { <span class="tag">Sem. {{ project.semester }}</span> }
-                  @if (project.subject)  { <span class="tag">{{ project.subject }}</span> }
-                  @if (project.featured) { <span class="tag" style="color:#f59e0b">⭐ Destacado</span> }
+            <div class="proj-card">
+              <div class="proj-card__cover">
+                <img [src]="project.cover_image" [alt]="project.title" />
+                <div class="proj-card__cover-overlay">
+                  <span class="proj-card__cat">{{ project.category }}</span>
+                  @if (project.featured) { <span class="proj-card__featured">⭐</span> }
                 </div>
               </div>
-              <div class="review-card__actions">
-                <button class="btn btn--primary btn--sm" (click)="approveProject(project.id)">✓ Aprobar</button>
-                <button class="btn btn--outline btn--sm" (click)="rejectProject(project.id)">✗ Rechazar</button>
-                <button class="btn btn--ghost btn--sm" (click)="featureProject(project.id, project.featured)" [title]="project.featured ? 'Quitar destacado' : 'Destacar'">
-                  {{ project.featured ? '☆' : '⭐' }}
+              <div class="proj-card__body">
+                <h4 class="proj-card__title">{{ project.title }}</h4>
+                <span class="proj-card__author">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  {{ project.author?.name || 'Diseñador' }}
+                </span>
+                <div class="proj-card__stats">
+                  <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    {{ project.views || 0 }}
+                  </span>
+                  <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {{ project.likes || 0 }}
+                  </span>
+                  <span class="status-badge" [class.active]="project.status === 'active'" [class.pending]="project.status === 'pending'">
+                    {{ getStatusLabel(project.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="proj-card__actions">
+                @if (project.status !== 'active') {
+                  <button class="proj-btn proj-btn--approve" (click)="approveProject(project.id)" title="Aprobar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </button>
+                }
+                @if (project.status === 'active') {
+                  <button class="proj-btn proj-btn--reject" (click)="rejectProject(project.id)" title="Rechazar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                }
+                <button class="proj-btn" [class.proj-btn--star]="!project.featured" [class.proj-btn--unstar]="project.featured"
+                        (click)="featureProject(project.id, project.featured)" title="Destacar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 </button>
-                <button class="btn btn--ghost btn--sm" (click)="openEditProject(project)" title="Editar sem/materia">✏️</button>
-                <button class="btn btn--ghost btn--sm table-actions__danger" (click)="deleteProject(project.id)">Eliminar</button>
+                <button class="proj-btn" (click)="openEditProject(project)" title="Clasificar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="proj-btn proj-btn--delete" (click)="deleteProject(project.id)" title="Eliminar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
               </div>
             </div>
           }
+          @if (projects().length === 0 && !loading()) {
+            <div class="empty-state" style="grid-column:1/-1">No hay proyectos subidos aún</div>
+          }
         </div>
       }
 
-      <!-- ─── Reportes ───────────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           REPORTES
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'reportes') {
+        @if (reports().length === 0 && !loading()) {
+          <div class="empty-state">No hay reportes pendientes 🎉</div>
+        }
         <div class="project-review-list">
-          @if (reports().length === 0) {
-            <div class="empty-state"><p>No hay reportes pendientes 🎉</p></div>
-          }
           @for (report of reports(); track report.id) {
             <div class="review-card">
               <img [src]="report.project?.cover_image" [alt]="report.project?.title" class="review-card__thumb" />
@@ -179,18 +310,17 @@
         </div>
       }
 
-      <!-- ─── Académico ──────────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           ACADÉMICO
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'academico') {
         <div class="academic-admin">
 
-          <!-- Semestres -->
           <div class="academic-section">
             <div class="academic-section__header">
               <h2 class="academic-section__title">Semestres</h2>
               <span class="academic-section__count">{{ semesters().length }} configurados</span>
             </div>
-
-            <!-- Tabla de semestres -->
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>ID</th><th>Clave</th><th>Etiqueta</th><th>Orden</th><th>Activo</th><th>Acciones</th></tr></thead>
@@ -202,9 +332,7 @@
                         <td><input class="admin-inline-input" [(ngModel)]="editSem()!.name" /></td>
                         <td><input class="admin-inline-input" [(ngModel)]="editSem()!.label" /></td>
                         <td><input class="admin-inline-input" type="number" [(ngModel)]="editSem()!.sort_order" style="width:60px" /></td>
-                        <td>
-                          <input type="checkbox" [(ngModel)]="editSem()!.active" />
-                        </td>
+                        <td><input type="checkbox" [(ngModel)]="editSem()!.active" /></td>
                         <td>
                           <div class="table-actions">
                             <button class="btn btn--primary btn--sm" (click)="saveSemester()">Guardar</button>
@@ -232,29 +360,22 @@
                 </tbody>
               </table>
             </div>
-
-            <!-- Agregar semestre -->
             <div class="academic-add-form">
               <h4 class="academic-add-form__title">Agregar semestre</h4>
               <div class="academic-add-row">
                 <input class="form-input" [(ngModel)]="newSemName" placeholder="Clave (ej. XI)" />
                 <input class="form-input" [(ngModel)]="newSemLabel" placeholder="Etiqueta (ej. Semestre XI)" />
                 <input class="form-input" type="number" [(ngModel)]="newSemOrder" placeholder="Orden" style="width:80px" />
-                <button class="btn btn--primary btn--sm" (click)="addSemester()" [disabled]="!newSemName.trim() || !newSemLabel.trim()">
-                  + Agregar
-                </button>
+                <button class="btn btn--primary btn--sm" (click)="addSemester()" [disabled]="!newSemName.trim() || !newSemLabel.trim()">+ Agregar</button>
               </div>
             </div>
           </div>
 
-          <!-- Materias -->
           <div class="academic-section">
             <div class="academic-section__header">
               <h2 class="academic-section__title">Materias</h2>
               <span class="academic-section__count">{{ subjects().length }} configuradas</span>
             </div>
-
-            <!-- Agrupadas por categoría -->
             @for (cat of categories; track cat) {
               <div class="subject-group">
                 <h4 class="subject-group__title">{{ cat }}</h4>
@@ -270,9 +391,7 @@
                       } @else {
                         <span class="subject-name" [class.inactive]="!sub.active">{{ sub.name }}</span>
                         <span class="subject-order">{{ sub.sort_order }}</span>
-                        <button class="toggle-btn" [class.on]="sub.active" (click)="toggleSubjectActive(sub)">
-                          {{ sub.active ? 'Activo' : 'Inactivo' }}
-                        </button>
+                        <button class="toggle-btn" [class.on]="sub.active" (click)="toggleSubjectActive(sub)">{{ sub.active ? 'Activo' : 'Inactivo' }}</button>
                         <button class="btn btn--ghost btn--sm" (click)="startEditSub(sub)">Editar</button>
                         <button class="btn btn--ghost btn--sm table-actions__danger" (click)="deleteSubject(sub.id)">✕</button>
                       }
@@ -284,22 +403,16 @@
                 </div>
               </div>
             }
-
-            <!-- Agregar materia -->
             <div class="academic-add-form">
               <h4 class="academic-add-form__title">Agregar materia</h4>
               <div class="academic-add-row">
                 <select class="form-input" [(ngModel)]="newSubCat">
                   <option value="">Selecciona categoría</option>
-                  @for (cat of categories; track cat) {
-                    <option [value]="cat">{{ cat }}</option>
-                  }
+                  @for (cat of categories; track cat) { <option [value]="cat">{{ cat }}</option> }
                 </select>
                 <input class="form-input" [(ngModel)]="newSubName" placeholder="Nombre de la materia" />
                 <input class="form-input" type="number" [(ngModel)]="newSubOrder" placeholder="Orden" style="width:80px" />
-                <button class="btn btn--primary btn--sm" (click)="addSubject()" [disabled]="!newSubCat || !newSubName.trim()">
-                  + Agregar
-                </button>
+                <button class="btn btn--primary btn--sm" (click)="addSubject()" [disabled]="!newSubCat || !newSubName.trim()">+ Agregar</button>
               </div>
             </div>
           </div>
@@ -307,7 +420,9 @@
         </div>
       }
 
-      <!-- ─── Configuración ──────────────────────────────────────── -->
+      <!-- ══════════════════════════════════════════════
+           CONFIGURACIÓN
+      ══════════════════════════════════════════════ -->
       @if (activeSection() === 'configuracion') {
         @if (config()) {
           <div class="config-form">
@@ -328,7 +443,7 @@
                 <input type="email" [value]="config()!.support_email"
                   (input)="config.update(c => c ? {...c, support_email: $any($event.target).value} : c)" />
               </div>
-              <div class="form-group">
+              <div class="form-group form-group--check">
                 <label>Permitir nuevos registros</label>
                 <input type="checkbox" [checked]="config()!.allow_register"
                   (change)="config.update(c => c ? {...c, allow_register: $any($event.target).checked} : c)" />
@@ -348,7 +463,7 @@
   </main>
 </div>
 
-<!-- ─── Modal editar semestre/materia de proyecto ──────────────────────────── -->
+<!-- ─── Modal editar clasificación académica ──────────────────────────── -->
 @if (editingProject()) {
   <div class="modal-backdrop" (click)="closeEditProject()">
     <div class="modal" (click)="$event.stopPropagation()" style="max-width:480px">
@@ -364,7 +479,6 @@
         <p style="font-size:.85rem;opacity:.6;margin-bottom:.5rem">
           <strong>{{ editingProject()!.title }}</strong> · {{ editingProject()!.category }}
         </p>
-
         <div class="form-group">
           <label class="form-label">Semestre</label>
           <select class="form-input" [(ngModel)]="editingProject()!.semester">
@@ -374,14 +488,11 @@
             }
           </select>
         </div>
-
         <div class="form-group" style="margin-top:1rem">
           <label class="form-label">Materia</label>
           <select class="form-input" [(ngModel)]="editingProject()!.subject">
             <option [ngValue]="null">Sin especificar</option>
-            @for (sub of projectSubjects(); track sub) {
-              <option [value]="sub">{{ sub }}</option>
-            }
+            @for (sub of projectSubjects(); track sub) { <option [value]="sub">{{ sub }}</option> }
           </select>
           @if (projectSubjects().length === 0) {
             <span style="font-size:.8rem;opacity:.5">Primero configura materias para esta categoría en la sección Académico</span>

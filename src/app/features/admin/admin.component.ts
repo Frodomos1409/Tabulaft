@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, PlatformConfig } from '../../core/services/admin.service';
 import { AcademicService, AcademicSemester, AcademicSubject } from '../../core/services/academic.service';
@@ -13,7 +13,7 @@ type AdminSection = 'dashboard' | 'usuarios' | 'proyectos' | 'reportes' | 'acade
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, DatePipe],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
 })
@@ -60,6 +60,8 @@ export class AdminComponent implements OnInit {
     if (!cat) return [];
     return (this.subjectsByCategory()[cat] ?? []).map((s: AcademicSubject) => s.name);
   });
+
+  today = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
   stats = signal([
     { label: 'Usuarios',  value: '0', change: '', up: true,  icon: 'users' },

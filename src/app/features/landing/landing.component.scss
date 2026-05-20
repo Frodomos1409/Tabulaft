@@ -28,72 +28,72 @@
   align-items: flex-start;
   justify-content: center;
   overflow: hidden;
-  padding: calc(#{$navbar-height} + 32px) $space-6 60px;
+  padding: calc(#{$navbar-height} + 40px) clamp(24px, 5vw, 72px) 60px;
 
   &__spark {
     position: absolute; pointer-events: none; z-index: 2;
     transition: transform 0.1s ease-out;
-    &--1 { width: 100px; top: 10%; left: 6%; }
-    &--2 { width: 80px; bottom: 20%; left: 30%; }
+    &--1 { width: clamp(60px, 7vw, 90px); top: 8%; left: 5%; }
+    &--2 { width: clamp(50px, 5vw, 70px); bottom: 18%; left: 38%; }
   }
 
   &__char {
     position: absolute; pointer-events: none; z-index: 1; bottom: 0;
-    &--a { height: clamp(260px, 38vw, 560px); right: 0; }
-    &--b { height: clamp(180px, 24vw, 360px); right: clamp(200px, 28vw, 440px); }
+    &--a { height: clamp(55vh, 72vh, 88vh); right: 0; }
+    &--b { height: clamp(35vh, 46vh, 56vh); right: clamp(160px, 32vw, 480px); }
     @include mobile { display: none; }
   }
 
   &__card {
     position: relative; z-index: 3;
     background: #fff;
-    border-radius: 24px;
-    padding: 36px 40px;
-    max-width: clamp(320px, 46vw, 660px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.20);
+    border-radius: 20px;
+    padding: clamp(20px, 2.5vw, 32px) clamp(24px, 3vw, 40px);
+    max-width: clamp(280px, 38vw, 520px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
     transition: transform 0.08s ease-out;
     will-change: transform;
-    margin-bottom: 28px;
-    @include mobile { padding: 24px; max-width: 100%; }
+    margin-bottom: 24px;
+    @include mobile { padding: 20px 22px; max-width: 88vw; }
   }
 
   &__title {
     font-family: $font-heading;
-    font-size: clamp(36px, 5.5vw, 80px);
+    font-size: clamp(28px, 4.2vw, 62px);
     font-weight: 400;
-    line-height: 0.95;
+    line-height: 0.96;
     letter-spacing: -0.5px;
     color: $blue;
     margin: 0;
 
     &-line3 {
       display: block;
-      margin-top: 4px;
+      margin-top: 2px;
     }
   }
 
   &__subtitle {
     position: relative; z-index: 3;
-    font-size: clamp(13px, 1.4vw, 15px);
+    font-size: clamp(12px, 1.2vw, 14px);
     color: rgba(255,255,255,0.65);
-    max-width: 440px;
-    line-height: 1.65;
-    margin: 0 0 24px;
+    max-width: 380px;
+    line-height: 1.6;
+    margin: 0 0 20px;
   }
 
   &__ctas {
     position: relative; z-index: 3;
-    display: flex; gap: 12px; flex-wrap: wrap;
+    display: flex; gap: 10px; flex-wrap: wrap;
   }
 
   &__btn {
     display: inline-flex; align-items: center; gap: 8px;
-    height: 48px; padding: 0 28px; border-radius: $radius-pill;
-    font-size: 14px; font-weight: 700; text-decoration: none;
+    height: 44px; padding: 0 24px; border-radius: $radius-pill;
+    font-size: 13px; font-weight: 700; text-decoration: none;
     background: #fff; color: $blue;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.20);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.28); }
+    &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.26); }
 
     &--outline {
       background: transparent; color: rgba(255,255,255,0.88);

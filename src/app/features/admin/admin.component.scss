@@ -41,22 +41,14 @@
   }
 
   &__logo {
-    font-family: $font-heading;
-    font-weight: 800;
-    font-size: $text-lg;
-    letter-spacing: -0.03em;
     text-decoration: none;
     color: var(--text);
-    white-space: nowrap;
+    display: flex; align-items: center;
+  }
 
-    .grad {
-      background: $gradient-primary;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .dot { color: $hot-pink; }
+  &__logo-svg {
+    height: 28px;
+    width: auto;
   }
 
   &__toggle {

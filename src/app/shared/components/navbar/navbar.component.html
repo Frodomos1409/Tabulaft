@@ -4,7 +4,7 @@
     <!-- Logo -->
     <a routerLink="/" class="navbar__logo">
       <svg class="navbar__logo-svg" viewBox="0 0 812.3 469.21" xmlns="http://www.w3.org/2000/svg" aria-label="Tabulaft">
-        <ellipse fill="#E91E8C" cx="776.85" cy="433.44" rx="35.45" ry="35.77"/>
+        <ellipse fill="#2830eb" cx="776.85" cy="433.44" rx="35.45" ry="35.77"/>
         <polygon fill="currentColor" points="206.28 469.21 55.38 469.21 55.38 61.55 0 61.55 0 .5 203.77 .5 181.82 61.55 124.24 61.55 124.24 408.15 185.9 408.15 206.28 469.21"/>
         <path fill="currentColor" d="M298.46.61l-.16.05v-.16h-74.47l-70.52,237.85.27.08-.36.11,70.52,230.67h74.47v-.16l.16.05,70.51-230.61.11-.03L298.46.61ZM261.13,117.12l9.91,33.45h-19.82l9.91-33.45ZM261.03,356.11l-10.22-33.45h20.44l-10.22,33.45ZM261.03,275.54c-20,0-36.21-16.66-36.21-37.21s16.21-37.21,36.21-37.21,36.21,16.66,36.21,37.21-16.21,37.21-36.21,37.21Z"/>
         <path fill="currentColor" d="M741.24,156.38l.16-156.38h-68.74l-.16,163.53c0,16.36-6.55,21.8-14.74,21.8s-14.72-5.44-14.72-21.8l.16-163.53h-68.74l-.16,156.38c0,41.65,15.3,63.56,36.92,74.3h-87.57c26.43-10.95,40.37-33.28,40.37-62.2,0-25.53-11.95-44.78-34.2-55.27,18.92-10.85,28.88-28.33,28.88-51.43,0-37.78-29.21-61.22-82.66-61.22h-87.61v468.65h68.85v-74.03h92.71v-69.48h-92.71v-25.55h166.04v169.05s68.86,0,68.86,0v-169.05h49.04v-69.48h-36.92c21.62-10.74,36.92-32.65,36.92-74.3ZM458.13,56.53h11.29c11.96,0,17.94,8.75,17.94,17.5s-5.97,17.84-17.94,17.84h-11.29v-35.34ZM475.07,182.13h-16.93v-44.78h16.93c11.96,0,17.94,11.2,17.94,22.38s-5.97,22.4-17.94,22.4Z"/>
@@ -13,7 +13,7 @@
 
     <!-- Center Links -->
     <div class="navbar__links">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+      <a [routerLink]="auth.isLoggedIn() ? '/inicio' : '/'" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
       <a routerLink="/explorar" routerLinkActive="active">Explorar</a>
       <a routerLink="/publicar" routerLinkActive="active">Publicar</a>
     </div>
@@ -21,9 +21,9 @@
     <!-- Actions -->
     <div class="navbar__actions">
 
-      <!-- Search Button -->
+      <!-- Search pill -->
       <button class="navbar__search-btn" (click)="openSearch()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <span class="navbar__search-label">Buscar</span>
@@ -33,7 +33,7 @@
       <!-- Theme Toggle -->
       <button class="navbar__icon-btn" (click)="theme.toggle()" [title]="theme.isDark() ? 'Modo claro' : 'Modo oscuro'">
         @if (theme.isDark()) {
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
             <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
             <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
@@ -41,7 +41,7 @@
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
         } @else {
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         }
@@ -50,8 +50,8 @@
       <!-- Notifications (solo si autenticado) -->
       @if (auth.isLoggedIn()) {
         <div class="navbar__notif-wrapper">
-          <button class="navbar__icon-btn" (click)="toggleNotif($event)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="navbar__icon-btn" style="position:relative" (click)="toggleNotif($event)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
@@ -79,24 +79,27 @@
                 </div>
               }
               @if (notifications().length === 0) {
-                <p style="padding:1rem;text-align:center;opacity:0.5;font-size:.85rem">Sin notificaciones</p>
+                <p style="padding:1.25rem;text-align:center;opacity:0.45;font-size:.85rem">Sin notificaciones</p>
               }
             </div>
           }
         </div>
       }
 
-      <!-- Auth Button / User -->
+      <!-- Auth: logueado → chip usuario | no logueado → btn Entrar -->
       @if (auth.isLoggedIn()) {
-        <div style="display:flex;align-items:center;gap:.75rem">
+        <div style="display:flex;align-items:center;gap:8px">
           @if (auth.isAdmin()) {
-            <a routerLink="/admin" class="btn btn--sm" style="opacity:.7">Admin</a>
+            <a routerLink="/admin" class="btn btn--sm btn--ghost" style="font-size:12px;opacity:.65">Admin</a>
           }
-          <a [routerLink]="['/perfil', auth.currentUser()?.id]" class="btn btn--sm">
-            {{ auth.currentUser()?.name }}
+          <a [routerLink]="['/perfil', auth.currentUser()?.id]" class="navbar__user-chip">
+            <span style="width:24px;height:24px;border-radius:50%;background:#2830eb;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">
+              {{ (auth.currentUser()?.name || 'U').charAt(0).toUpperCase() }}
+            </span>
+            {{ (auth.currentUser()?.name || '').split(' ')[0] }}
           </a>
           <button class="navbar__icon-btn" (click)="logout()" title="Cerrar sesión">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
@@ -106,7 +109,7 @@
         <a routerLink="/auth" class="btn btn--primary btn--sm">Entrar</a>
       }
 
-      <!-- Mobile Menu Toggle -->
+      <!-- Mobile toggle -->
       <button class="navbar__hamburger" (click)="toggleMobile()">
         <span [class.open]="mobileMenuOpen()"></span>
         <span [class.open]="mobileMenuOpen()"></span>
@@ -118,7 +121,7 @@
   <!-- Mobile Menu -->
   @if (mobileMenuOpen()) {
     <div class="navbar__mobile-menu">
-      <a routerLink="/" (click)="toggleMobile()">Inicio</a>
+      <a [routerLink]="auth.isLoggedIn() ? '/inicio' : '/'" (click)="toggleMobile()">Inicio</a>
       <a routerLink="/explorar" (click)="toggleMobile()">Explorar</a>
       <a routerLink="/publicar" (click)="toggleMobile()">Publicar</a>
       <button class="navbar__mobile-search" (click)="toggleMobile(); openSearch()">

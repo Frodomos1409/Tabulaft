@@ -6,6 +6,11 @@ import { adminGuard } from './core/guards/admin.guard';
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   {
+    path: 'inicio',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
+  },
+  {
     path: 'explorar',
     loadComponent: () => import('./features/feed/feed.component').then(m => m.FeedComponent)
   },

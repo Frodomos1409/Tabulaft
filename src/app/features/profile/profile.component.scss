@@ -1,221 +1,506 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.profile-cover {
-  height: 280px;
-  background: $gradient-primary;
-  position: relative;
-  margin-top: $navbar-height;
+// ─── Page ─────────────────────────────────────────────────────────────────────
+.profile-page {
+  min-height: 100vh;
+  background: #fafafe;
+}
 
-  &__gradient {
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.profile-hero {
+  position: relative;
+  background: $blue;
+  padding: calc(#{$navbar-height} + 48px) 0 56px;
+  overflow: hidden;
+
+  &__grain {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba($violet, 0.8), rgba($purple, 0.9), rgba($hot-pink, 0.4));
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 0;
   }
-}
 
-.profile-body { padding-top: 0; }
+  &__blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(80px);
+    z-index: 0;
+    &--1 {
+      width: 500px; height: 500px;
+      background: rgba(#ee41ba, 0.16);
+      right: -100px; top: -80px;
+    }
+    &--2 {
+      width: 300px; height: 300px;
+      background: rgba(#36d7ff, 0.10);
+      left: 0; bottom: -60px;
+    }
+  }
 
-.profile-header {
-  @include flex-between;
-  align-items: flex-end;
-  padding: 0 0 $space-8;
-  flex-wrap: wrap;
-  gap: $space-4;
-
-  &__left {
+  &__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 $space-6;
     display: flex;
     align-items: flex-end;
-    gap: $space-5;
+    gap: $space-8;
+    @include tablet { gap: $space-6; }
+    @include mobile { flex-direction: column; align-items: flex-start; padding: 0 $space-4; gap: $space-4; }
   }
 }
 
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: $radius-2xl;
-  object-fit: cover;
-  border: 4px solid var(--bg);
-  box-shadow: $shadow-dark;
-  margin-top: -60px;
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+.profile-avatar-wrap {
+  position: relative;
   flex-shrink: 0;
 }
 
+.profile-avatar {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 3px solid rgba(255,255,255,0.20);
+  @include mobile { width: 80px; height: 80px; }
+}
+
+.profile-avatar__ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: $aurora-gradient;
+  background-size: 200% 200%;
+  animation: aurora 4s linear infinite;
+  z-index: -1;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+
+// ─── Info ─────────────────────────────────────────────────────────────────────
 .profile-info {
-  padding-bottom: $space-2;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 
   &__name {
     font-family: $font-heading;
-    font-size: $text-3xl;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--text);
-    margin-bottom: $space-1;
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 400;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 1px;
+    line-height: 1.05;
   }
 
   &__role {
-    font-size: $text-sm;
-    color: $violet-light;
-    font-weight: 600;
-    margin-bottom: $space-2;
+    font-size: $text-md;
+    color: rgba(255,255,255,0.60);
+    margin: 0;
+    font-weight: 500;
   }
 
   &__bio {
     font-size: $text-sm;
-    color: var(--text-secondary);
-    max-width: 400px;
+    color: rgba(255,255,255,0.55);
+    margin: 4px 0 0;
+    line-height: 1.5;
+    max-width: 460px;
   }
 }
 
-.profile-stats {
+// ─── Stats inline ─────────────────────────────────────────────────────────────
+.profile-stats-inline {
   display: flex;
   gap: $space-8;
-  padding: $space-5 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: $space-8;
-  flex-wrap: wrap;
+  margin-top: 12px;
+  @include mobile { gap: $space-6; }
 }
 
-.profile-stat {
+.profile-stat-inline {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 
   strong {
     font-family: $font-heading;
-    font-size: $text-2xl;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
+    font-size: clamp(20px, 2.2vw, 28px);
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: 0.5px;
+    line-height: 1;
   }
 
   span {
-    font-size: $text-xs;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
     letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+.profile-actions {
+  display: flex;
+  gap: $space-3;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  @include mobile { width: 100%; }
+}
+
+.profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  border: none;
+
+  &--primary {
+    background: #fff;
+    color: $blue;
+    &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.20); }
+  }
+
+  &--outline {
+    background: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.90);
+    border: 1.5px solid rgba(255,255,255,0.22);
+    &:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.40); }
+  }
+
+  &--following {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.80);
+    border: 1.5px solid rgba(255,255,255,0.20);
+    &:hover { background: rgba(#f87171, 0.20); border-color: rgba(#f87171, 0.40); color: #f87171; }
+  }
+
+  @include mobile { flex: 1; justify-content: center; }
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.profile-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $space-6 80px;
+  @include mobile { padding: 0 $space-4 80px; }
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+.profile-tabs-wrap {
+  border-bottom: 1px solid rgba($blue, 0.08);
+  margin-bottom: $space-8;
 }
 
 .profile-tabs {
   display: flex;
-  gap: $space-2;
-  margin-bottom: $space-8;
-  border-bottom: 1px solid var(--border);
+  gap: 0;
 }
 
 .profile-tab {
-  padding: $space-3 $space-5;
-  font-size: $text-sm;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 20px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
+  color: rgba(0,0,0,0.38);
+  background: transparent;
   border: none;
-  background: none;
-  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
   margin-bottom: -1px;
-  transition: all $transition-fast;
+  transition: all 0.15s ease;
 
-  &:hover { color: var(--text); }
+  &:hover { color: $blue; }
 
   &.active {
-    color: $violet-light;
-    border-bottom-color: $violet;
+    color: $blue;
+    border-bottom-color: $blue;
+  }
+
+  &__count {
+    background: rgba($blue, 0.08);
+    color: $blue;
+    border-radius: $radius-pill;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 700;
   }
 }
 
+// ─── Grid masonry ─────────────────────────────────────────────────────────────
 .masonry-grid {
-  columns: 3;
-  column-gap: $space-5;
-  padding-bottom: $space-16;
-
-  @include tablet { columns: 2; }
-  @include mobile { columns: 1; }
+  columns: 4;
+  column-gap: 18px;
+  @include tablet { columns: 3; }
+  @include mobile { columns: 2; column-gap: 12px; }
+  @include small  { columns: 1; }
+  > * { break-inside: avoid; margin-bottom: 18px; @include mobile { margin-bottom: 12px; } }
 }
 
-// ─── Modal ──────────────────────────────────────────────────────────────────
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(4px);
+// ─── Empty ────────────────────────────────────────────────────────────────────
+.profile-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-4;
+  padding: 80px 0;
+  text-align: center;
+
+  &__icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba($blue, 0.05);
+    @include flex-center;
+    color: rgba($blue, 0.28);
+  }
+
+  p { font-size: $text-md; color: rgba(0,0,0,0.38); margin: 0; }
+
+  &__cta {
+    font-size: 13px;
+    font-weight: 700;
+    color: $blue;
+    text-decoration: none;
+    border-bottom: 2px solid rgba($blue, 0.22);
+    padding-bottom: 1px;
+    transition: border-color 0.15s ease;
+    &:hover { border-color: $blue; }
+  }
+}
+
+.profile-not-found {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: $space-4;
+  height: 60vh;
+  font-size: $text-lg;
+  color: rgba(0,0,0,0.30);
 }
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(5, 5, 20, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  @include flex-center;
+  padding: $space-4;
+  animation: fadeInFast 0.15s ease;
+}
+
+@keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
 
 .modal {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: $radius-xl;
+  background: #fff;
+  border-radius: 20px;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 24px 64px rgba(0,0,0,.4);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.24);
+  animation: modalIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  position: relative;
 
-  &__header {
-    @include flex-between;
-    padding: $space-5 $space-6;
-    border-bottom: 1px solid var(--border);
-  }
-
-  &__title { font-size: 1.1rem; font-weight: 600; }
-
-  &__close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: $space-1;
-    display: flex;
-    &:hover { color: var(--text); }
-  }
-
-  &__body { padding: $space-6; display: flex; flex-direction: column; gap: $space-4; }
-
-  &__footer {
-    @include flex-between;
-    padding: $space-4 $space-6;
-    border-top: 1px solid var(--border);
-    gap: $space-3;
+  // Aurora line top
+  &::before {
+    content: '';
+    display: block;
+    height: 2.5px;
+    background: linear-gradient(90deg, $blue, $accent-pink, #36d7ff);
+    background-size: 200% 100%;
+    animation: aurora 5s linear infinite;
+    flex-shrink: 0;
   }
 }
 
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba($blue, 0.07);
+}
+
+.modal__title {
+  font-family: $font-heading;
+  font-size: 20px;
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.modal__close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.05);
+  border: none;
+  cursor: pointer;
+  @include flex-center;
+  color: rgba(0,0,0,0.40);
+  transition: all 0.15s ease;
+  &:hover { background: rgba(0,0,0,0.09); color: #000; }
+}
+
+.modal__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.modal__footer {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: $space-3;
+  justify-content: flex-end;
+  border-top: 1px solid rgba($blue, 0.07);
+}
+
+// ─── Edit avatar ──────────────────────────────────────────────────────────────
 .edit-avatar-wrap {
   display: flex;
   align-items: center;
   gap: $space-4;
-  margin-bottom: $space-2;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba($blue, 0.07);
 }
 
 .edit-avatar {
-  width: 72px;
-  height: 72px;
+  width: 72px; height: 72px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border);
+  border: 2px solid rgba($blue, 0.12);
+  flex-shrink: 0;
 }
 
 .edit-avatar-btn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: $radius-pill;
+  border: 1.5px solid rgba($blue, 0.18);
+  background: transparent;
+  color: $blue;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: .85rem;
-  color: $violet-light;
-  text-decoration: underline;
-  &:hover { color: $hot-pink; }
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+  &:hover { background: rgba($blue, 0.05); }
 }
 
-.form-group { display: flex; flex-direction: column; gap: $space-1; }
-.form-label { font-size: .85rem; font-weight: 500; color: var(--text-muted); }
-.form-input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: $radius-md;
-  padding: $space-3 $space-4;
-  color: var(--text);
-  font-size: .95rem;
-  width: 100%;
-  &:focus { outline: none; border-color: $violet; }
+// ─── Modal form ───────────────────────────────────────────────────────────────
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  &__group { display: flex; flex-direction: column; gap: 6px; }
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(0,0,0,0.50);
+    letter-spacing: 0.04em;
+  }
+
+  &__input {
+    background: #fafafe;
+    border: 1.5px solid rgba($blue, 0.10);
+    border-radius: $radius-lg;
+    padding: 10px 14px;
+    font-size: $text-base;
+    font-family: $font-body;
+    color: #000;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder { color: rgba(0,0,0,0.22); }
+
+    &:focus {
+      outline: none;
+      border-color: $blue;
+      box-shadow: 0 0 0 3px rgba($blue, 0.07);
+      background: #fff;
+    }
+  }
+
+  &__textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 }
-.form-textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+
+// ─── Modal buttons ────────────────────────────────────────────────────────────
+.modal-btn {
+  height: 40px;
+  padding: 0 22px;
+  border-radius: $radius-pill;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &--ghost {
+    background: transparent;
+    border: 1.5px solid rgba($blue, 0.15);
+    color: rgba(0,0,0,0.50);
+    &:hover { border-color: rgba($blue, 0.30); color: $blue; }
+  }
+
+  &--primary {
+    background: $blue;
+    border: none;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba($blue, 0.28);
+    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 18px rgba($blue, 0.40); }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+  }
+}
+
+.modal-spinner {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── Aurora keyframe ──────────────────────────────────────────────────────────
+@keyframes aurora {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}

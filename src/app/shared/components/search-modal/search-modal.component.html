@@ -1,81 +1,124 @@
-<div class="search-modal" (click)="onBackdropClick($event)">
-  <div class="search-modal__panel">
+<div class="sm-backdrop" (click)="onBackdropClick($event)">
+  <div class="sm-panel">
 
-    <!-- Input -->
-    <div class="search-modal__input-wrap">
-      @if (isSearching()) {
-        <div class="search-modal__spinner"></div>
-      } @else {
-        <svg class="search-modal__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-      }
+    <!-- ── Input ─────────────────────────────────────────────────────── -->
+    <div class="sm-input-row">
+      <div class="sm-input-icon">
+        @if (isSearching()) {
+          <div class="sm-spinner"></div>
+        } @else {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        }
+      </div>
       <input
         #searchInput
-        class="search-modal__input"
+        class="sm-input"
         type="text"
-        placeholder="Buscar proyectos, autores, categorías..."
+        placeholder="Proyectos, autores, categorías..."
+        autocomplete="off"
+        spellcheck="false"
         (input)="onInput($event)"
       />
       @if (query()) {
-        <button class="search-modal__clear" (click)="clearQuery()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <button class="sm-clear" (click)="clearQuery()" aria-label="Limpiar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       }
-      <button class="search-modal__esc" (click)="close.emit()">ESC</button>
+      <button class="sm-esc" (click)="close.emit()">ESC</button>
     </div>
 
-    <!-- Category Filters -->
-    <div class="search-modal__filters">
+    <!-- ── Categorías ─────────────────────────────────────────────────── -->
+    <div class="sm-cats">
       @for (cat of categories; track cat) {
-        <button class="tag" [class.active]="activeFilter() === cat" (click)="setFilter(cat)">
+        <button class="sm-cat" [class.active]="activeFilter() === cat" (click)="setFilter(cat)">
           {{ cat }}
         </button>
       }
     </div>
 
-    <!-- Results -->
-    <div class="search-modal__results">
+    <!-- ── Body ───────────────────────────────────────────────────────── -->
+    <div class="sm-body">
 
       @if (results().length > 0) {
-        <div class="search-modal__results-header">
-          {{ query() ? results().length + ' resultado' + (results().length !== 1 ? 's' : '') : 'Proyectos recientes' }}
-        </div>
-        @for (project of results(); track project.id) {
-          <a class="search-result" [routerLink]="['/proyecto', project.id]" (click)="onResultClick()">
-            <img class="search-result__thumb" [src]="project.cover_image" [alt]="project.title" />
-            <div class="search-result__info">
-              <span class="search-result__title">{{ project.title }}</span>
-              <span class="search-result__meta">{{ project.author.name }} · {{ project.category }}</span>
-            </div>
-            <div class="search-result__stats">
-              <span class="search-result__likes">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                {{ project.likes }}
+
+        <!-- Primer resultado grande (preview) -->
+        <div class="sm-preview">
+          <img class="sm-preview__img" [src]="results()[0].cover_image || 'assets/work-1.png'" [alt]="results()[0].title" />
+          <div class="sm-preview__info">
+            <span class="sm-preview__cat">{{ results()[0].category }}</span>
+            <h3 class="sm-preview__title">{{ results()[0].title }}</h3>
+            <p class="sm-preview__author">{{ results()[0].author?.name }}</p>
+            <div class="sm-preview__stats">
+              <span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                {{ results()[0].likes }}
+              </span>
+              <span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {{ results()[0].views }}
               </span>
             </div>
-          </a>
-        }
-      } @else if (query() && !isSearching()) {
-        <div class="search-modal__empty">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <p>Sin resultados para <strong>"{{ query() }}"</strong></p>
-          <span>Intenta con otro término o cambia la categoría</span>
-        </div>
-      } @else if (!query()) {
-        <div class="search-modal__hint">
-          <p>Empieza a escribir para buscar proyectos</p>
-          <div class="search-modal__shortcuts">
-            <span><kbd>ESC</kbd> cerrar</span>
-            <span><kbd>Enter</kbd> abrir proyecto</span>
+            <a [routerLink]="['/proyecto', results()[0].id]"
+               class="sm-preview__cta"
+               (click)="onResultClick()">
+              Ver proyecto →
+            </a>
           </div>
         </div>
+
+        <!-- Lista del resto -->
+        @if (results().length > 1) {
+          <div class="sm-list-header">
+            {{ query() ? 'Más resultados' : 'Otros proyectos' }}
+          </div>
+          <div class="sm-list">
+            @for (project of results().slice(1); track project.id) {
+              <a class="sm-item" [routerLink]="['/proyecto', project.id]" (click)="onResultClick()">
+                <img class="sm-item__thumb" [src]="project.cover_image || 'assets/work-1.png'" [alt]="project.title" />
+                <div class="sm-item__info">
+                  <span class="sm-item__title">{{ project.title }}</span>
+                  <span class="sm-item__meta">{{ project.author?.name }} · {{ project.category }}</span>
+                </div>
+                <div class="sm-item__likes">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  {{ project.likes }}
+                </div>
+              </a>
+            }
+          </div>
+        }
+
+      } @else if (query() && !isSearching()) {
+
+        <div class="sm-empty">
+          <div class="sm-empty__icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <line x1="8" y1="11" x2="14" y2="11"/>
+            </svg>
+          </div>
+          <p>Sin resultados para <strong>"{{ query() }}"</strong></p>
+          <span>Prueba con otro término o cambia la categoría</span>
+        </div>
+
+      } @else if (!query() && !isSearching()) {
+
+        <div class="sm-hint">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.25">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <p>Busca proyectos, diseñadores o categorías</p>
+          <div class="sm-shortcuts">
+            <span><kbd>ESC</kbd> cerrar</span>
+            <span><kbd>↵</kbd> abrir</span>
+            <span><kbd>⌘K</kbd> abrir buscador</span>
+          </div>
+        </div>
+
       }
 
     </div>

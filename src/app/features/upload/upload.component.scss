@@ -1,444 +1,646 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 .upload-page {
-  padding-top: calc(#{$navbar-height} + #{$space-8});
-  padding-bottom: $space-20;
   min-height: 100vh;
-  background: var(--bg);
+  background: #fafafe;
+  padding-top: $navbar-height;
 }
 
-// ─── Centered wrapper ────────────────────────────────────────────────────
-.upload-center {
-  max-width: 760px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-// ─── Header ──────────────────────────────────────────────────────────────
+// ─── Header ───────────────────────────────────────────────────────────────────
 .upload-header {
-  margin-bottom: $space-8;
+  position: sticky;
+  top: $navbar-height;
+  z-index: 90;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba($blue, 0.07);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+
+  &__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 $space-6;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: $space-6;
+    @include mobile { padding: 0 $space-4; gap: $space-3; }
+  }
+
+  &__center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__right {
+    display: flex;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
 }
 
 .upload-back {
   display: inline-flex;
   align-items: center;
-  gap: $space-2;
-  color: var(--text-secondary);
-  font-size: $text-sm;
-  font-weight: 500;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.40);
   text-decoration: none;
-  margin-bottom: $space-4;
-  transition: color $transition-fast;
-  &:hover { color: var(--text); }
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+  &:hover { color: $blue; }
 }
 
 .upload-title {
   font-family: $font-heading;
-  font-size: $text-4xl;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--text);
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+  letter-spacing: 0.5px;
 
-  @include mobile { font-size: $text-3xl; }
+  em {
+    font-style: italic;
+    @include gradient-text(linear-gradient(135deg, $blue, $accent-pink));
+  }
 }
 
-// ─── Progress Bar ────────────────────────────────────────────────────────
-.upload-progress {
+// ─── Steps ────────────────────────────────────────────────────────────────────
+.upload-steps {
   display: flex;
-  gap: $space-3;
-  margin-bottom: $space-10;
-  max-width: 540px;
+  align-items: center;
+  gap: 0;
+  @include mobile { display: none; }
 }
 
-.upload-progress__step {
-  flex: 1;
+.upload-step-item {
   display: flex;
-  flex-direction: column;
-  gap: $space-2;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.30);
+  transition: color 0.2s ease;
 
-  .upload-progress__bar {
-    height: 4px;
-    background: var(--bg-card);
-    border-radius: $radius-pill;
-    transition: background $transition-slow;
+  &__circle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
   }
 
-  .upload-progress__label {
-    font-size: $text-xs;
-    color: var(--text-tertiary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: color $transition-fast;
+  &.active {
+    color: $blue;
+    .upload-step-item__circle {
+      background: $blue;
+      border-color: $blue;
+      color: #fff;
+    }
   }
 
-  &.active .upload-progress__bar { background: $gradient-primary; }
-  &.current .upload-progress__label { color: $violet-light; }
-  &.active .upload-progress__label { color: var(--text-secondary); }
+  &.done {
+    color: rgba(0,0,0,0.50);
+    .upload-step-item__circle {
+      background: rgba($blue, 0.10);
+      border-color: $blue;
+      color: $blue;
+    }
+  }
 }
 
-// ─── Step Wrapper ────────────────────────────────────────────────────────
-.upload-step {
-  max-width: 720px;
+.upload-step-connector {
+  width: 28px;
+  height: 1.5px;
+  background: rgba(0,0,0,0.10);
+  margin: 0 4px;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+  &.done { background: rgba($blue, 0.35); }
+}
+
+// ─── Nav buttons ──────────────────────────────────────────────────────────────
+.upload-nav-btn {
+  height: 36px;
+  padding: 0 20px;
+  border-radius: $radius-pill;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &--ghost {
+    background: transparent;
+    border: 1.5px solid rgba($blue, 0.18);
+    color: $blue;
+    &:hover { background: rgba($blue, 0.05); }
+  }
+
+  &--primary {
+    background: $blue;
+    border: none;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba($blue, 0.30);
+    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 18px rgba($blue, 0.40); }
+    &:disabled { opacity: 0.40; cursor: not-allowed; }
+  }
+}
+
+// ─── Body 2-col ───────────────────────────────────────────────────────────────
+.upload-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px $space-6 80px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
+  align-items: start;
+
+  @include tablet { grid-template-columns: 1fr 320px; gap: 28px; }
+  @include mobile { grid-template-columns: 1fr; padding: 24px $space-4 80px; }
+}
+
+// ─── Form col ─────────────────────────────────────────────────────────────────
+.upload-section {
+  background: #fff;
+  border-radius: $radius-xl;
+  border: 1px solid rgba($blue, 0.07);
+  padding: 36px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+
+  @include mobile { padding: 24px 20px; }
 
   &__title {
     font-family: $font-heading;
-    font-size: $text-2xl;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    margin-bottom: $space-2;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 400;
+    color: #000;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px;
   }
 
-  &__subtitle {
+  &__sub {
     font-size: $text-sm;
-    color: var(--text-secondary);
-    margin-bottom: $space-8;
-    line-height: 1.5;
+    color: rgba(0,0,0,0.40);
+    margin: 0 0 28px;
   }
 }
 
-// ─── Drop Zone ───────────────────────────────────────────────────────────
+// ─── Dropzone ─────────────────────────────────────────────────────────────────
 .dropzone {
-  border: 2px dashed var(--border);
+  border: 2px dashed rgba($blue, 0.20);
   border-radius: $radius-xl;
-  padding: $space-12 $space-8;
-  text-align: center;
+  padding: 48px 24px;
+  @include flex-center;
   cursor: pointer;
-  transition: all $transition-base;
-  background: var(--bg-card);
-  margin-bottom: $space-6;
+  transition: all 0.2s ease;
+  background: rgba($blue, 0.01);
+  position: relative;
 
   &:hover, &.drag-over {
-    border-color: $violet;
-    background: rgba($violet, 0.04);
+    border-color: $blue;
+    background: rgba($blue, 0.03);
   }
 
   &.drag-over {
     transform: scale(1.01);
-    box-shadow: 0 0 0 4px rgba($violet, 0.1);
+    box-shadow: 0 0 0 4px rgba($blue, 0.08);
   }
 
   &.has-images {
-    padding: $space-5 $space-6;
+    padding: 18px 24px;
     border-style: solid;
-    border-color: var(--border);
   }
 
-  &__empty {}
+  &__empty { text-align: center; }
 
   &__icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba($blue, 0.06);
     @include flex-center;
-    width: 72px;
-    height: 72px;
-    background: rgba($violet, 0.08);
-    border-radius: $radius-xl;
-    margin: 0 auto $space-4;
-    color: $violet-light;
-    transition: all $transition-base;
-
-    .dropzone:hover & { background: rgba($violet, 0.14); transform: scale(1.05); }
+    margin: 0 auto 16px;
+    color: rgba($blue, 0.50);
+    transition: transform 0.2s ease;
+    .dropzone:hover & { transform: translateY(-3px); }
   }
 
   &__text {
     font-size: $text-md;
-    color: var(--text-secondary);
-    margin-bottom: $space-2;
-
-    span {
-      color: $violet-light;
-      font-weight: 600;
-      text-decoration: underline;
-    }
+    color: rgba(0,0,0,0.50);
+    margin: 0 0 6px;
+    span { color: $blue; font-weight: 700; }
   }
 
-  &__hint {
-    font-size: $text-xs;
-    color: var(--text-tertiary);
-  }
+  &__hint { font-size: 12px; color: rgba(0,0,0,0.28); margin: 0; }
 
   &__add-more {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: $space-2;
-    color: $violet-light;
-    font-size: $text-sm;
+    gap: 8px;
+    font-size: 13px;
     font-weight: 600;
+    color: rgba($blue, 0.70);
   }
 }
 
-// ─── Thumbnails ──────────────────────────────────────────────────────────
+// ─── Thumbs ───────────────────────────────────────────────────────────────────
 .thumbs-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $space-3;
-  margin-bottom: $space-3;
-
-  @include mobile { grid-template-columns: repeat(3, 1fr); }
-  @include small  { grid-template-columns: repeat(2, 1fr); }
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .thumb {
   position: relative;
-  border-radius: $radius-lg;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
   overflow: hidden;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all $transition-fast;
-  aspect-ratio: 1;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  &:hover { border-color: rgba($violet, 0.4); }
+  &:hover { transform: scale(1.03); }
 
-  &.is-cover {
-    border-color: $violet;
-    box-shadow: 0 0 0 3px rgba($violet, 0.2);
-  }
+  &.is-cover { border-color: $blue; box-shadow: 0 0 0 2px rgba($blue, 0.25); }
 
   &__badge {
     position: absolute;
-    top: 6px;
-    left: 6px;
-    background: $gradient-primary;
-    color: white;
-    font-size: 9px;
+    bottom: 5px; left: 50%;
+    transform: translateX(-50%);
+    background: $blue;
+    color: #fff;
+    font-size: 8px;
     font-weight: 800;
-    padding: 3px 7px;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
     border-radius: $radius-pill;
-    letter-spacing: 0.05em;
+    white-space: nowrap;
   }
 
   &__remove {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 22px;
-    height: 22px;
+    top: 4px; right: 4px;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    @include flex-center;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity $transition-fast;
+    background: rgba(0,0,0,0.65);
     border: none;
-
-    .thumb:hover & { opacity: 1; }
-
-    &:hover { background: rgba(248, 113, 113, 0.9); }
+    color: #fff;
+    cursor: pointer;
+    @include flex-center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
+
+  &:hover &__remove { opacity: 1; }
 }
 
 .thumbs-hint {
-  font-size: $text-xs;
-  color: var(--text-tertiary);
-  margin-bottom: $space-4;
+  font-size: 11px;
+  color: rgba(0,0,0,0.30);
+  margin: 10px 0 0;
+  text-align: center;
 }
 
-// ─── Form ────────────────────────────────────────────────────────────────
-.upload-form {
-  display: flex;
-  flex-direction: column;
-  gap: $space-6;
+// ─── Form fields ──────────────────────────────────────────────────────────────
+.form-stack { display: flex; flex-direction: column; gap: 22px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  @include mobile { grid-template-columns: 1fr; }
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-  position: relative;
+.form-group { position: relative; display: flex; flex-direction: column; gap: 6px; }
 
-  label {
-    font-size: $text-sm;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .required { color: $hot-pink; }
-
-  input, textarea, select {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: $radius-lg;
-    color: var(--text);
-    font-size: $text-base;
-    font-family: $font-body;
-    padding: $space-3 $space-4;
-    transition: border-color $transition-fast, box-shadow $transition-fast;
-    outline: none;
-    resize: vertical;
-
-    &::placeholder { color: var(--text-tertiary); }
-
-    &:focus {
-      border-color: $violet;
-      box-shadow: 0 0 0 3px rgba($violet, 0.12);
-    }
-  }
-
-  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-
-  &__count {
-    font-size: $text-xs;
-    color: var(--text-tertiary);
-    text-align: right;
-    margin-top: -$space-1;
-  }
-
-  &__hint {
-    font-size: $text-xs;
-    color: var(--text-tertiary);
-  }
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
+  letter-spacing: 0.04em;
+  .required { color: $accent-pink; margin-left: 2px; }
 }
 
-// ─── Tags Input ──────────────────────────────────────────────────────────
-.tags-input {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
+.form-input {
+  width: 100%;
+  background: #fafafe;
+  border: 1.5px solid rgba($blue, 0.10);
   border-radius: $radius-lg;
-  padding: $space-2 $space-3;
-  transition: border-color $transition-fast;
+  padding: 11px 14px;
+  font-size: $text-base;
+  font-family: $font-body;
+  color: #000;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+
+  &::placeholder { color: rgba(0,0,0,0.25); }
+
+  &:focus {
+    outline: none;
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($blue, 0.08);
+    background: #fff;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.55;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.form-count {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+
+.form-hint {
+  font-size: 11px;
+  color: rgba(0,0,0,0.28);
+  margin-top: 2px;
+}
+
+// ─── Tags input ───────────────────────────────────────────────────────────────
+.tags-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #fafafe;
+  border: 1.5px solid rgba($blue, 0.10);
+  border-radius: $radius-lg;
+  padding: 8px 12px;
+  min-height: 46px;
+  align-items: center;
+  transition: border-color 0.15s ease;
   cursor: text;
 
   &:focus-within {
-    border-color: $violet;
-    box-shadow: 0 0 0 3px rgba($violet, 0.12);
-  }
-
-  &__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-2;
-    align-items: center;
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($blue, 0.08);
+    background: #fff;
   }
 
   input {
-    border: none !important;
-    background: transparent !important;
-    padding: $space-1 $space-2 !important;
-    min-width: 140px;
     flex: 1;
-    box-shadow: none !important;
+    min-width: 120px;
+    background: transparent;
+    border: none;
     outline: none;
-    font-size: $text-sm;
-    color: var(--text);
-
-    &::placeholder { color: var(--text-tertiary); }
+    font-size: $text-base;
+    font-family: $font-body;
+    color: #000;
+    &::placeholder { color: rgba(0,0,0,0.25); }
   }
 }
 
-.tags-chip {
+.tag-chip {
   display: inline-flex;
   align-items: center;
-  gap: $space-1;
-  padding: 4px $space-3 4px $space-3;
-  background: rgba($violet, 0.12);
-  color: $violet-light;
+  gap: 5px;
+  background: rgba($blue, 0.08);
+  border: 1px solid rgba($blue, 0.18);
+  color: $blue;
   border-radius: $radius-pill;
-  font-size: $text-xs;
-  font-weight: 600;
-  border: 1px solid rgba($violet, 0.25);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
 
   button {
-    @include flex-center;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: rgba($violet, 0.3);
-    color: $violet-light;
-    cursor: pointer;
-    transition: background $transition-fast;
-    border: none;
-    padding: 0;
-
-    &:hover { background: rgba($hot-pink, 0.6); color: white; }
+    background: none; border: none; cursor: pointer; color: inherit;
+    opacity: .55; display: flex; align-items: center; padding: 0;
+    &:hover { opacity: 1; }
   }
 }
 
-// ─── Preview ─────────────────────────────────────────────────────────────
-.preview-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: $radius-xl;
-  overflow: hidden;
-  max-width: 480px;
-  margin-bottom: $space-8;
+// ─── Publish confirm ──────────────────────────────────────────────────────────
+.publish-confirm {
+  background: #fafafe;
+  border: 1px solid rgba($blue, 0.08);
+  border-radius: $radius-lg;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
 
-  &__cover {
-    img {
-      width: 100%;
-      max-height: 320px;
-      object-fit: cover;
-      display: block;
-    }
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.60);
+    svg { color: $blue; flex-shrink: 0; }
+  }
+}
+
+.publish-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: $radius-pill;
+  background: $blue;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba($blue, 0.35);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 60%);
+    pointer-events: none;
   }
 
-  &__body { padding: $space-6; }
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba($blue, 0.48);
+  }
+
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  &__spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.30);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+  }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── Preview col ──────────────────────────────────────────────────────────────
+.upload-preview-col {
+  @include mobile { order: -1; }
+}
+
+.preview-sticky {
+  position: sticky;
+  top: calc(#{$navbar-height} + 80px);
+}
+
+.preview-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.30);
+  margin: 0 0 12px;
+}
+
+.preview-card {
+  background: #fff;
+  border-radius: $radius-xl;
+  border: 1px solid rgba($blue, 0.08);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+
+  &__cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #f0f0f5;
+    overflow: hidden;
+    @include flex-center;
+
+    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    &.empty { background: linear-gradient(135deg, #f5f5fb, #ededf5); }
+  }
+
+  &__placeholder { color: rgba(0,0,0,0.20); }
+
+  &__cat {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: $accent-pink;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: $radius-pill;
+  }
+
+  &__body { padding: 16px 18px 18px; }
 
   &__title {
     font-family: $font-heading;
-    font-size: $text-2xl;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    margin-bottom: $space-3;
+    font-size: 17px;
+    font-weight: 400;
+    color: #000;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px;
+    line-height: 1.2;
   }
 
   &__desc {
-    font-size: $text-sm;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: $space-4;
+    font-size: 12px;
+    color: rgba(0,0,0,0.45);
+    margin: 0 0 10px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   &__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: $space-2;
-    margin-bottom: $space-4;
+    gap: 5px;
+    margin-bottom: 10px;
   }
 
   &__meta {
+    font-size: 11px;
+    color: rgba(0,0,0,0.30);
     display: flex;
-    gap: $space-2;
-    font-size: $text-xs;
-    color: var(--text-tertiary);
+    gap: 4px;
   }
 }
 
-.publish-btn {
-  margin-bottom: $space-4;
+.preview-tag {
+  background: rgba($blue, 0.06);
+  color: $blue;
+  border-radius: $radius-pill;
+  padding: 2px 9px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
-// ─── Navigation ──────────────────────────────────────────────────────────
-.upload-nav {
+// ─── Preview mini thumbs ──────────────────────────────────────────────────────
+.preview-thumbs {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: $space-10;
-  padding-top: $space-6;
-  border-top: 1px solid var(--border);
-  max-width: 720px;
-
-  .btn[disabled] {
-    opacity: 0.45;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
+  gap: 6px;
+  margin-top: 10px;
 }
 
-// ─── Form row (semestre + materia lado a lado) ────────────────────────────────
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $space-4;
+.preview-thumb {
+  width: 48px; height: 48px;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  @include flex-center;
+  background: rgba($blue, 0.06);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba($blue, 0.60);
 
-  @include mobile { grid-template-columns: 1fr; }
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  &.cover { border-color: $blue; }
+  &--more { font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.35); background: #f0f0f5; }
+}
+
+// ─── Animate ─────────────────────────────────────────────────────────────────
+.animate-fade-in { animation: fadeIn 0.35s ease forwards; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

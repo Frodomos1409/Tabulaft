@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { supabase } from '../supabase.client';
 import { ToastService } from './toast.service';
+import { environment } from '../../../environments/environment';
 
 export interface Profile {
   id: string;
@@ -20,97 +21,112 @@ export class AuthService {
   private toast = inject(ToastService);
 
   currentUser = signal<Profile | null>(null);
-  isLoggedIn = computed(() => !!this.currentUser());
-  isAdmin = computed(() => this.currentUser()?.is_admin === true);
+  isLoggedIn  = computed(() => !!this.currentUser());
+  isAdmin     = computed(() => this.currentUser()?.is_admin === true);
 
-  // Promesa que se resuelve cuando la sesión inicial fue verificada
+  // Resolves once we know the initial auth state (has session or not)
   sessionReady: Promise<void>;
-  private sessionReadyResolve!: () => void;
+  private _resolve!: () => void;
+  private _resolved = false;
 
   constructor() {
-    this.sessionReady = new Promise(resolve => {
-      this.sessionReadyResolve = resolve;
-    });
-    // Carga la sesión existente al iniciar (refresco de página, sesión persistida)
-    this.loadSession();
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    this.sessionReady = new Promise(r => this._resolve = r);
+
+    // onAuthStateChange fires INITIAL_SESSION synchronously on subscribe
+    // which covers both "has session" and "no session" cases
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[Auth]', event, session?.user?.email ?? 'none');
+
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
-        this.sessionReadyResolve();
-      } else if (
-        (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') &&
-        session?.user
-      ) {
-        await this.loadProfile(session.user.id);
-        this.sessionReadyResolve();
+        this._resolveOnce();
+        return;
+      }
+
+      if (event === 'INITIAL_SESSION') {
+        if (session?.user) {
+          this._fetchProfile(session.user.id).then(() => this._resolveOnce());
+        } else {
+          this._resolveOnce();
+        }
+        return;
+      }
+
+      // SIGNED_IN / TOKEN_REFRESHED — load profile in background, don't block
+      if (session?.user) {
+        this._fetchProfile(session.user.id);
       }
     });
   }
 
-  async loadSession(): Promise<void> {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      await this.loadProfile(session.user.id);
+  private _resolveOnce() {
+    if (!this._resolved) {
+      this._resolved = true;
+      this._resolve();
     }
-    this.sessionReadyResolve();
   }
 
-  private async loadProfile(userId: string): Promise<void> {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (data) this.currentUser.set(data as Profile);
+  private async _fetchProfile(userId: string): Promise<Profile | null> {
+    console.log('[Auth] _fetchProfile start', userId);
+    const timeout = new Promise<null>(r => setTimeout(() => r(null), 5000));
+    const query = supabase.from('profiles').select('*').eq('id', userId).single()
+      .then(({ data, error }) => {
+        console.log('[Auth] _fetchProfile done', data?.name ?? null, error?.code ?? 'ok');
+        return data as Profile | null;
+      });
+    const result = await Promise.race([query, timeout]);
+    if (result) this.currentUser.set(result);
+    return result;
   }
 
-  async signUp(email: string, password: string, name: string): Promise<{ needsConfirmation: boolean }> {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } }
-    });
-    if (error) throw error;
-    // Si la sesión es null pero el usuario existe, Supabase requiere confirmación de email
-    if (data.user && !data.session) {
-      return { needsConfirmation: true };
-    }
-    if (data.user && data.session) {
-      await new Promise(r => setTimeout(r, 800));
-      await this.loadProfile(data.user.id);
-      this.toast.show('Cuenta creada', 'success', '🎉');
-    }
-    return { needsConfirmation: false };
+  async loadProfile(userId: string): Promise<void> {
+    await this._fetchProfile(userId);
   }
 
   async signInWithGoogle(): Promise<void> {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { redirectTo: `${environment.appUrl}/auth/callback` }
     });
     if (error) throw error;
   }
 
   async signIn(email: string, password: string): Promise<void> {
+    console.log('[signIn] calling signInWithPassword...');
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    console.log('[signIn] result:', data?.user?.email ?? null, 'error:', error?.message ?? null);
     if (error) throw error;
-    // Reintentar hasta 3 veces si el perfil aún no fue creado por el trigger
-    let profile = null;
-    for (let i = 0; i < 3; i++) {
-      const { data: p } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-      if (p) { profile = p; break; }
-      await new Promise(r => setTimeout(r, 600));
+
+    console.log('[signIn] fetching profile for', data.user.id);
+    for (let i = 0; i < 5; i++) {
+      const profile = await this._fetchProfile(data.user.id);
+      console.log('[signIn] attempt', i + 1, 'profile:', profile?.name ?? null);
+      if (profile) {
+        if (profile.banned) {
+          await supabase.auth.signOut();
+          throw new Error('Cuenta suspendida');
+        }
+        console.log('[signIn] success, navigating...');
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500));
     }
-    if (!profile) throw new Error('Perfil no encontrado. Intenta de nuevo.');
-    if ((profile as Profile).banned) {
-      await supabase.auth.signOut();
-      throw new Error('Cuenta suspendida');
+    throw new Error('Perfil no encontrado. Intenta de nuevo.');
+  }
+
+  async signUp(email: string, password: string, name: string): Promise<{ needsConfirmation: boolean }> {
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { name } }
+    });
+    if (error) throw error;
+    if (data.user && !data.session) return { needsConfirmation: true };
+    if (data.user) {
+      await new Promise(r => setTimeout(r, 800));
+      await this._fetchProfile(data.user.id);
+      this.toast.show('Cuenta creada', 'success', '🎉');
     }
-    this.currentUser.set(profile as Profile);
+    return { needsConfirmation: false };
   }
 
   async signOut(): Promise<void> {

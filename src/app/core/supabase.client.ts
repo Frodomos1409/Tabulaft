@@ -3,11 +3,5 @@ import { environment } from '../../environments/environment';
 
 export const supabase = createClient(
   environment.supabase.url,
-  environment.supabase.anonKey,
-  {
-    auth: {
-      flowType: 'pkce',
-      detectSessionInUrl: true,
-    }
-  }
+  environment.supabase.anonKey
 );

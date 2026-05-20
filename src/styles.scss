@@ -2,91 +2,42 @@
 @use 'styles/reset';
 @use 'styles/animations';
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,700;0,800;0,900;1,800;1,900&display=swap');
 
 // ─── CSS Custom Properties (theme-aware) ─────────────────────────────────────
-// Default to dark (SSR-safe fallback)
 :root {
-  --bg: #{$dark-bg};
-  --bg-card: #{$dark-bg-card};
-  --bg-elevated: #{$dark-bg-elevated};
-  --bg-hover: #{$dark-bg-hover};
-  --bg-input: #{$dark-bg-input};
-  --border: #{$dark-border};
-  --border-hover: #{$dark-border-hover};
-  --text: #{$dark-text};
-  --text-secondary: #{$dark-text-secondary};
-  --text-tertiary: #{$dark-text-tertiary};
-  --shadow: #{$shadow-dark};
-  --shadow-lg: #{$shadow-dark-lg};
+  --tabulaft-blue: #2830eb;
+  --tabulaft-blue-dark: #101663;
+  --tabulaft-blue-mid: #202dc9;
+  --scale: calc(100vw / 1280);
 
-  // Extended: surfaces used in panels & nav
-  --bg-nav: #{$dark-bg};
-  --bg-panel: #{$dark-bg-card};
-  --bg-footer: #080810;
-  --text-on-surface: rgba(255, 255, 255, 0.65);
-  --text-dim: rgba(255, 255, 255, 0.35);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.15);
-  --hover-surface: rgba(255, 255, 255, 0.04);
-  --hover-surface-md: rgba(255, 255, 255, 0.07);
-  --text-inverse: #{$dark-text};
-}
-
-[data-theme="dark"] {
-  --bg: #{$dark-bg};
-  --bg-card: #{$dark-bg-card};
-  --bg-elevated: #{$dark-bg-elevated};
-  --bg-hover: #{$dark-bg-hover};
-  --bg-input: #{$dark-bg-input};
-  --border: #{$dark-border};
-  --border-hover: #{$dark-border-hover};
-  --text: #{$dark-text};
-  --text-secondary: #{$dark-text-secondary};
-  --text-tertiary: #{$dark-text-tertiary};
-  --shadow: #{$shadow-dark};
-  --shadow-lg: #{$shadow-dark-lg};
-
-  --bg-nav: #{$dark-bg};
-  --bg-panel: #{$dark-bg-card};
-  --bg-footer: #080810;
-  --text-on-surface: rgba(255, 255, 255, 0.65);
-  --text-dim: rgba(255, 255, 255, 0.35);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.15);
-  --hover-surface: rgba(255, 255, 255, 0.04);
-  --hover-surface-md: rgba(255, 255, 255, 0.07);
-  --text-inverse: #{$dark-text};
-}
-
-[data-theme="light"] {
-  --bg: #{$light-bg};
-  --bg-card: #{$light-bg-card};
-  --bg-elevated: #{$light-bg-elevated};
-  --bg-hover: #{$light-bg-hover};
-  --bg-input: #{$light-bg-input};
-  --border: #{$light-border};
-  --border-hover: #{$light-border-hover};
-  --text: #{$light-text};
-  --text-secondary: #{$light-text-secondary};
-  --text-tertiary: #{$light-text-tertiary};
-  --shadow: #{$shadow-light};
-  --shadow-lg: #{$shadow-light-lg};
+  --bg: #ffffff;
+  --bg-card: #ffffff;
+  --bg-elevated: #f5f5fa;
+  --bg-hover: #eeeef8;
+  --bg-input: #f5f5fa;
+  --border: rgba(40, 48, 235, 0.12);
+  --border-hover: rgba(40, 48, 235, 0.3);
+  --text: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.65);
+  --text-tertiary: rgba(0, 0, 0, 0.38);
+  --shadow: 0 4px 24px rgba(40, 48, 235, 0.08);
+  --shadow-lg: 0 12px 48px rgba(40, 48, 235, 0.15);
 
   --bg-nav: #ffffff;
   --bg-panel: #ffffff;
-  --bg-footer: #f0f0f5;
-  --text-on-surface: rgba(10, 10, 15, 0.65);
-  --text-dim: rgba(10, 10, 15, 0.35);
-  --border-subtle: rgba(0, 0, 0, 0.05);
-  --border-light: rgba(0, 0, 0, 0.08);
-  --border-medium: rgba(0, 0, 0, 0.12);
-  --hover-surface: rgba(0, 0, 0, 0.03);
-  --hover-surface-md: rgba(0, 0, 0, 0.06);
+  --bg-footer: #{$blue-dark};
+  --text-on-surface: rgba(0, 0, 0, 0.65);
+  --text-dim: rgba(0, 0, 0, 0.35);
+  --border-subtle: rgba(40, 48, 235, 0.06);
+  --border-light: rgba(40, 48, 235, 0.1);
+  --border-medium: rgba(40, 48, 235, 0.2);
+  --hover-surface: rgba(40, 48, 235, 0.04);
+  --hover-surface-md: rgba(40, 48, 235, 0.08);
   --text-inverse: #ffffff;
 }
+
+// Tabulaft usa tema único claro (blanco + azul)
 
 body {
   background: var(--bg);
@@ -95,7 +46,7 @@ body {
 
 // ─── Global Utility Classes ──────────────────────────────────────────────────
 .gradient-text {
-  background: $gradient-primary;
+  background: linear-gradient(135deg, $blue, $blue-mid);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -124,18 +75,20 @@ body {
   border: none;
 
   &--primary {
-    background: $gradient-primary;
+    background: $blue;
     color: #fff;
-    box-shadow: 0 4px 16px rgba($violet, 0.35);
-    &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba($violet, 0.45); }
+    box-shadow: 0 4px 16px rgba($blue, 0.35);
+    border-radius: 39px;
+    &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba($blue, 0.5); }
     &:active { transform: translateY(0); }
   }
 
   &--outline {
     background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-    &:hover { border-color: var(--border-hover); background: var(--bg-hover); }
+    color: $blue;
+    border: 2px solid $blue;
+    border-radius: 39px;
+    &:hover { background: rgba($blue, 0.06); }
   }
 
   &--ghost {
@@ -168,21 +121,41 @@ body {
   }
 }
 
-// ─── View Transitions (Route Animations) ────────────────────────────────
-@keyframes view-fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+// ─── View Transitions — Flip 3D desde la derecha ─────────────────────────────
+@keyframes page-flip-in {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-15deg) translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateX(0);
+  }
 }
 
-@keyframes view-fade-out {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-10px); }
+@keyframes page-flip-out {
+  from {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(15deg) translateX(-40px);
+  }
 }
 
 ::view-transition-old(root) {
-  animation: 200ms ease view-fade-out;
+  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) page-flip-out;
 }
 
 ::view-transition-new(root) {
-  animation: 300ms ease view-fade-in;
+  animation: 380ms cubic-bezier(0.22, 1, 0.36, 1) page-flip-in;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
+// ─── CSS custom property para accent pink ────────────────────────────────────
+:root { --accent-pink: #ee41ba; }

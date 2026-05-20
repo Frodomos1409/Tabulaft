@@ -1,0 +1,359 @@
+<main class="home-page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       HERO — Full viewport, massive typography
+  ══════════════════════════════════════════════════════════ -->
+  <section class="home-hero">
+    <div class="home-hero__grain"></div>
+    <div class="home-hero__blob home-hero__blob--pink"></div>
+    <div class="home-hero__blob home-hero__blob--cyan"></div>
+    <div class="home-hero__blob home-hero__blob--violet"></div>
+
+    <!-- BG text layers -->
+    <div class="home-hero__bg-text home-hero__bg-text--1" aria-hidden="true">DISEÑO</div>
+    <div class="home-hero__bg-text home-hero__bg-text--2" aria-hidden="true">TABULAFT</div>
+
+    <div class="home-hero__inner">
+
+      <!-- TOP ROW: avatar + greeting -->
+      <div class="home-hero__top">
+        <div class="home-hero__avatar-wrap">
+          <img
+            class="home-hero__avatar"
+            [src]="auth.currentUser()?.avatar_url || 'https://ui-avatars.com/api/?name=' + auth.currentUser()?.name + '&background=2830eb&color=fff&size=200'"
+            [alt]="auth.currentUser()?.name" />
+          <div class="home-hero__avatar-ring"></div>
+          <span class="home-hero__avatar-status"></span>
+        </div>
+        <div class="home-hero__meta">
+          <span class="home-hero__eyebrow">Tu espacio creativo · UNIVALLE</span>
+          <p class="home-hero__greeting-sm">{{ greeting() }}</p>
+        </div>
+        <div class="home-hero__quick">
+          <a routerLink="/publicar" class="ha-btn ha-btn--white">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Publicar
+          </a>
+          <a routerLink="/explorar" class="ha-btn ha-btn--ghost">Explorar →</a>
+          <a [routerLink]="['/perfil', auth.currentUser()?.id]" class="ha-btn ha-btn--ghost">Mi perfil</a>
+        </div>
+      </div>
+
+      <!-- MAIN TITLE BLOCK -->
+      <div class="home-hero__title-block">
+        <h1 class="home-hero__title">
+          <span class="home-hero__title-solid">LOS MEJORES</span>
+          <span class="home-hero__title-outline">TRABAJOS</span>
+          <span class="home-hero__title-accent">DE DISEÑO</span>
+        </h1>
+        <div class="home-hero__sub-row">
+          <p class="home-hero__subtitle">Proyectos reales · Creatividad sin límites · UNIVALLE</p>
+          <div class="home-hero__stats">
+            @if (carouselProjects().length > 0) {
+              <span class="home-hero__stat"><strong>{{ carouselProjects().length + recentProjects().length }}</strong> proyectos</span>
+            }
+            <span class="home-hero__stat--dot"></span>
+            <span class="home-hero__stat"><strong>{{ popularProjects().length }}</strong> destacados</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPACT 3D PREVIEW — only on large screens -->
+      @if (carouselProjects().length > 0) {
+        <div class="home-hero__carousel-preview" (click)="nextSlide()">
+          @for (item of visibleSlides; track item.project.id) {
+            <div class="hcp-card"
+                 [class.active]="item.offset === 0"
+                 [class.left1]="item.offset === -1"
+                 [class.left2]="item.offset === -2"
+                 [class.right1]="item.offset === 1"
+                 [class.right2]="item.offset === 2"
+                 (click)="$event.stopPropagation(); item.offset !== 0 ? goToSlide(carouselIndex() + item.offset) : null">
+              <img [src]="item.project.cover_image" [alt]="item.project.title" class="hcp-card__img" />
+              @if (item.offset === 0) {
+                <div class="hcp-card__info">
+                  <span class="hcp-card__cat">{{ item.project.category }}</span>
+                  <p class="hcp-card__title">{{ item.project.title }}</p>
+                  <a [routerLink]="['/proyecto', item.project.id]" class="hcp-card__cta" (click)="$event.stopPropagation()">Ver →</a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else if (loadingCarousel()) {
+        <div class="home-hero__carousel-preview">
+          <div class="hcp-skeleton hcp-skeleton--active"></div>
+          <div class="hcp-skeleton hcp-skeleton--left"></div>
+          <div class="hcp-skeleton hcp-skeleton--right"></div>
+        </div>
+      }
+    </div>
+
+    <!-- Ticker -->
+    <div class="home-hero__ticker" aria-hidden="true">
+      <div class="home-ticker__track">
+        <span>DISEÑO</span><span class="sep">✦</span>
+        <span>TIPOGRAFÍA</span><span class="sep">✦</span>
+        <span>IDENTIDAD VISUAL</span><span class="sep">✦</span>
+        <span>UNIVALLE</span><span class="sep">✦</span>
+        <span>ILUSTRACIÓN</span><span class="sep">✦</span>
+        <span>TABULAFT</span><span class="sep">✦</span>
+        <span>BRANDING</span><span class="sep">✦</span>
+        <span>MOTION</span><span class="sep">✦</span>
+        <span>DISEÑO</span><span class="sep">✦</span>
+        <span>TIPOGRAFÍA</span><span class="sep">✦</span>
+        <span>IDENTIDAD VISUAL</span><span class="sep">✦</span>
+        <span>UNIVALLE</span><span class="sep">✦</span>
+        <span>ILUSTRACIÓN</span><span class="sep">✦</span>
+        <span>TABULAFT</span><span class="sep">✦</span>
+        <span>BRANDING</span><span class="sep">✦</span>
+        <span>MOTION</span><span class="sep">✦</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CARRUSEL 3D FULL
+  ══════════════════════════════════════════════════════════ -->
+  <section class="carousel-section">
+    <div class="carousel-section__header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow__dot eyebrow__dot--pink"></span>Proyectos destacados</div>
+        <h2 class="section-heading animate-text">Lo más visto</h2>
+      </div>
+      <a routerLink="/explorar" class="section-link">Ver todos →</a>
+    </div>
+
+    @if (loadingCarousel()) {
+      <div class="carousel-skeleton-wrap">
+        <div class="carousel-skeleton carousel-skeleton--center"></div>
+        <div class="carousel-skeleton carousel-skeleton--side"></div>
+        <div class="carousel-skeleton carousel-skeleton--side"></div>
+      </div>
+    } @else if (carouselProjects().length > 0) {
+      <div class="carousel-stage" (click)="nextSlide()">
+        @for (item of visibleSlides; track item.project.id) {
+          <div class="carousel-card"
+               [class.active]="item.offset === 0"
+               [class.left1]="item.offset === -1"
+               [class.left2]="item.offset === -2"
+               [class.right1]="item.offset === 1"
+               [class.right2]="item.offset === 2"
+               (click)="$event.stopPropagation(); item.offset !== 0 ? goToSlide(carouselIndex() + item.offset) : null">
+            <div class="carousel-card__img-wrap">
+              <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
+              @if (item.offset === 0) {
+                <div class="carousel-card__overlay">
+                  <span class="carousel-card__cat">{{ item.project.category }}</span>
+                  <h3 class="carousel-card__name">{{ item.project.title }}</h3>
+                  <div class="carousel-card__meta">
+                    <span>{{ item.project.author?.name || 'Diseñador' }}</span>
+                    <span class="carousel-card__views">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      {{ item.project.views }}
+                    </span>
+                  </div>
+                  <a [routerLink]="['/proyecto', item.project.id]" class="carousel-card__cta" (click)="$event.stopPropagation()">Ver proyecto</a>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="carousel-controls">
+        <button class="carousel-arrow" (click)="prevSlide()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="carousel-dots">
+          @for (p of carouselProjects(); track p.id; let i = $index) {
+            <button class="carousel-dot" [class.active]="i === carouselIndex()" (click)="goToSlide(i)"></button>
+          }
+        </div>
+        <button class="carousel-arrow" (click)="nextSlide()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    } @else {
+      <div class="home-empty">
+        <p>Aún no hay proyectos destacados. <a routerLink="/publicar">¡Publica el primero!</a></p>
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MARQUEE DE IMÁGENES
+  ══════════════════════════════════════════════════════════ -->
+  @if (recentProjects().length > 0) {
+    <div class="img-marquee" aria-hidden="true">
+      <div class="img-marquee__track">
+        @for (p of recentProjects(); track p.id) {
+          <div class="img-marquee__item">
+            <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
+          </div>
+        }
+        @for (p of recentProjects(); track p.id + '_dup') {
+          <div class="img-marquee__item">
+            <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════════════════════════
+       SPLIT STATEMENT — tipografía masiva con números
+  ══════════════════════════════════════════════════════════ -->
+  <section class="statement-section">
+    <div class="statement-section__inner">
+      <div class="statement-section__left">
+        <p class="statement-section__label">La plataforma del</p>
+        <h2 class="statement-section__heading animate-text">
+          Diseño Gráfico<br><em>Universitario</em>
+        </h2>
+        <a routerLink="/explorar" class="see-more-btn" style="margin-top:28px">Explorar galería →</a>
+      </div>
+      <div class="statement-section__right">
+        <div class="statement-stat">
+          <span class="statement-stat__num">{{ (carouselProjects().length + recentProjects().length) || '—' }}</span>
+          <span class="statement-stat__label">Proyectos publicados</span>
+        </div>
+        <div class="statement-stat statement-stat--accent">
+          <span class="statement-stat__num">{{ popularProjects().length || '—' }}</span>
+          <span class="statement-stat__label">Proyectos populares</span>
+        </div>
+        <div class="statement-stat">
+          <span class="statement-stat__num">∞</span>
+          <span class="statement-stat__label">Creatividad</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GRID ASIMÉTRICO — Popular
+  ══════════════════════════════════════════════════════════ -->
+  <section class="asymmetric-section">
+    <div class="asymmetric-section__header">
+      <div class="eyebrow"><span class="eyebrow__dot eyebrow__dot--blue"></span>Más populares</div>
+      <h2 class="section-heading animate-text">Los más<br><em>queridos</em></h2>
+      <p class="asymmetric-section__sub">Los proyectos que más amor han recibido de la comunidad.</p>
+    </div>
+
+    @if (loadingPopular()) {
+      <div class="asym-grid">
+        <div class="asym-skeleton asym-skeleton--hero"></div>
+        <div class="asym-grid__small">
+          <div class="asym-skeleton asym-skeleton--sm"></div>
+          <div class="asym-skeleton asym-skeleton--sm"></div>
+          <div class="asym-skeleton asym-skeleton--sm"></div>
+          <div class="asym-skeleton asym-skeleton--sm"></div>
+        </div>
+      </div>
+    } @else if (popularProjects().length > 0) {
+      <div class="asym-grid">
+        @if (popularProjects()[0]) {
+          <a class="asym-card asym-card--hero" [routerLink]="['/proyecto', popularProjects()[0].id]">
+            <img [src]="popularProjects()[0].cover_image || 'assets/work-1.png'" [alt]="popularProjects()[0].title" />
+            <div class="asym-card__overlay">
+              <span class="asym-card__cat">{{ popularProjects()[0].category }}</span>
+              <h3 class="asym-card__title">{{ popularProjects()[0].title }}</h3>
+              <p class="asym-card__author">{{ popularProjects()[0].author?.name }}</p>
+              <span class="asym-card__likes">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                {{ popularProjects()[0].likes }}
+              </span>
+            </div>
+          </a>
+        }
+        <div class="asym-grid__small">
+          @for (p of popularProjects().slice(1, 5); track p.id) {
+            <a class="asym-card asym-card--sm" [routerLink]="['/proyecto', p.id]">
+              <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
+              <div class="asym-card__overlay asym-card__overlay--sm">
+                <span class="asym-card__cat">{{ p.category }}</span>
+                <h3 class="asym-card__title asym-card__title--sm">{{ p.title }}</h3>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="home-empty">
+        <p>Sé el primero en publicar un proyecto. <a routerLink="/publicar">Publicar ahora →</a></p>
+      </div>
+    }
+    <div class="asymmetric-section__footer">
+      <a routerLink="/explorar" class="see-more-btn">Ver todos los proyectos →</a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       RECIENTES — scroll horizontal film strip
+  ══════════════════════════════════════════════════════════ -->
+  <section class="recents-section">
+    <div class="recents-section__header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow__dot eyebrow__dot--pink"></span>Últimas subidas</div>
+        <h2 class="section-heading animate-text">Recién llegados</h2>
+      </div>
+      <a routerLink="/explorar" class="section-link">Ver todos →</a>
+    </div>
+
+    @if (loadingRecent()) {
+      <div class="recents-track">
+        @for (s of skeletonItems; track $index) {
+          <div class="recents-skeleton"></div>
+        }
+      </div>
+    } @else if (recentProjects().length > 0) {
+      <div class="recents-track">
+        @for (p of recentProjects(); track p.id) {
+          <a [routerLink]="['/proyecto', p.id]" class="recents-card">
+            <div class="recents-card__img">
+              <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
+              <span class="recents-card__badge">{{ p.category }}</span>
+            </div>
+            <p class="recents-card__title">{{ p.title }}</p>
+            <p class="recents-card__author">{{ p.author?.name || 'Diseñador' }}</p>
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="home-empty" style="padding: 0 24px 40px">
+        <p>Aún no hay proyectos recientes.</p>
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       BANNER PUBLICAR
+  ══════════════════════════════════════════════════════════ -->
+  <section class="pub-banner">
+    <div class="pub-banner__grain"></div>
+    <div class="pub-banner__marquee" aria-hidden="true">
+      <div class="pub-banner__marquee-track">
+        <span>PUBLICA</span><span class="dot">·</span>
+        <span>INSPIRA</span><span class="dot">·</span>
+        <span>COMPARTE</span><span class="dot">·</span>
+        <span>DISEÑA</span><span class="dot">·</span>
+        <span>PUBLICA</span><span class="dot">·</span>
+        <span>INSPIRA</span><span class="dot">·</span>
+        <span>COMPARTE</span><span class="dot">·</span>
+        <span>DISEÑA</span><span class="dot">·</span>
+      </div>
+    </div>
+    <div class="pub-banner__inner">
+      <h2 class="pub-banner__title">
+        Que tus trabajos<br>no se queden<br><em>en el olvido.</em>
+      </h2>
+      <a routerLink="/publicar" class="pub-banner__btn">
+        Publicar ahora
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>

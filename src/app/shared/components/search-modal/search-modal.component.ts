@@ -75,7 +75,7 @@ export class SearchModalComponent implements OnInit, OnDestroy {
   onEsc() { this.close.emit(); }
 
   onBackdropClick(e: MouseEvent) {
-    if ((e.target as HTMLElement).classList.contains('search-modal')) {
+    if ((e.target as HTMLElement).classList.contains('sm-backdrop')) {
       this.close.emit();
     }
   }

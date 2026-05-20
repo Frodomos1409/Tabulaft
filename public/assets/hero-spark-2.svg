@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 111.051 120.363" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Capa_1" clip-path="url(#clip0_0_176)">
+<path id="Vector" d="M96.0743 85.0111C56.637 81.3727 57.2334 125.7 40.9054 119.824C35.8465 118.003 32.2347 113.059 33.0063 106.431C35.3877 85.9332 24.7359 67.0155 7.47376 58.214C1.91432 55.3837 -0.512974 50.5127 0.0917655 45.3953C0.813282 39.278 5.16741 33.7314 11.8821 34.8864C31.0794 38.187 48.1122 28.121 56.6537 8.6828C59.252 2.76644 62.1756 -0.712157 68.0269 0.123254C73.2485 0.867364 78.0114 5.87527 77.6777 13.1201C76.7102 34.1834 85.7229 53.2061 104.22 62.2587C110.104 65.1393 112.256 72.1923 110.405 77.7983C108.119 84.7189 102.647 85.6183 96.0743 85.0111Z" fill="url(#paint0_radial_0_176)"/>
+</g>
+<defs>
+<radialGradient id="paint0_radial_0_176" cx="0" cy="0" r="1" gradientTransform="matrix(56.1885 4.86297 -3.88179 60.7551 55.5318 60.2193)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2830EB"/>
+<stop offset="1" stop-color="#C9413A"/>
+</radialGradient>
+<clipPath id="clip0_0_176">
+<rect width="111.051" height="120.363" fill="white"/>
+</clipPath>
+</defs>
+</svg>

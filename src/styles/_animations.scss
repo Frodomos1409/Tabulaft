@@ -33,7 +33,82 @@
   to   { transform: rotate(360deg); }
 }
 
-.animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+// ─── Marquee infinito horizontal ─────────────────────────────────────────────
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+// ─── Aurora (hue-rotate) para navbar border ───────────────────────────────────
+@keyframes aurora {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+// ─── Glitch RGB split ─────────────────────────────────────────────────────────
+@keyframes glitch-x {
+  0%,  100% { clip-path: inset(0 0 95% 0); transform: translateX(0); }
+  20%        { clip-path: inset(5% 0 80% 0); transform: translateX(-4px); }
+  40%        { clip-path: inset(35% 0 50% 0); transform: translateX(4px); }
+  60%        { clip-path: inset(60% 0 20% 0); transform: translateX(-3px); }
+  80%        { clip-path: inset(80% 0 5% 0); transform: translateX(3px); }
+}
+
+@keyframes glitch-y {
+  0%,  100% { clip-path: inset(0 0 95% 0); transform: translateX(0); }
+  15%        { clip-path: inset(15% 0 70% 0); transform: translateX(5px); }
+  35%        { clip-path: inset(45% 0 40% 0); transform: translateX(-5px); }
+  55%        { clip-path: inset(70% 0 15% 0); transform: translateX(4px); }
+  75%        { clip-path: inset(88% 0 2% 0); transform: translateX(-4px); }
+}
+
+// ─── Card shimmer borde glassmorphism ─────────────────────────────────────────
+@keyframes cardShimmer {
+  0%   { background-position: -300% 0; }
+  100% { background-position: 300% 0; }
+}
+
+// ─── SVG stroke draw ──────────────────────────────────────────────────────────
+@keyframes strokeDraw {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
+
+// ─── Orbit cursor tooltip ─────────────────────────────────────────────────────
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(52px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(52px) rotate(-360deg); }
+}
+
+// ─── Flip 3D page transition ──────────────────────────────────────────────────
+@keyframes pageFlipIn {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-90deg) translateZ(80px);
+    transform-origin: left center;
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0);
+    transform-origin: left center;
+  }
+}
+
+@keyframes pageFlipOut {
+  from {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0);
+    transform-origin: right center;
+  }
+  to {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(90deg) translateZ(80px);
+    transform-origin: right center;
+  }
+}
+
+// ─── Word jump ────────────────────────────────────────────────────────────────
+.animate-fade-in  { animation: fadeIn 0.5s ease forwards; }
 .animate-slide-up { animation: slideUp 0.6s ease forwards; }
 
 @for $i from 1 through 8 {

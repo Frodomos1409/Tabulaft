@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './auth.component.scss'
 })
 export class AuthComponent {
-  private auth = inject(AuthService);
+  auth    = inject(AuthService);
   private router = inject(Router);
 
   isLogin = signal(true);
@@ -24,10 +24,7 @@ export class AuthComponent {
   password = '';
   name = '';
 
-  toggle() {
-    this.isLogin.update(v => !v);
-    this.errorMsg.set('');
-  }
+  toggle() { this.isLogin.update(v => !v); this.errorMsg.set(''); }
 
   heroImages = [
     'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&q=80',
@@ -38,22 +35,13 @@ export class AuthComponent {
 
   private translateError(msg: string): string {
     if (!msg) return 'Ocurrió un error. Intenta de nuevo.';
-    if (msg.includes('email rate limit') || msg.includes('rate limit'))
-      return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
-    if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials'))
-      return 'Correo o contraseña incorrectos.';
-    if (msg.includes('Email not confirmed'))
-      return 'Debes confirmar tu correo antes de entrar. Revisa tu bandeja de entrada.';
-    if (msg.includes('User already registered'))
-      return 'Ya existe una cuenta con ese correo. Inicia sesión.';
-    if (msg.includes('Password should be at least'))
-      return 'La contraseña debe tener al menos 6 caracteres.';
-    if (msg.includes('email_address_invalid') || msg.includes('is invalid'))
-      return 'El correo electrónico no es válido.';
-    if (msg.includes('Perfil no encontrado'))
-      return 'Perfil no encontrado. Intenta de nuevo.';
-    if (msg.includes('Cuenta suspendida'))
-      return 'Tu cuenta ha sido suspendida.';
+    if (msg.includes('rate limit')) return 'Demasiados intentos. Espera unos minutos.';
+    if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) return 'Correo o contraseña incorrectos.';
+    if (msg.includes('Email not confirmed')) return 'Confirma tu correo antes de entrar.';
+    if (msg.includes('User already registered')) return 'Ya existe una cuenta con ese correo.';
+    if (msg.includes('Password should be at least')) return 'La contraseña debe tener al menos 6 caracteres.';
+    if (msg.includes('Perfil no encontrado')) return 'Perfil no encontrado. Intenta de nuevo.';
+    if (msg.includes('Cuenta suspendida')) return 'Tu cuenta ha sido suspendida.';
     return msg;
   }
 
@@ -69,27 +57,25 @@ export class AuthComponent {
   }
 
   async onSubmit(): Promise<void> {
+    if (this.isLoading()) return;
     this.isLoading.set(true);
     this.errorMsg.set('');
     try {
       if (this.isLogin()) {
         await this.auth.signIn(this.email, this.password);
-        if (this.auth.isAdmin()) {
-          this.router.navigate(['/admin']);
-        } else {
-          this.router.navigate(['/explorar']);
-        }
+        const dest = this.auth.isAdmin() ? '/admin' : '/inicio';
+        window.location.href = dest;
       } else {
         const { needsConfirmation } = await this.auth.signUp(this.email, this.password, this.name);
         if (needsConfirmation) {
           this.confirmationSent.set(true);
+          this.isLoading.set(false);
         } else {
-          this.router.navigate(['/explorar']);
+          window.location.href = '/inicio';
         }
       }
     } catch (e: any) {
-      this.errorMsg.set(this.translateError(e.message));
-    } finally {
+      this.errorMsg.set(this.translateError(e?.message ?? 'Error desconocido'));
       this.isLoading.set(false);
     }
   }

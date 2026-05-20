@@ -71,19 +71,21 @@
     transform-origin: bottom center;
 
     &--a {
-      // Grande: mucho más alto que el hero, anclado abajo — se corta por arriba (intencional)
-      height: 160%;
-      width: auto;
-      bottom: -5%;
-      right: -2%;
+      // Grande de rayas: su base toca el fondo, su cabeza sobresale por arriba del hero
+      // En la referencia ocupa ~55% del ancho desde la derecha y se corta en top
+      width: clamp(340px, 46vw, 700px);
+      height: auto;
+      bottom: 0;
+      right: -20px;
       animation-duration: 5.5s;
     }
     &--b {
-      // Pequeño: tamaño medio, centrado-derecha
-      height: 75%;
+      // Pequeño (cabeza morada): visible completo, a la izquierda del grande
+      // En la referencia está a ~55% del ancho, altura ~60% del hero
+      height: 60%;
       width: auto;
       bottom: 0;
-      right: clamp(140px, 30vw, 440px);
+      right: clamp(200px, 34vw, 520px);
       animation-duration: 4.2s;
       animation-delay: -1.8s;
     }

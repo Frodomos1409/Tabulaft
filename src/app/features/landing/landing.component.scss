@@ -39,8 +39,7 @@
 
 .hero {
   position: relative;
-  // Altura que coincide con la referencia: personajes visibles completos
-  height: clamp(500px, 52vw, 680px);
+  height: clamp(500px, 58vw, 740px);
   background: $blue;
   display: flex;
   flex-direction: column;
@@ -71,21 +70,18 @@
     transform-origin: bottom center;
 
     &--a {
-      // Grande de rayas: su base toca el fondo, su cabeza sobresale por arriba del hero
-      // En la referencia ocupa ~55% del ancho desde la derecha y se corta en top
-      width: clamp(340px, 46vw, 700px);
-      height: auto;
-      bottom: 0;
-      right: -20px;
+      height: 130%;
+      width: auto;
+      top: -8%;
+      right: -2%;
+      bottom: auto;
       animation-duration: 5.5s;
     }
     &--b {
-      // Pequeño (cabeza morada): visible completo, a la izquierda del grande
-      // En la referencia está a ~55% del ancho, altura ~60% del hero
-      height: 60%;
+      height: 58%;
       width: auto;
       bottom: 0;
-      right: clamp(200px, 34vw, 520px);
+      right: 25%;
       animation-duration: 4.2s;
       animation-delay: -1.8s;
     }

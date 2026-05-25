@@ -137,8 +137,8 @@ export class UploadComponent implements OnInit {
         },
         this.images().map(i => i.file)
       );
-      this.toast.show('Proyecto publicado', 'success', '🎉');
-      this.router.navigate(['/proyecto', project.id]);
+      this.toast.show('Proyecto enviado. Pendiente de revisión por el admin.', 'success');
+      this.router.navigate(['/feed']);
     } catch (e: any) {
       this.toast.show(e.message ?? 'Error al publicar', 'error');
     } finally {

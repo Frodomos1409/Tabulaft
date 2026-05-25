@@ -38,12 +38,18 @@
           @if (item.icon === 'book') {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           }
+          @if (item.icon === 'activity') {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          }
           @if (item.icon === 'settings') {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           }
           <span class="admin-nav-item__label">{{ item.label }}</span>
-          @if (item.id === 'reportes' && reports().length > 0) {
-            <span class="admin-nav-item__badge">{{ reports().length }}</span>
+          @if (item.id === 'reportes' && (stats()?.pendingReports ?? 0) > 0) {
+            <span class="admin-nav-item__badge">{{ stats()?.pendingReports }}</span>
+          }
+          @if (item.id === 'proyectos' && pendingCount() > 0) {
+            <span class="admin-nav-item__badge admin-nav-item__badge--warn">{{ pendingCount() }}</span>
           }
         </button>
       }
@@ -78,6 +84,11 @@
             <span class="spinner-ring"></span> Cargando...
           </span>
         }
+        @if (!loading()) {
+          <button class="btn btn--ghost btn--sm" (click)="loadAll()" title="Recargar datos">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        }
       </div>
     </header>
 
@@ -89,64 +100,138 @@
       @if (activeSection() === 'dashboard') {
         <div class="dashboard">
 
+          <!-- Alerta proyectos pendientes -->
+          @if (pendingCount() > 0) {
+            <div class="alert-banner alert-banner--warn" (click)="setSection('proyectos'); projectStatusFilter.set('pending')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>{{ pendingCount() }} proyecto{{ pendingCount() > 1 ? 's' : '' }} pendiente{{ pendingCount() > 1 ? 's' : '' }} de revisión — <strong>Revisar ahora</strong></span>
+            </div>
+          }
+
           <!-- KPI cards -->
           <div class="kpi-grid">
-            @for (stat of stats(); track stat.label) {
-              <div class="kpi-card" [class.kpi-card--alert]="stat.icon === 'flag' && +stat.value > 0">
-                <div class="kpi-card__icon-wrap">
-                  @if (stat.icon === 'users') {
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  }
-                  @if (stat.icon === 'grid') {
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                  }
-                  @if (stat.icon === 'eye') {
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  }
-                  @if (stat.icon === 'flag') {
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                  }
-                </div>
-                <div class="kpi-card__body">
-                  <span class="kpi-card__label">{{ stat.label }}</span>
-                  <span class="kpi-card__value">{{ stat.value }}</span>
-                </div>
+            <div class="kpi-card" (click)="setSection('usuarios')" style="cursor:pointer">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
-            }
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Usuarios</span>
+                <span class="kpi-card__value">{{ stats()?.users ?? 0 }}</span>
+                <span class="kpi-card__sub">+{{ stats()?.newUsersThisWeek ?? 0 }} esta semana</span>
+              </div>
+            </div>
+            <div class="kpi-card" (click)="setSection('proyectos'); projectStatusFilter.set('active')" style="cursor:pointer">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Publicados</span>
+                <span class="kpi-card__value">{{ stats()?.activeProjects ?? 0 }}</span>
+                <span class="kpi-card__sub">+{{ stats()?.newProjectsThisWeek ?? 0 }} esta semana</span>
+              </div>
+            </div>
+            <div class="kpi-card kpi-card--alert" (click)="setSection('proyectos'); projectStatusFilter.set('pending')" style="cursor:pointer">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Pendientes</span>
+                <span class="kpi-card__value">{{ stats()?.pendingProjects ?? 0 }}</span>
+                <span class="kpi-card__sub">Esperan revisión</span>
+              </div>
+            </div>
+            <div class="kpi-card" [class.kpi-card--danger]="(stats()?.pendingReports ?? 0) > 0" (click)="setSection('reportes')" style="cursor:pointer">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              </div>
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Reportes</span>
+                <span class="kpi-card__value">{{ stats()?.pendingReports ?? 0 }}</span>
+                <span class="kpi-card__sub">Sin resolver</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Visitas totales</span>
+                <span class="kpi-card__value">{{ stats()?.totalViews ?? 0 }}</span>
+                <span class="kpi-card__sub">Acumulado</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-card__icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </div>
+              <div class="kpi-card__body">
+                <span class="kpi-card__label">Likes totales</span>
+                <span class="kpi-card__value">{{ stats()?.totalLikes ?? 0 }}</span>
+                <span class="kpi-card__sub">Acumulado</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Dos columnas: proyectos recientes + usuarios -->
+          <!-- Gráfica de visitas + panel proyectos -->
           <div class="dash-grid">
 
-            <!-- Últimos proyectos -->
+            <!-- Gráfica de visitas últimos 7 días -->
             <div class="dash-panel">
               <div class="dash-panel__header">
-                <h3 class="dash-panel__title">Últimos proyectos</h3>
-                <button class="dash-panel__link" (click)="setSection('proyectos')">Ver todos →</button>
+                <h3 class="dash-panel__title">Visitas últimos 7 días</h3>
+              </div>
+              <div class="chart-wrap">
+                @for (bar of (stats()?.dailyViews ?? []); track bar.date) {
+                  <div class="chart-col">
+                    <div class="chart-bar-wrap">
+                      <div class="chart-bar" [style.height.px]="chartBarHeight(bar.views)" [title]="bar.views + ' visitas'"></div>
+                    </div>
+                    <span class="chart-label">{{ dayLabel(bar.date) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Proyectos pendientes rápidos -->
+            <div class="dash-panel">
+              <div class="dash-panel__header">
+                <h3 class="dash-panel__title">
+                  Pendientes de revisión
+                  @if (pendingCount() > 0) { <span class="badge-count">{{ pendingCount() }}</span> }
+                </h3>
+                <button class="dash-panel__link" (click)="setSection('proyectos'); projectStatusFilter.set('pending')">Ver todos →</button>
               </div>
               <div class="dash-panel__list">
-                @for (p of projects().slice(0, 5); track p.id) {
+                @for (p of projects().filter(p => p.status === 'pending').slice(0, 5); track p.id) {
                   <div class="dash-row">
                     <img [src]="p.cover_image" [alt]="p.title" class="dash-row__thumb" />
                     <div class="dash-row__info">
                       <span class="dash-row__title">{{ p.title }}</span>
                       <span class="dash-row__sub">{{ p.author?.name }} · {{ p.category }}</span>
                     </div>
-                    <span class="status-badge" [class.active]="p.status === 'active'" [class.pending]="p.status === 'pending'">
-                      {{ getStatusLabel(p.status) }}
-                    </span>
+                    <div class="dash-row__quick-actions">
+                      <button class="proj-btn proj-btn--approve" (click)="approveProject(p.id)" title="Aprobar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      </button>
+                      <button class="proj-btn proj-btn--reject" (click)="openRejectModal(p)" title="Rechazar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </div>
                   </div>
                 }
-                @if (projects().length === 0 && !loading()) {
-                  <p class="dash-empty">No hay proyectos aún</p>
+                @if (pendingCount() === 0 && !loading()) {
+                  <p class="dash-empty">Sin proyectos pendientes</p>
                 }
               </div>
             </div>
 
-            <!-- Usuarios registrados -->
+          </div>
+
+          <!-- Segunda fila: últimos usuarios + actividad reciente -->
+          <div class="dash-grid">
             <div class="dash-panel">
               <div class="dash-panel__header">
-                <h3 class="dash-panel__title">Diseñadores</h3>
+                <h3 class="dash-panel__title">Últimos registros</h3>
                 <button class="dash-panel__link" (click)="setSection('usuarios')">Ver todos →</button>
               </div>
               <div class="dash-panel__list">
@@ -155,20 +240,144 @@
                     <div class="dash-row__avatar">{{ (u.name || '?')[0] }}</div>
                     <div class="dash-row__info">
                       <span class="dash-row__title">{{ u.name }}</span>
-                      <span class="dash-row__sub">{{ u.role }}</span>
+                      <span class="dash-row__sub">{{ u.email }}</span>
                     </div>
                     <span class="status-badge" [class.active]="!u.banned" [class.pending]="u.banned">
                       {{ u.banned ? 'Suspendido' : 'Activo' }}
                     </span>
                   </div>
                 }
-                @if (users().length === 0 && !loading()) {
-                  <p class="dash-empty">No hay usuarios aún</p>
-                }
               </div>
             </div>
 
+            <div class="dash-panel">
+              <div class="dash-panel__header">
+                <h3 class="dash-panel__title">Actividad reciente</h3>
+                <button class="dash-panel__link" (click)="setSection('actividad')">Ver todo →</button>
+              </div>
+              <div class="dash-panel__list">
+                @for (log of activityLog().slice(0, 6); track log.id) {
+                  <div class="dash-row">
+                    <div class="dash-row__avatar">{{ (log.admin?.name || 'A')[0] }}</div>
+                    <div class="dash-row__info">
+                      <span class="dash-row__title">{{ actionLabel(log.action) }}</span>
+                      <span class="dash-row__sub">{{ log.admin?.name }} · {{ log.created_at | date:'dd/MM HH:mm' }}</span>
+                    </div>
+                  </div>
+                }
+                @if (activityLog().length === 0 && !loading()) {
+                  <p class="dash-empty">Sin actividad registrada</p>
+                }
+              </div>
+            </div>
           </div>
+
+        </div>
+      }
+
+      <!-- ══════════════════════════════════════════════
+           PROYECTOS
+      ══════════════════════════════════════════════ -->
+      @if (activeSection() === 'proyectos') {
+
+        <!-- Filtros y búsqueda -->
+        <div class="section-toolbar">
+          <div class="status-tabs">
+            <button class="status-tab" [class.active]="projectStatusFilter() === 'pending'" (click)="projectStatusFilter.set('pending')">
+              Pendientes
+              @if (pendingCount() > 0) { <span class="badge-count">{{ pendingCount() }}</span> }
+            </button>
+            <button class="status-tab" [class.active]="projectStatusFilter() === 'active'" (click)="projectStatusFilter.set('active')">
+              Aprobados <span class="badge-count badge-count--muted">{{ activeCount() }}</span>
+            </button>
+            <button class="status-tab" [class.active]="projectStatusFilter() === 'rejected'" (click)="projectStatusFilter.set('rejected')">
+              Rechazados <span class="badge-count badge-count--muted">{{ rejectedCount() }}</span>
+            </button>
+            <button class="status-tab" [class.active]="projectStatusFilter() === 'all'" (click)="projectStatusFilter.set('all')">
+              Todos
+            </button>
+          </div>
+          <div class="toolbar-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="toolbar-search__input" [value]="projectSearch()" (input)="projectSearch.set($any($event.target).value)" placeholder="Buscar proyecto o autor..." />
+          </div>
+          <select class="form-input form-input--sm" [value]="projectCategoryFilter()" (change)="projectCategoryFilter.set($any($event.target).value)">
+            <option value="all">Todas las categorías</option>
+            @for (cat of categories; track cat) { <option [value]="cat">{{ cat }}</option> }
+          </select>
+        </div>
+
+        <div class="project-grid">
+          @for (project of filteredProjects(); track project.id) {
+            <div class="proj-card" [class.proj-card--pending]="project.status === 'pending'" [class.proj-card--rejected]="project.status === 'rejected'">
+              <div class="proj-card__cover" (click)="viewProject(project)" style="cursor:pointer">
+                <img [src]="project.cover_image" [alt]="project.title" />
+                <div class="proj-card__cover-overlay">
+                  <span class="proj-card__cat">{{ project.category }}</span>
+                  @if (project.featured) { <span class="proj-card__featured">⭐</span> }
+                </div>
+                <div class="proj-card__status-overlay">
+                  <span class="status-badge"
+                    [class.active]="project.status === 'active'"
+                    [class.pending]="project.status === 'pending'"
+                    [class.rejected]="project.status === 'rejected'">
+                    {{ getStatusLabel(project.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="proj-card__body">
+                <h4 class="proj-card__title">{{ project.title }}</h4>
+                <span class="proj-card__author">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  {{ project.author?.name || 'Diseñador' }}
+                </span>
+                @if (project.admin_note) {
+                  <div class="proj-card__note">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ project.admin_note }}
+                  </div>
+                }
+                <div class="proj-card__stats">
+                  <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    {{ project.views || 0 }}
+                  </span>
+                  <span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {{ project.likes || 0 }}
+                  </span>
+                  <span class="proj-card__date">{{ project.created_at | date:'dd/MM/yy' }}</span>
+                </div>
+              </div>
+              <div class="proj-card__actions">
+                @if (project.status !== 'active') {
+                  <button class="proj-btn proj-btn--approve" (click)="approveProject(project.id)" title="Aprobar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </button>
+                }
+                @if (project.status !== 'rejected') {
+                  <button class="proj-btn proj-btn--reject" (click)="openRejectModal(project)" title="Rechazar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                }
+                @if (project.status === 'active') {
+                  <button class="proj-btn" [class.proj-btn--star]="!project.featured" [class.proj-btn--unstar]="project.featured"
+                          (click)="featureProject(project.id, project.featured)" title="Destacar / Quitar destacado">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </button>
+                }
+                <button class="proj-btn" (click)="openEditProject(project)" title="Clasificar académicamente">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="proj-btn proj-btn--delete" (click)="deleteProject(project.id)" title="Eliminar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              </div>
+            </div>
+          }
+          @if (filteredProjects().length === 0 && !loading()) {
+            <div class="empty-state" style="grid-column:1/-1">No hay proyectos en este estado</div>
+          }
         </div>
       }
 
@@ -176,11 +385,19 @@
            USUARIOS
       ══════════════════════════════════════════════ -->
       @if (activeSection() === 'usuarios') {
+        <div class="section-toolbar">
+          <div class="toolbar-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="toolbar-search__input" [value]="userSearch()" (input)="userSearch.set($any($event.target).value)" placeholder="Buscar por nombre o email..." />
+          </div>
+          <span class="toolbar-count">{{ filteredUsers().length }} usuarios</span>
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
                 <th>Usuario</th>
+                <th>Email</th>
                 <th>Rol</th>
                 <th>Registro</th>
                 <th>Estado</th>
@@ -188,20 +405,22 @@
               </tr>
             </thead>
             <tbody>
-              @for (user of users(); track user.id) {
-                <tr>
+              @for (user of filteredUsers(); track user.id) {
+                <tr [class.row-banned]="user.banned">
                   <td>
                     <div class="table-user">
                       <div class="table-user__initials">{{ (user.name || '?')[0] }}</div>
                       <div>
                         <span class="table-user__name">{{ user.name }}</span>
+                        @if (user.is_admin) { <span class="badge-admin">Admin</span> }
                       </div>
                     </div>
                   </td>
-                  <td><span class="table-role">{{ user.role }}</span></td>
+                  <td><span class="table-date">{{ user.email || '—' }}</span></td>
+                  <td><span class="table-role">{{ user.role || 'Estudiante' }}</span></td>
                   <td><span class="table-date">{{ user.created_at | date:'dd/MM/yy' }}</span></td>
                   <td>
-                    <span class="status-badge" [class.active]="!user.banned" [class.pending]="user.banned">
+                    <span class="status-badge" [class.active]="!user.banned" [class.rejected]="user.banned">
                       {{ user.banned ? 'Suspendido' : 'Activo' }}
                     </span>
                   </td>
@@ -212,78 +431,23 @@
                       } @else {
                         <button class="btn btn--ghost btn--sm table-actions__danger" (click)="banUser(user.id)">Suspender</button>
                       }
+                      @if (!user.is_admin) {
+                        <button class="btn btn--ghost btn--sm" (click)="makeAdmin(user.id)" title="Dar permisos admin">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </button>
+                      } @else {
+                        <button class="btn btn--ghost btn--sm table-actions__danger" (click)="removeAdmin(user.id)" title="Revocar admin">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
-          @if (users().length === 0 && !loading()) {
-            <div class="empty-state">No hay usuarios registrados aún</div>
-          }
-        </div>
-      }
-
-      <!-- ══════════════════════════════════════════════
-           PROYECTOS
-      ══════════════════════════════════════════════ -->
-      @if (activeSection() === 'proyectos') {
-        <div class="project-grid">
-          @for (project of projects(); track project.id) {
-            <div class="proj-card">
-              <div class="proj-card__cover">
-                <img [src]="project.cover_image" [alt]="project.title" />
-                <div class="proj-card__cover-overlay">
-                  <span class="proj-card__cat">{{ project.category }}</span>
-                  @if (project.featured) { <span class="proj-card__featured">⭐</span> }
-                </div>
-              </div>
-              <div class="proj-card__body">
-                <h4 class="proj-card__title">{{ project.title }}</h4>
-                <span class="proj-card__author">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                  {{ project.author?.name || 'Diseñador' }}
-                </span>
-                <div class="proj-card__stats">
-                  <span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    {{ project.views || 0 }}
-                  </span>
-                  <span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    {{ project.likes || 0 }}
-                  </span>
-                  <span class="status-badge" [class.active]="project.status === 'active'" [class.pending]="project.status === 'pending'">
-                    {{ getStatusLabel(project.status) }}
-                  </span>
-                </div>
-              </div>
-              <div class="proj-card__actions">
-                @if (project.status !== 'active') {
-                  <button class="proj-btn proj-btn--approve" (click)="approveProject(project.id)" title="Aprobar">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  </button>
-                }
-                @if (project.status === 'active') {
-                  <button class="proj-btn proj-btn--reject" (click)="rejectProject(project.id)" title="Rechazar">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                }
-                <button class="proj-btn" [class.proj-btn--star]="!project.featured" [class.proj-btn--unstar]="project.featured"
-                        (click)="featureProject(project.id, project.featured)" title="Destacar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                </button>
-                <button class="proj-btn" (click)="openEditProject(project)" title="Clasificar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="proj-btn proj-btn--delete" (click)="deleteProject(project.id)" title="Eliminar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
-            </div>
-          }
-          @if (projects().length === 0 && !loading()) {
-            <div class="empty-state" style="grid-column:1/-1">No hay proyectos subidos aún</div>
+          @if (filteredUsers().length === 0 && !loading()) {
+            <div class="empty-state">No se encontraron usuarios</div>
           }
         </div>
       }
@@ -292,25 +456,68 @@
            REPORTES
       ══════════════════════════════════════════════ -->
       @if (activeSection() === 'reportes') {
+        <div class="section-toolbar">
+          <span class="toolbar-count">{{ reports().length }} {{ showResolvedReports() ? 'reportes (incl. resueltos)' : 'reportes pendientes' }}</span>
+          <button class="btn btn--ghost btn--sm" (click)="toggleShowResolved()">
+            {{ showResolvedReports() ? 'Ocultar resueltos' : 'Ver resueltos también' }}
+          </button>
+        </div>
         @if (reports().length === 0 && !loading()) {
-          <div class="empty-state">No hay reportes pendientes 🎉</div>
+          <div class="empty-state">Sin reportes pendientes</div>
         }
         <div class="project-review-list">
           @for (report of reports(); track report.id) {
-            <div class="review-card">
+            <div class="review-card" [class.review-card--resolved]="report.resolved">
               <img [src]="report.project?.cover_image" [alt]="report.project?.title" class="review-card__thumb" />
               <div class="review-card__info">
                 <h4 class="review-card__title">{{ report.project?.title }}</h4>
-                <span class="review-card__author">Reportado por: {{ report.reporter?.name }}</span>
+                <span class="review-card__author">Reportado por: <strong>{{ report.reporter?.name }}</strong></span>
                 <div class="report-reason">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   {{ report.reason }}
                 </div>
+                <span class="report-date">{{ report.created_at | date:'dd/MM/yy HH:mm' }}</span>
               </div>
               <div class="review-card__actions">
-                <button class="btn btn--outline btn--sm" (click)="resolveReport(report.id)">Resolver</button>
+                @if (!report.resolved) {
+                  <button class="btn btn--outline btn--sm" (click)="resolveReport(report.id, 'dismiss')">Desestimar</button>
+                  <button class="btn btn--danger btn--sm" (click)="resolveReport(report.id, 'remove_project')">Eliminar proyecto</button>
+                } @else {
+                  <span class="status-badge active">Resuelto</span>
+                }
               </div>
             </div>
+          }
+        </div>
+      }
+
+      <!-- ══════════════════════════════════════════════
+           ACTIVIDAD
+      ══════════════════════════════════════════════ -->
+      @if (activeSection() === 'actividad') {
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Admin</th><th>Acción</th><th>Entidad</th><th>Fecha</th></tr>
+            </thead>
+            <tbody>
+              @for (log of activityLog(); track log.id) {
+                <tr>
+                  <td>
+                    <div class="table-user">
+                      <div class="table-user__initials">{{ (log.admin?.name || 'A')[0] }}</div>
+                      <span class="table-user__name">{{ log.admin?.name ?? 'Admin' }}</span>
+                    </div>
+                  </td>
+                  <td><span class="table-role">{{ actionLabel(log.action) }}</span></td>
+                  <td><span class="table-date">{{ log.entity_type }} / <code style="font-size:.75rem;opacity:.5">{{ log.entity_id.slice(0,8) }}…</code></span></td>
+                  <td><span class="table-date">{{ log.created_at | date:'dd/MM/yy HH:mm' }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (activityLog().length === 0 && !loading()) {
+            <div class="empty-state">Sin actividad registrada aún</div>
           }
         </div>
       }
@@ -468,20 +675,18 @@
   </main>
 </div>
 
-<!-- ─── Modal editar clasificación académica ──────────────────────────── -->
+<!-- ─── Modal: clasificación académica ──────────────────────────────────── -->
 @if (editingProject()) {
   <div class="modal-backdrop" (click)="closeEditProject()">
     <div class="modal" (click)="$event.stopPropagation()" style="max-width:480px">
       <div class="modal__header">
         <h3 class="modal__title">Clasificación académica</h3>
         <button class="modal__close" (click)="closeEditProject()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="modal__body">
-        <p style="font-size:.85rem;opacity:.6;margin-bottom:.5rem">
+        <p style="font-size:.85rem;opacity:.6;margin-bottom:1rem">
           <strong>{{ editingProject()!.title }}</strong> · {{ editingProject()!.category }}
         </p>
         <div class="form-group">
@@ -500,13 +705,119 @@
             @for (sub of projectSubjects(); track sub) { <option [value]="sub">{{ sub }}</option> }
           </select>
           @if (projectSubjects().length === 0) {
-            <span style="font-size:.8rem;opacity:.5">Primero configura materias para esta categoría en la sección Académico</span>
+            <span style="font-size:.8rem;opacity:.5;display:block;margin-top:.3rem">Primero configura materias para esta categoría en la sección Académico</span>
           }
         </div>
       </div>
       <div class="modal__footer">
         <button class="btn btn--outline" (click)="closeEditProject()">Cancelar</button>
         <button class="btn btn--primary" (click)="saveProjectAcademic()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Modal: rechazar proyecto con nota ──────────────────────────────── -->
+@if (rejectingProject()) {
+  <div class="modal-backdrop" (click)="closeRejectModal()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width:480px">
+      <div class="modal__header">
+        <h3 class="modal__title">Rechazar proyecto</h3>
+        <button class="modal__close" (click)="closeRejectModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p style="font-size:.85rem;opacity:.7;margin-bottom:1rem">
+          Rechazando: <strong>{{ rejectingProject()!.title }}</strong> de {{ rejectingProject()!.author?.name }}
+        </p>
+        <div class="form-group">
+          <label class="form-label">Motivo del rechazo <span style="opacity:.5">(opcional)</span></label>
+          <textarea class="form-input" rows="3" [value]="rejectNote()"
+            (input)="rejectNote.set($any($event.target).value)"
+            placeholder="Ej: Las imágenes no cumplen la resolución mínima requerida...">
+          </textarea>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--outline" (click)="closeRejectModal()">Cancelar</button>
+        <button class="btn btn--danger" (click)="confirmReject()">Rechazar proyecto</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Modal: ver detalle proyecto ────────────────────────────────────── -->
+@if (viewingProject()) {
+  <div class="modal-backdrop" (click)="closeViewProject()">
+    <div class="modal modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ viewingProject()!.title }}</h3>
+        <button class="modal__close" (click)="closeViewProject()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal__body modal__body--project">
+        <div class="proj-detail__images">
+          <img [src]="viewingProject()!.cover_image" [alt]="viewingProject()!.title" class="proj-detail__cover" />
+          @if (viewingProject()!.images?.length > 1) {
+            <div class="proj-detail__thumbs">
+              @for (img of viewingProject()!.images; track img) {
+                <img [src]="img" class="proj-detail__thumb" />
+              }
+            </div>
+          }
+        </div>
+        <div class="proj-detail__info">
+          <div class="proj-detail__meta">
+            <span class="status-badge"
+              [class.active]="viewingProject()!.status === 'active'"
+              [class.pending]="viewingProject()!.status === 'pending'"
+              [class.rejected]="viewingProject()!.status === 'rejected'">
+              {{ getStatusLabel(viewingProject()!.status) }}
+            </span>
+            <span class="proj-card__cat">{{ viewingProject()!.category }}</span>
+            @if (viewingProject()!.featured) { <span class="proj-card__featured">⭐ Destacado</span> }
+          </div>
+          <p class="proj-detail__desc">{{ viewingProject()!.description || 'Sin descripción.' }}</p>
+          <div class="proj-detail__author">
+            <div class="table-user__initials">{{ (viewingProject()!.author?.name || '?')[0] }}</div>
+            <div>
+              <span class="table-user__name">{{ viewingProject()!.author?.name }}</span>
+              <span class="dash-row__sub">{{ viewingProject()!.author?.role }}</span>
+            </div>
+          </div>
+          @if (viewingProject()!.semester || viewingProject()!.subject) {
+            <div class="proj-detail__academic">
+              @if (viewingProject()!.semester) { <span class="table-role">Semestre {{ viewingProject()!.semester }}</span> }
+              @if (viewingProject()!.subject) { <span class="table-role">{{ viewingProject()!.subject }}</span> }
+            </div>
+          }
+          @if (viewingProject()!.tags?.length) {
+            <div class="proj-detail__tags">
+              @for (tag of viewingProject()!.tags; track tag) { <span class="tag-chip">{{ tag }}</span> }
+            </div>
+          }
+          <div class="proj-detail__stats">
+            <span>{{ viewingProject()!.views || 0 }} vistas</span>
+            <span>{{ viewingProject()!.likes || 0 }} likes</span>
+            <span>{{ viewingProject()!.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+          @if (viewingProject()!.admin_note) {
+            <div class="proj-card__note" style="margin-top:1rem">
+              Nota admin: {{ viewingProject()!.admin_note }}
+            </div>
+          }
+        </div>
+      </div>
+      <div class="modal__footer">
+        @if (viewingProject()!.status !== 'active') {
+          <button class="btn btn--primary" (click)="approveProject(viewingProject()!.id); closeViewProject()">Aprobar</button>
+        }
+        @if (viewingProject()!.status !== 'rejected') {
+          <button class="btn btn--danger" (click)="openRejectModal(viewingProject()!); closeViewProject()">Rechazar</button>
+        }
+        <button class="btn btn--outline" (click)="closeViewProject()">Cerrar</button>
       </div>
     </div>
   </div>

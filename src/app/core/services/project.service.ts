@@ -144,6 +144,7 @@ export class ProjectService {
         author_id: userId,
         images: imageUrls,
         cover_image: imageUrls[0] ?? null,
+        status: 'pending',
       })
       .select('*, author:profiles!projects_author_id_fkey(*)')
       .single();

@@ -912,3 +912,245 @@
     font-size: 13px; font-weight: 700;
   }
 }
+
+// ─── Status badge extra states ────────────────────────────────────────────────
+.status-badge {
+  &.rejected { background: rgba($error, 0.12); color: $error; }
+}
+
+.kpi-card {
+  &--danger {
+    border-color: rgba($error, 0.3);
+    background: rgba($error, 0.04);
+    .kpi-card__icon-wrap { background: rgba($error, 0.1); color: $error; }
+  }
+  &__sub { font-size: 11px; color: var(--text-tertiary); }
+}
+
+// ─── Alert banner ────────────────────────────────────────────────────────────
+.alert-banner {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-5;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  margin-bottom: $space-6;
+  cursor: pointer;
+  transition: opacity $transition-fast;
+  &:hover { opacity: 0.85; }
+
+  &--warn {
+    background: rgba($warning, 0.1);
+    border: 1px solid rgba($warning, 0.3);
+    color: $warning;
+  }
+}
+
+// ─── Section toolbar ────────────────────────────────────────────────────────
+.section-toolbar {
+  display: flex; align-items: center; gap: $space-4;
+  margin-bottom: $space-6; flex-wrap: wrap;
+}
+
+.status-tabs {
+  display: flex; gap: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  padding: 3px;
+}
+
+.status-tab {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-2 $space-4;
+  border-radius: $radius-md;
+  font-size: $text-xs; font-weight: 600;
+  color: var(--text-secondary);
+  background: none; border: none; cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &.active {
+    background: $violet;
+    color: #fff;
+  }
+  &:not(.active):hover { background: var(--bg-hover); color: var(--text); }
+}
+
+.badge-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: $radius-pill;
+  font-size: 10px; font-weight: 800;
+  background: $error; color: #fff;
+
+  &--muted { background: var(--bg-hover); color: var(--text-tertiary); }
+  &--warn  { background: $warning; color: #000; }
+}
+
+.toolbar-search {
+  display: flex; align-items: center; gap: $space-2;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: $radius-lg; padding: $space-2 $space-4;
+  flex: 1; max-width: 320px;
+  color: var(--text-tertiary);
+
+  &__input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-size: $text-sm; width: 100%;
+    &::placeholder { color: var(--text-tertiary); }
+  }
+}
+
+.toolbar-count {
+  font-size: $text-xs; color: var(--text-tertiary); white-space: nowrap;
+}
+
+// ─── Project card extras ──────────────────────────────────────────────────────
+.proj-card {
+  &--pending { border-color: rgba($warning, 0.4); }
+  &--rejected { border-color: rgba($error, 0.25); opacity: 0.8; }
+
+  &__status-overlay {
+    position: absolute; bottom: $space-2; right: $space-2;
+  }
+
+  &__note {
+    display: flex; align-items: flex-start; gap: $space-1;
+    font-size: 11px; color: $warning;
+    background: rgba($warning, 0.08);
+    padding: 4px $space-3; border-radius: $radius-md;
+    @include truncate;
+  }
+
+  &__date { margin-left: auto; }
+}
+
+.proj-card__actions {
+  .dash-row__quick-actions { display: flex; gap: 4px; margin-left: auto; }
+}
+
+// ─── Review card extras ───────────────────────────────────────────────────────
+.review-card {
+  &--resolved { opacity: 0.5; }
+  .report-date { font-size: 11px; color: var(--text-tertiary); display: block; margin-top: $space-1; }
+  &__actions { flex-direction: column; }
+}
+
+.btn--danger {
+  background: rgba($error, 0.1);
+  border: 1px solid rgba($error, 0.3);
+  color: $error;
+  &:hover { background: rgba($error, 0.18); }
+}
+
+// ─── Badge admin ────────────────────────────────────────────────────────────
+.badge-admin {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 7px; border-radius: $radius-pill;
+  background: rgba($violet, 0.15); color: $violet-light;
+  margin-left: $space-2;
+}
+
+.row-banned td { opacity: 0.55; }
+
+// ─── KPI grid 6 columnas en dashboard ────────────────────────────────────────
+.kpi-grid {
+  grid-template-columns: repeat(3, 1fr);
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile  { grid-template-columns: 1fr 1fr; }
+}
+
+// ─── Chart barras ────────────────────────────────────────────────────────────
+.chart-wrap {
+  display: flex; align-items: flex-end; gap: $space-2;
+  height: 100px; padding: $space-4 $space-6 $space-4;
+}
+
+.chart-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: $space-1;
+}
+
+.chart-bar-wrap {
+  flex: 1; display: flex; align-items: flex-end; width: 100%;
+}
+
+.chart-bar {
+  width: 100%; border-radius: $radius-md $radius-md 0 0;
+  background: $gradient-primary; min-height: 3px;
+  transition: height 0.5s ease;
+  &:hover { opacity: 0.8; }
+}
+
+.chart-label {
+  font-size: 10px; font-weight: 700; color: var(--text-tertiary);
+}
+
+// ─── Dashboard margin ─────────────────────────────────────────────────────────
+.dashboard {
+  .dash-grid { margin-bottom: $space-6; }
+}
+
+// ─── Modal wide ───────────────────────────────────────────────────────────────
+.modal--wide { max-width: 780px !important; }
+
+.modal__body--project {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-6;
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.proj-detail {
+  &__cover {
+    width: 100%; border-radius: $radius-lg; object-fit: cover; aspect-ratio: 4/3;
+    display: block; background: var(--bg-elevated);
+  }
+  &__thumbs {
+    display: flex; gap: $space-2; margin-top: $space-2; flex-wrap: wrap;
+  }
+  &__thumb {
+    width: 52px; height: 40px; border-radius: $radius-md;
+    object-fit: cover; border: 1px solid var(--border);
+  }
+  &__info { display: flex; flex-direction: column; gap: $space-4; }
+  &__meta { display: flex; gap: $space-2; flex-wrap: wrap; align-items: center; }
+  &__desc { font-size: $text-sm; color: var(--text-secondary); line-height: 1.6; }
+  &__author {
+    display: flex; align-items: center; gap: $space-3;
+    padding: $space-3; background: var(--bg-elevated);
+    border-radius: $radius-lg; border: 1px solid var(--border);
+  }
+  &__academic { display: flex; gap: $space-2; flex-wrap: wrap; }
+  &__tags { display: flex; flex-wrap: wrap; gap: $space-2; }
+  &__stats { display: flex; gap: $space-4; font-size: $text-xs; color: var(--text-tertiary); }
+  &__images { display: flex; flex-direction: column; }
+}
+
+.tag-chip {
+  display: inline-block; padding: 3px 10px; border-radius: $radius-pill;
+  font-size: 11px; background: var(--bg-elevated);
+  border: 1px solid var(--border); color: var(--text-secondary);
+}
+
+.form-input--sm {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: $radius-lg; color: var(--text); font-size: $text-xs;
+  padding: $space-2 $space-3; outline: none;
+  &:focus { border-color: $violet; }
+}
+
+// ─── Admin nav badge warn ─────────────────────────────────────────────────────
+.admin-nav-item__badge--warn {
+  background: $warning !important;
+  color: #000 !important;
+}
+
+// ─── Textarea en modal ───────────────────────────────────────────────────────
+textarea.form-input {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: $radius-lg; color: var(--text); font-size: $text-sm;
+  font-family: $font-body; padding: $space-3 $space-4;
+  width: 100%; resize: vertical; outline: none;
+  &:focus { border-color: $violet; box-shadow: 0 0 0 3px rgba($violet, 0.12); }
+}

@@ -303,7 +303,7 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CARRUSEL 3D FULL
+// CARRUSEL — Tira freestyle (stack + drift)
 // ═══════════════════════════════════════════════════════════════════════════════
 .carousel-section {
   position: relative; background: #fff;
@@ -324,31 +324,73 @@
   }
 }
 
+// Stage: overflow visible para que las tarjetas sobresalgan
 .carousel-stage {
-  position: relative; height: 480px; width: 100%;
-  perspective: 1200px; display: flex; align-items: center; justify-content: center;
+  position: relative; height: 500px; width: 100%;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  @include mobile { height: 320px; }
+  @include mobile { height: 360px; }
 }
 
 .carousel-card {
-  position: absolute; width: 340px; height: 440px;
-  border-radius: 22px; overflow: hidden;
-  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease, box-shadow 0.55s ease;
-  will-change: transform, opacity; cursor: pointer;
+  position: absolute;
+  width: 320px; height: 440px;
+  border-radius: 20px; overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity   0.5s ease,
+    box-shadow 0.5s ease,
+    filter    0.5s ease;
+  will-change: transform, opacity;
 
-  &.active  { transform: translateX(0) scale(1) rotateY(0deg) translateZ(0); opacity: 1; z-index: 10; box-shadow: 0 32px 80px rgba(0,0,0,0.30); pointer-events: none; }
-  &.left1   { transform: translateX(-300px) scale(0.82) rotateY(22deg) translateZ(-120px); opacity: 0.65; z-index: 5; }
-  &.left2   { transform: translateX(-520px) scale(0.66) rotateY(32deg) translateZ(-240px); opacity: 0.28; z-index: 2; pointer-events: none; }
-  &.right1  { transform: translateX(300px) scale(0.82) rotateY(-22deg) translateZ(-120px); opacity: 0.65; z-index: 5; }
-  &.right2  { transform: translateX(520px) scale(0.66) rotateY(-32deg) translateZ(-240px); opacity: 0.28; z-index: 2; pointer-events: none; }
+  // Centro — se agranda, upright, sin rotación
+  &.active {
+    transform: translateX(0) scale(1) rotate(0deg) translateZ(0);
+    opacity: 1; z-index: 10;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.28), 0 0 0 2px rgba($blue, 0.10);
+    filter: none;
+    pointer-events: none;
+  }
+
+  // Izquierda 1 — inclinado hacia izquierda, levemente abajo
+  &.left1 {
+    transform: translateX(-280px) scale(0.80) rotate(-8deg) translateY(20px);
+    opacity: 0.72; z-index: 5;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+    filter: brightness(0.88) saturate(0.8);
+  }
+
+  // Izquierda 2 — más inclinado, más pequeño
+  &.left2 {
+    transform: translateX(-490px) scale(0.62) rotate(-15deg) translateY(50px);
+    opacity: 0.30; z-index: 2;
+    filter: brightness(0.70) saturate(0.5);
+    pointer-events: none;
+  }
+
+  // Derecha 1 — inclinado hacia derecha
+  &.right1 {
+    transform: translateX(280px) scale(0.80) rotate(8deg) translateY(20px);
+    opacity: 0.72; z-index: 5;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+    filter: brightness(0.88) saturate(0.8);
+  }
+
+  // Derecha 2
+  &.right2 {
+    transform: translateX(490px) scale(0.62) rotate(15deg) translateY(50px);
+    opacity: 0.30; z-index: 2;
+    filter: brightness(0.70) saturate(0.5);
+    pointer-events: none;
+  }
 
   @include mobile {
-    width: 240px; height: 300px;
-    &.left1  { transform: translateX(-190px) scale(0.78) rotateY(20deg) translateZ(-80px); }
-    &.left2  { transform: translateX(-320px) scale(0.58) rotateY(30deg) translateZ(-150px); opacity: 0.18; }
-    &.right1 { transform: translateX(190px) scale(0.78) rotateY(-20deg) translateZ(-80px); }
-    &.right2 { transform: translateX(320px) scale(0.58) rotateY(-30deg) translateZ(-150px); opacity: 0.18; }
+    width: 230px; height: 310px;
+    &.left1  { transform: translateX(-180px) scale(0.78) rotate(-7deg) translateY(16px); }
+    &.left2  { transform: translateX(-310px) scale(0.58) rotate(-13deg) translateY(40px); opacity: 0.20; }
+    &.right1 { transform: translateX(180px)  scale(0.78) rotate(7deg)  translateY(16px); }
+    &.right2 { transform: translateX(310px)  scale(0.58) rotate(13deg) translateY(40px); opacity: 0.20; }
   }
 
   &__img-wrap { position: relative; width: 100%; height: 100%; }
@@ -356,7 +398,7 @@
 
   &__overlay {
     position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 50%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.30) 55%, transparent 100%);
     display: flex; flex-direction: column; justify-content: flex-end;
     padding: 28px 24px; gap: 6px; animation: fadeIn 0.35s ease;
   }
@@ -381,22 +423,21 @@
 
 // Carousel skeleton
 .carousel-skeleton-wrap {
-  position: relative; height: 480px; width: 100%;
+  position: relative; height: 500px; width: 100%;
   display: flex; align-items: center; justify-content: center;
-  perspective: 1200px;
-  @include mobile { height: 320px; }
+  @include mobile { height: 360px; }
 }
 .carousel-skeleton {
   @extend %skeleton-base;
-  position: absolute; border-radius: 22px;
-  &--center { width: 340px; height: 440px; z-index: 10; @include mobile { width: 240px; height: 300px; } }
+  position: absolute; border-radius: 20px;
+  &--center { width: 320px; height: 440px; z-index: 10; @include mobile { width: 230px; height: 310px; } }
   &--side {
-    width: 280px; height: 360px; opacity: 0.5;
-    &:nth-child(2) { transform: translateX(-300px) scale(0.82) rotateY(22deg) translateZ(-120px); }
-    &:nth-child(3) { transform: translateX(300px)  scale(0.82) rotateY(-22deg) translateZ(-120px); }
-    @include mobile { width: 190px; height: 234px;
-      &:nth-child(2) { transform: translateX(-190px) scale(0.78) rotateY(20deg) translateZ(-80px); }
-      &:nth-child(3) { transform: translateX(190px)  scale(0.78) rotateY(-20deg) translateZ(-80px); }
+    width: 256px; height: 352px; opacity: 0.45;
+    &:nth-child(2) { transform: translateX(-280px) scale(0.80) rotate(-8deg) translateY(20px); }
+    &:nth-child(3) { transform: translateX(280px)  scale(0.80) rotate(8deg)  translateY(20px); }
+    @include mobile { width: 180px; height: 242px;
+      &:nth-child(2) { transform: translateX(-180px) scale(0.78) rotate(-7deg) translateY(16px); }
+      &:nth-child(3) { transform: translateX(180px)  scale(0.78) rotate(7deg)  translateY(16px); }
     }
   }
 }

@@ -24,10 +24,13 @@
   overflow: hidden;
   margin-bottom: $space-8;
   border: 1px solid var(--border);
+  max-height: 520px;
 
   img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    max-height: 520px;
+    object-fit: cover;
     display: block;
   }
 }

@@ -22,7 +22,7 @@
 .eyebrow {
   display: inline-flex; align-items: center; gap: 7px;
   font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(0,0,0,0.35); margin-bottom: 8px;
+  text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px;
   &__dot {
     width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
     &--pink { background: $accent-pink; box-shadow: 0 0 7px rgba(#ee41ba, 0.75); }
@@ -31,7 +31,7 @@
 }
 .section-heading {
   font-family: $font-heading; font-size: clamp(28px, 3.5vw, 48px);
-  font-weight: 400; color: #000; letter-spacing: 1px; margin: 0; line-height: 1.05;
+  font-weight: 400; color: var(--text); letter-spacing: 1px; margin: 0; line-height: 1.05;
   em { font-style: italic; @include gradient-text(linear-gradient(135deg, $blue, $accent-pink)); }
 }
 .section-link {
@@ -61,7 +61,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // HERO — full viewport
 // ═══════════════════════════════════════════════════════════════════════════════
-.home-page { min-height: 100vh; background: #fafafe; }
+.home-page { min-height: 100vh; background: var(--bg); }
 
 .home-hero {
   position: relative;
@@ -306,7 +306,7 @@
 // CARRUSEL — Tira freestyle (stack + drift)
 // ═══════════════════════════════════════════════════════════════════════════════
 .carousel-section {
-  position: relative; background: #fff;
+  position: relative; background: var(--bg-card);
   padding: 72px 0 80px; overflow: hidden;
 
   &::before {
@@ -448,7 +448,7 @@
 }
 .carousel-arrow {
   width: 44px; height: 44px; border-radius: 50%;
-  border: 2px solid rgba($blue, 0.16); background: #fff; color: $blue;
+  border: 2px solid var(--border); background: var(--bg-card); color: $blue;
   cursor: pointer; @include flex-center;
   transition: all 0.2s ease;
   &:hover { background: $blue; border-color: $blue; color: #fff; transform: scale(1.08); }
@@ -634,8 +634,8 @@
 // RECIENTES — scroll horizontal film strip
 // ═══════════════════════════════════════════════════════════════════════════════
 .recents-section {
-  padding: 64px 0; background: #fff;
-  border-top: 1px solid rgba($blue, 0.06);
+  padding: 64px 0; background: var(--bg-card);
+  border-top: 1px solid var(--border-subtle);
 
   &__header {
     max-width: 1280px; margin: 0 auto 32px; padding: 0 $space-6;
@@ -661,8 +661,8 @@
   &__img {
     position: relative; width: 100%; aspect-ratio: 3/4;
     border-radius: 16px; overflow: hidden;
-    background: #eee; margin-bottom: 10px;
-    border: 1px solid rgba($blue, 0.06);
+    background: var(--bg-elevated); margin-bottom: 10px;
+    border: 1px solid var(--border-subtle);
     img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
   }
   &:hover &__img img { transform: scale(1.06); }
@@ -673,8 +673,8 @@
     color: #fff; font-size: 8px; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; padding: 3px 8px; border-radius: $radius-pill;
   }
-  &__title { font-size: 12px; font-weight: 700; color: #000; margin: 0 0 3px; @include truncate; }
-  &__author { font-size: 11px; color: rgba(0,0,0,0.40); margin: 0; @include truncate; }
+  &__title { font-size: 12px; font-weight: 700; color: var(--text); margin: 0 0 3px; @include truncate; }
+  &__author { font-size: 11px; color: var(--text-tertiary); margin: 0; @include truncate; }
 }
 
 .recents-skeleton {

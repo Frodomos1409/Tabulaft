@@ -4,40 +4,76 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,700;0,800;0,900;1,800;1,900&display=swap');
 
-// ─── CSS Custom Properties (theme-aware) ─────────────────────────────────────
+// ─── Tokens fijos (no dependen del tema) ─────────────────────────────────────
 :root {
   --tabulaft-blue: #2830eb;
   --tabulaft-blue-dark: #101663;
   --tabulaft-blue-mid: #202dc9;
   --scale: calc(100vw / 1280);
+  --accent-pink: #ee41ba;
+}
 
+// ─── Light theme ─────────────────────────────────────────────────────────────
+body, body[data-theme="light"] {
   --bg: #ffffff;
   --bg-card: #ffffff;
   --bg-elevated: #f5f5fa;
   --bg-hover: #eeeef8;
   --bg-input: #f5f5fa;
-  --border: rgba(40, 48, 235, 0.12);
-  --border-hover: rgba(40, 48, 235, 0.3);
-  --text: #000000;
-  --text-secondary: rgba(0, 0, 0, 0.65);
-  --text-tertiary: rgba(0, 0, 0, 0.38);
-  --shadow: 0 4px 24px rgba(40, 48, 235, 0.08);
-  --shadow-lg: 0 12px 48px rgba(40, 48, 235, 0.15);
-
   --bg-nav: #ffffff;
   --bg-panel: #ffffff;
   --bg-footer: #{$blue-dark};
-  --text-on-surface: rgba(0, 0, 0, 0.65);
-  --text-dim: rgba(0, 0, 0, 0.35);
+
+  --border: rgba(40, 48, 235, 0.12);
+  --border-hover: rgba(40, 48, 235, 0.3);
   --border-subtle: rgba(40, 48, 235, 0.06);
   --border-light: rgba(40, 48, 235, 0.1);
   --border-medium: rgba(40, 48, 235, 0.2);
+
+  --text: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.65);
+  --text-tertiary: rgba(0, 0, 0, 0.38);
+  --text-on-surface: rgba(0, 0, 0, 0.65);
+  --text-dim: rgba(0, 0, 0, 0.35);
+  --text-inverse: #ffffff;
+
+  --shadow: 0 4px 24px rgba(40, 48, 235, 0.08);
+  --shadow-lg: 0 12px 48px rgba(40, 48, 235, 0.15);
+
   --hover-surface: rgba(40, 48, 235, 0.04);
   --hover-surface-md: rgba(40, 48, 235, 0.08);
-  --text-inverse: #ffffff;
 }
 
-// Tabulaft usa tema único claro (blanco + azul)
+// ─── Dark theme ──────────────────────────────────────────────────────────────
+body[data-theme="dark"] {
+  --bg: #0a0a12;
+  --bg-card: #12121e;
+  --bg-elevated: #1a1a2a;
+  --bg-hover: #1f1f32;
+  --bg-input: #12121e;
+  --bg-nav: #0a0a12;
+  --bg-panel: #12121e;
+  --bg-footer: #06060f;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.14);
+
+  --text: #f0f0ff;
+  --text-secondary: rgba(240, 240, 255, 0.65);
+  --text-tertiary: rgba(240, 240, 255, 0.35);
+  --text-on-surface: rgba(240, 240, 255, 0.65);
+  --text-dim: rgba(240, 240, 255, 0.30);
+  --text-inverse: #0a0a12;
+
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.50);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.65);
+
+  --hover-surface: rgba(255, 255, 255, 0.04);
+  --hover-surface-md: rgba(255, 255, 255, 0.08);
+}
 
 body {
   background: var(--bg);

@@ -1,22 +1,21 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  isDark = signal(true);
+  isDark = signal(false);
 
   constructor() {
     const saved = localStorage.getItem('theme');
-    if (saved) this.isDark.set(saved === 'dark');
-    this.applyTheme(this.isDark());
-
-    effect(() => {
-      this.applyTheme(this.isDark());
-      localStorage.setItem('theme', this.isDark() ? 'dark' : 'light');
-    });
+    const dark = saved === 'dark';
+    this.isDark.set(dark);
+    this.applyTheme(dark);
   }
 
   toggle() {
-    this.isDark.update(v => !v);
+    const next = !this.isDark();
+    this.isDark.set(next);
+    this.applyTheme(next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
   }
 
   private applyTheme(dark: boolean) {

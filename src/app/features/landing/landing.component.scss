@@ -90,7 +90,7 @@
 
   &__card {
     position: relative; z-index: 3;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 24px;
     padding: clamp(20px, 2.6vw, 34px) clamp(24px, 3vw, 42px);
     max-width: clamp(240px, 32vw, 460px);
@@ -153,7 +153,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 .carousel-section {
   position: relative;
-  background: #fff;
+  background: var(--bg-card);
   padding: 72px 0 80px;
   overflow: hidden;
 
@@ -177,7 +177,7 @@
   &__eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-    text-transform: uppercase; color: rgba(0,0,0,0.40);
+    text-transform: uppercase; color: var(--text-tertiary);
   }
 
   &__dot {
@@ -188,7 +188,7 @@
 
   &__title {
     font-family: $font-heading; font-size: clamp(28px, 3.5vw, 48px);
-    font-weight: 400; color: #000; letter-spacing: 1px; margin: 0;
+    font-weight: 400; color: var(--text); letter-spacing: 1px; margin: 0;
   }
 
   &__link {
@@ -267,7 +267,7 @@
 
   &__arrow {
     width: 44px; height: 44px; border-radius: 50%;
-    border: 2px solid rgba($blue, 0.16); background: #fff; color: $blue;
+    border: 2px solid var(--border); background: var(--bg-card); color: $blue;
     cursor: pointer; @include flex-center;
     transition: all 0.2s ease;
     &:hover { background: $blue; border-color: $blue; color: #fff; transform: scale(1.08); }
@@ -288,13 +288,13 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 .gallery {
   padding: 72px 0 96px;
-  background: #fafafe;
+  background: var(--bg);
   overflow: hidden;
   position: relative;
 
   &__title {
     font-family: $font-heading; font-size: clamp(28px, 4vw, 52px);
-    font-weight: 400; color: #000; letter-spacing: 1px;
+    font-weight: 400; color: var(--text); letter-spacing: 1px;
     text-align: center; margin: 0 auto 48px;
     max-width: 800px; padding: 0 $space-6;
   }
@@ -313,7 +313,7 @@
   &__marquee-img {
     width: 220px; height: 160px; border-radius: 16px;
     object-fit: cover; flex-shrink: 0;
-    border: 1px solid rgba($blue, 0.08);
+    border: 1px solid var(--border-subtle);
   }
 
   &__live-grid {

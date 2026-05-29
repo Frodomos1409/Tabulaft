@@ -4,7 +4,7 @@
 // ─── Page ─────────────────────────────────────────────────────────────────────
 .feed-page {
   min-height: 100vh;
-  background: #fafafe;
+  background: var(--bg);
 }
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -152,11 +152,11 @@
   position: sticky;
   top: $navbar-height;
   z-index: 100;
-  background: rgba(255,255,255,0.92);
+  background: var(--bg-nav);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba($blue, 0.07);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
 
   &__inner {
     max-width: 1280px;
@@ -189,9 +189,9 @@
   border-radius: $radius-pill;
   font-size: 12px;
   font-weight: 600;
-  border: 1.5px solid rgba($blue, 0.12);
+  border: 1.5px solid var(--border);
   background: transparent;
-  color: rgba(0,0,0,0.45);
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.15s ease;
   flex-shrink: 0;
@@ -218,9 +218,9 @@
   border-radius: $radius-pill;
   font-size: 11px;
   font-weight: 600;
-  border: 1.5px solid rgba(0,0,0,0.08);
+  border: 1.5px solid var(--border);
   background: transparent;
-  color: rgba(0,0,0,0.40);
+  color: var(--text-dim);
   cursor: pointer;
   transition: all 0.15s ease;
   flex-shrink: 0;
@@ -239,13 +239,13 @@
 .feed-select-wrap { position: relative; flex-shrink: 0; }
 .feed-select {
   appearance: none;
-  background: transparent;
-  border: 1.5px solid rgba(0,0,0,0.09);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
   border-radius: $radius-pill;
   padding: 5px 26px 5px 12px;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(0,0,0,0.50);
+  color: var(--text-secondary);
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -317,7 +317,7 @@
     margin-bottom: $space-2;
   }
 
-  p { color: rgba(0,0,0,0.40); font-size: $text-md; margin: 0; }
+  p { color: var(--text-tertiary); font-size: $text-md; margin: 0; }
 
   &__btn {
     height: 40px;
@@ -348,8 +348,8 @@
   height: 48px;
   padding: 0 32px;
   border-radius: $radius-pill;
-  border: 1.5px solid rgba($blue, 0.20);
-  background: #fff;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
   color: $blue;
   font-size: 13px;
   font-weight: 700;
@@ -384,7 +384,7 @@
 .cat-m__page {
   overflow-x: hidden;
   padding-top: $navbar-height;
-  background: #fafafe;
+  background: var(--bg);
 }
 
 .cat-m__cats-bar {
@@ -393,8 +393,8 @@
   padding: 12px 16px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid rgba($blue, 0.07);
-  background: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-card);
   &::-webkit-scrollbar { display: none; }
 }
 
@@ -402,9 +402,9 @@
   white-space: nowrap;
   padding: 6px 14px;
   border-radius: 20px;
-  border: 1.5px solid rgba($blue, 0.13);
+  border: 1.5px solid var(--border);
   background: transparent;
-  color: rgba(0,0,0,0.45);
+  color: var(--text-tertiary);
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -418,9 +418,9 @@
   padding: 10px 16px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 1px solid rgba($blue, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
   align-items: center;
-  background: #fff;
+  background: var(--bg-card);
   &::-webkit-scrollbar { display: none; }
 }
 
@@ -428,9 +428,9 @@
   white-space: nowrap;
   padding: 5px 12px;
   border-radius: 14px;
-  border: 1.5px solid rgba(0,0,0,0.09);
+  border: 1.5px solid var(--border);
   background: transparent;
-  color: rgba(0,0,0,0.40);
+  color: var(--text-dim);
   font-size: 0.73rem;
   font-weight: 600;
   cursor: pointer;
@@ -441,9 +441,9 @@
 .cat-m__select {
   padding: 5px 10px;
   border-radius: 14px;
-  border: 1.5px solid rgba(0,0,0,0.09);
-  background: transparent;
-  color: rgba(0,0,0,0.50);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
   font-size: 0.73rem;
   font-weight: 600;
   cursor: pointer;
@@ -477,7 +477,7 @@
 .cat-m__count {
   padding: 6px 16px;
   font-size: 0.73rem;
-  color: rgba(0,0,0,0.30);
+  color: var(--text-dim);
   font-weight: 500;
 }
 

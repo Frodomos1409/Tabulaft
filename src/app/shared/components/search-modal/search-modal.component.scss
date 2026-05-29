@@ -25,7 +25,7 @@
 .sm-panel {
   width: 100%;
   max-width: 700px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 22px;
   overflow: hidden;
   max-height: 84vh;
@@ -69,13 +69,13 @@
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba($blue, 0.07);
+  border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
-  background: #fff;
+  background: var(--bg-card);
 }
 
 .sm-input-icon {
-  color: rgba(0,0,0,0.28);
+  color: var(--text-dim);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -101,19 +101,19 @@
   font-size: 18px;
   font-family: $font-body;
   font-weight: 400;
-  color: #000;
+  color: var(--text);
   letter-spacing: -0.01em;
   line-height: 1;
 
-  &::placeholder { color: rgba(0,0,0,0.22); }
+  &::placeholder { color: var(--text-dim); }
 }
 
 .sm-clear {
   @include flex-center;
   width: 26px; height: 26px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.38);
+  background: var(--hover-surface);
+  color: var(--text-tertiary);
   cursor: pointer;
   border: none;
   flex-shrink: 0;
@@ -130,9 +130,9 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: rgba(0,0,0,0.25);
-  background: rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.09);
+  color: var(--text-dim);
+  background: var(--hover-surface);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 3px 8px;
   cursor: pointer;
@@ -151,11 +151,11 @@
   display: flex;
   gap: 6px;
   padding: 10px 20px;
-  border-bottom: 1px solid rgba($blue, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
-  background: #fafafe;
+  background: var(--bg-elevated);
   &::-webkit-scrollbar { display: none; }
 }
 
@@ -166,9 +166,9 @@
   border-radius: $radius-pill;
   font-size: 11px;
   font-weight: 600;
-  border: 1.5px solid rgba(0,0,0,0.09);
-  background: #fff;
-  color: rgba(0,0,0,0.40);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.15s ease;
 
@@ -190,7 +190,7 @@
 .sm-body {
   overflow-y: auto;
   flex: 1;
-  background: #fff;
+  background: var(--bg-card);
   scrollbar-width: thin;
   scrollbar-color: rgba($blue, 0.12) transparent;
   &::-webkit-scrollbar { width: 3px; }
@@ -243,7 +243,7 @@
     font-family: $font-heading;
     font-size: clamp(16px, 2.2vw, 22px);
     font-weight: 400;
-    color: #000;
+    color: var(--text);
     letter-spacing: 0.5px;
     margin: 0;
     line-height: 1.2;
@@ -251,7 +251,7 @@
 
   &__author {
     font-size: 12px;
-    color: rgba(0,0,0,0.40);
+    color: var(--text-tertiary);
     margin: 0;
     font-weight: 500;
   }
@@ -261,7 +261,7 @@
     gap: 14px;
     font-size: 12px;
     font-weight: 600;
-    color: rgba(0,0,0,0.30);
+    color: var(--text-dim);
     margin-top: 2px;
 
     span {
@@ -301,7 +301,7 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.22);
+  color: var(--text-dim);
 }
 
 .sm-list { display: flex; flex-direction: column; }
@@ -313,7 +313,7 @@
   padding: 10px 20px;
   text-decoration: none;
   transition: background 0.10s ease;
-  border-bottom: 1px solid rgba($blue, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
 
   &:last-child { border-bottom: none; }
 
@@ -341,14 +341,14 @@
   &__title {
     font-size: 13px;
     font-weight: 600;
-    color: #000;
+    color: var(--text);
     @include truncate;
     transition: color 0.12s ease;
   }
 
   &__meta {
     font-size: 11px;
-    color: rgba(0,0,0,0.35);
+    color: var(--text-tertiary);
     @include truncate;
   }
 
@@ -384,14 +384,14 @@
 
   p {
     font-size: 14px;
-    color: rgba(0,0,0,0.50);
+    color: var(--text-secondary);
     margin: 0;
-    strong { color: #000; }
+    strong { color: var(--text); }
   }
 
   span {
     font-size: 12px;
-    color: rgba(0,0,0,0.28);
+    color: var(--text-dim);
   }
 }
 
@@ -406,7 +406,7 @@
 
   p {
     font-size: 13px;
-    color: rgba(0,0,0,0.30);
+    color: var(--text-dim);
     margin: 0;
   }
 }
@@ -417,17 +417,17 @@
   flex-wrap: wrap;
   justify-content: center;
   font-size: 11px;
-  color: rgba(0,0,0,0.25);
+  color: var(--text-dim);
 
   kbd {
     display: inline-block;
     padding: 2px 6px;
-    background: rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.10);
+    background: var(--hover-surface);
+    border: 1px solid var(--border);
     border-radius: 5px;
     font-family: monospace;
     font-size: 10px;
     margin-right: 3px;
-    color: rgba(0,0,0,0.40);
+    color: var(--text-tertiary);
   }
 }

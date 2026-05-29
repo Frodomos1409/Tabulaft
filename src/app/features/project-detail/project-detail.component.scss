@@ -4,6 +4,8 @@
 .detail-page {
   padding-top: calc(#{$navbar-height} + #{$space-8});
   padding-bottom: $space-20;
+  background: var(--bg);
+  min-height: 100vh;
 }
 
 .detail-back {

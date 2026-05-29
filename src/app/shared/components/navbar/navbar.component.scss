@@ -11,8 +11,8 @@ $nav-border:      rgba(40, 48, 235, 0.10);
   top: 0; left: 0; right: 0;
   z-index: 1000;
   height: $navbar-height;
-  background: $nav-bg;
-  border-bottom: 1px solid $nav-border;
+  background: var(--bg-nav, $nav-bg);
+  border-bottom: 1px solid var(--border, $nav-border);
   transition:
     background 0.3s ease,
     box-shadow 0.3s ease,
@@ -39,9 +39,9 @@ $nav-border:      rgba(40, 48, 235, 0.10);
   }
 
   &.scrolled {
-    background: $nav-bg-scrolled;
-    box-shadow: 0 2px 40px rgba(40, 48, 235, 0.10);
-    border-color: rgba(40, 48, 235, 0.14);
+    background: var(--bg-nav, $nav-bg-scrolled);
+    box-shadow: 0 2px 40px rgba(0, 0, 0, 0.15);
+    border-color: var(--border);
 
     &::after { opacity: 1; }
   }
@@ -92,7 +92,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
       border-radius: $radius-pill;
       font-size: 12px;
       font-weight: 700;
-      color: rgba(0, 0, 0, 0.55);
+      color: var(--text-secondary);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       text-decoration: none;
@@ -124,7 +124,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     @include flex-center;
     width: 36px; height: 36px;
     border-radius: $radius-lg;
-    color: rgba(0, 0, 0, 0.55);
+    color: var(--text-secondary);
     background: transparent;
     cursor: pointer;
     border: none;
@@ -155,10 +155,10 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     align-items: center;
     gap: 7px;
     padding: 7px 14px;
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: var(--hover-surface);
+    border: 1px solid var(--border);
     border-radius: $radius-pill;
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--text-tertiary);
     font-size: $text-sm;
     font-weight: 500;
     cursor: pointer;
@@ -178,9 +178,9 @@ $nav-border:      rgba(40, 48, 235, 0.10);
 
   &__search-kbd {
     font-size: 10px; font-weight: 700;
-    color: rgba(0,0,0,0.35);
-    background: rgba(0,0,0,0.06);
-    border: 1px solid rgba(0,0,0,0.12);
+    color: var(--text-dim);
+    background: var(--hover-surface);
+    border: 1px solid var(--border);
     border-radius: 4px;
     padding: 1px 5px;
     font-family: monospace;
@@ -211,8 +211,8 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     top: calc(100% + 12px);
     right: 0;
     width: 340px;
-    background: #fff;
-    border: 1px solid rgba($blue, 0.12);
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
     border-top: 2px solid $blue;
     border-radius: $radius-xl;
     box-shadow: 0 20px 60px rgba(0,0,0,0.18);
@@ -324,7 +324,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     span {
       display: block;
       width: 22px; height: 2px;
-      background: rgba(0,0,0,0.55);
+      background: var(--text-secondary);
       border-radius: 2px;
       transition: all 0.3s ease;
       transform-origin: center;
@@ -339,7 +339,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
   &__mobile-menu {
     position: absolute;
     top: $navbar-height; left: 0; right: 0;
-    background: rgba(255,255,255,0.96);
+    background: var(--bg-nav);
     backdrop-filter: blur(32px);
     border-top: 1px solid rgba($blue, 0.10);
     padding: $space-4 $space-4 $space-6;
@@ -352,7 +352,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     a, button {
       padding: $space-3 $space-4;
       border-radius: $radius-lg;
-      color: rgba(0,0,0,0.65);
+      color: var(--text-secondary);
       font-size: $text-md;
       font-weight: 500;
       text-decoration: none;

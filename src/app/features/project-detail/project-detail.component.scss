@@ -27,8 +27,7 @@
 
   img {
     width: 100%;
-    max-height: 600px;
-    object-fit: cover;
+    height: auto;
     display: block;
   }
 }
@@ -350,3 +349,36 @@
   h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 14px; }
 }
 .detail-m__related-list { display: flex; flex-direction: column; gap: 12px; }
+
+// ── LIGHTBOX ───────────────────────────────────────────────────────
+.lightbox {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: lb-in 0.2s ease;
+  cursor: zoom-out;
+
+  img {
+    max-width: 100%; max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    cursor: default;
+  }
+
+  &__close {
+    position: absolute; top: 20px; right: 20px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: none;
+    color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    &:hover { background: rgba(255,255,255,0.22); }
+  }
+}
+
+@keyframes lb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

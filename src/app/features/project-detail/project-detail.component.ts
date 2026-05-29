@@ -34,6 +34,7 @@ export class ProjectDetailComponent implements OnInit {
   showReportModal  = signal(false);
   reportReason     = '';
   sendingReport    = signal(false);
+  lightboxOpen     = signal(false);
   isOwnProject     = computed(() =>
     !!this.auth.currentUser() && this.auth.currentUser()!.id === this.project()?.author_id
   );

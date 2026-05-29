@@ -5,7 +5,8 @@
   @if (project()) {
     <!-- Cover image full width -->
     <div class="detail-m__cover">
-      <img [src]="project()!.cover_image" [alt]="project()!.title" />
+      <img [src]="project()!.cover_image" [alt]="project()!.title"
+           (click)="lightboxOpen.set(true)" style="cursor:zoom-in" />
       <a routerLink="/explorar" class="detail-m__back">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -129,7 +130,8 @@
 
     @if (project()) {
       <div class="detail-hero">
-        <img [src]="project()!.cover_image" [alt]="project()!.title" />
+        <img [src]="project()!.cover_image" [alt]="project()!.title"
+             (click)="lightboxOpen.set(true)" style="cursor:zoom-in" />
       </div>
 
       <div class="detail-meta">
@@ -259,5 +261,17 @@
         </button>
       </div>
     </div>
+  </div>
+}
+
+<!-- ─── Lightbox ──────────────────────────────────────────────────────────── -->
+@if (lightboxOpen()) {
+  <div class="lightbox" (click)="lightboxOpen.set(false)" (keydown.escape)="lightboxOpen.set(false)" tabindex="0">
+    <button class="lightbox__close" (click)="lightboxOpen.set(false)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <img [src]="project()!.cover_image" [alt]="project()!.title" (click)="$event.stopPropagation()" />
   </div>
 }

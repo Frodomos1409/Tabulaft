@@ -143,9 +143,9 @@
 
   // MAIN TITLE BLOCK
   &__title-block {
-    flex: 1;
+    flex: 1; min-width: 0;
     display: flex; flex-direction: column; justify-content: center;
-    padding: 40px 0 20px;
+    padding: 20px 0;
   }
 
   &__title {
@@ -159,6 +159,7 @@
     font-size: clamp(56px, 9.5vw, 160px);
     line-height: 0.92; letter-spacing: -1px;
     color: #fff;
+    @include mobile { line-height: 1.0; }
   }
 
   &__title-outline {
@@ -168,6 +169,7 @@
     line-height: 0.92; letter-spacing: -1px;
     color: transparent;
     -webkit-text-stroke: 2px rgba(255,255,255,0.55);
+    @include mobile { line-height: 1.0; }
   }
 
   &__title-accent {
@@ -176,6 +178,7 @@
     font-size: clamp(36px, 6vw, 100px);
     line-height: 0.95; letter-spacing: -1px;
     font-style: italic;
+    @include mobile { line-height: 1.0; }
     @include gradient-text(linear-gradient(90deg, #ee41ba 0%, #36d7ff 60%, #ee41ba 100%));
     background-size: 200% 100%;
     animation: gradientShift 4s linear infinite;
@@ -200,14 +203,23 @@
   &__stat { font-size: 12px; color: rgba(255,255,255,0.50); strong { color: #fff; font-weight: 700; } }
   &__stat--dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); }
 
-  // Compact 3D preview in hero (right side on xl screens)
+  // Body: title + carousel side by side
+  &__body {
+    display: flex; align-items: center; gap: $space-8; flex: 1; width: 100%;
+    @include tablet { flex-direction: column; align-items: flex-start; gap: $space-6; }
+  }
+
+  // 3D preview carousel in hero
   &__carousel-preview {
-    position: relative; height: 300px;
-    perspective: 900px; cursor: pointer;
+    flex: 0 0 520px;
+    position: relative; height: 520px;
+    perspective: 1100px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    padding-bottom: 20px;
-    // Show only on very large — on desktop the title takes full width
-    @media (max-width: 1100px) { display: none; }
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 82%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 82%, transparent 100%);
+    @include tablet { flex: none; width: 100%; height: 380px; }
+    @include mobile { display: none; }
   }
 
   // Ticker strip
@@ -248,35 +260,35 @@
 
 // ─── Hero compact carousel preview ────────────────────────────────────────────
 .hcp-card {
-  position: absolute; width: 200px; height: 260px;
-  border-radius: 16px; overflow: hidden;
+  position: absolute; width: 260px; height: 380px;
+  border-radius: 20px; overflow: hidden;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease;
   will-change: transform, opacity; cursor: pointer;
 
-  &.active  { transform: translateX(0) scale(1) rotateY(0deg); opacity: 1; z-index: 10; box-shadow: 0 24px 60px rgba(0,0,0,0.50); pointer-events: none; }
-  &.left1   { transform: translateX(-170px) scale(0.82) rotateY(20deg) translateZ(-70px); opacity: 0.55; z-index: 5; }
-  &.left2   { transform: translateX(-300px) scale(0.64) rotateY(30deg) translateZ(-140px); opacity: 0.20; z-index: 2; pointer-events: none; }
-  &.right1  { transform: translateX(170px) scale(0.82) rotateY(-20deg) translateZ(-70px); opacity: 0.55; z-index: 5; }
-  &.right2  { transform: translateX(300px) scale(0.64) rotateY(-30deg) translateZ(-140px); opacity: 0.20; z-index: 2; pointer-events: none; }
+  &.active  { transform: translateX(0) scale(1) rotateY(0deg); opacity: 1; z-index: 10; box-shadow: 0 32px 80px rgba(0,0,0,0.55); cursor: pointer; }
+  &.left1   { transform: translateX(-210px) scale(0.80) rotateY(22deg) translateZ(-90px); opacity: 0.65; z-index: 5; }
+  &.left2   { transform: translateX(-390px) scale(0.62) rotateY(32deg) translateZ(-180px); opacity: 0.22; z-index: 2; pointer-events: none; }
+  &.right1  { transform: translateX(210px) scale(0.80) rotateY(-22deg) translateZ(-90px); opacity: 0.65; z-index: 5; }
+  &.right2  { transform: translateX(390px) scale(0.62) rotateY(-32deg) translateZ(-180px); opacity: 0.22; z-index: 2; pointer-events: none; }
 
   &__img { width: 100%; height: 100%; object-fit: cover; display: block; }
   &__info {
     position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.25) 55%, transparent 100%);
     display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 16px 14px; gap: 4px; animation: fadeIn 0.3s ease;
+    padding: 24px 20px; gap: 6px; animation: fadeIn 0.3s ease;
   }
   &__cat {
     background: $accent-pink; color: #fff;
-    font-size: 7px; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase;
-    padding: 2px 7px; border-radius: $radius-pill; width: fit-content;
+    font-size: 9px; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: $radius-pill; width: fit-content;
   }
-  &__title { font-family: $font-heading; font-size: 13px; color: #fff; margin: 0; line-height: 1.2; }
+  &__title { font-family: $font-heading; font-size: 17px; color: #fff; margin: 0; line-height: 1.2; }
   &__cta {
     display: inline-flex; align-items: center;
-    height: 26px; padding: 0 10px; border-radius: $radius-pill;
-    background: #fff; color: $blue; font-size: 9px; font-weight: 700;
-    text-decoration: none; width: fit-content; margin-top: 4px;
+    height: 30px; padding: 0 14px; border-radius: $radius-pill;
+    background: #fff; color: $blue; font-size: 11px; font-weight: 700;
+    text-decoration: none; width: fit-content; margin-top: 6px;
     transition: transform 0.18s ease; &:hover { transform: translateY(-1px); }
   }
 }
@@ -285,9 +297,9 @@
 .hcp-skeleton {
   @extend %skeleton-base;
   position: absolute;
-  &--active { width: 200px; height: 260px; z-index: 10; opacity: 0.3; border-radius: 16px; }
-  &--left   { width: 160px; height: 210px; transform: translateX(-170px) scale(0.82) rotateY(20deg) translateZ(-70px); opacity: 0.18; }
-  &--right  { width: 160px; height: 210px; transform: translateX(170px)  scale(0.82) rotateY(-20deg) translateZ(-70px); opacity: 0.18; }
+  &--active { width: 260px; height: 380px; z-index: 10; opacity: 0.3; border-radius: 20px; }
+  &--left   { width: 210px; height: 310px; transform: translateX(-210px) scale(0.80) rotateY(22deg) translateZ(-90px); opacity: 0.18; }
+  &--right  { width: 210px; height: 310px; transform: translateX(210px)  scale(0.80) rotateY(-22deg) translateZ(-90px); opacity: 0.18; }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

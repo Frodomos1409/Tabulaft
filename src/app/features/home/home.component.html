@@ -39,54 +39,60 @@
         </div>
       </div>
 
-      <!-- MAIN TITLE BLOCK -->
-      <div class="home-hero__title-block">
-        <h1 class="home-hero__title">
-          <span class="home-hero__title-solid">LOS MEJORES</span>
-          <span class="home-hero__title-outline">TRABAJOS</span>
-          <span class="home-hero__title-accent">DE DISEÑO</span>
-        </h1>
-        <div class="home-hero__sub-row">
-          <p class="home-hero__subtitle">Proyectos reales · Creatividad sin límites · UNIVALLE</p>
-          <div class="home-hero__stats">
-            @if (carouselProjects().length > 0) {
-              <span class="home-hero__stat"><strong>{{ carouselProjects().length + recentProjects().length }}</strong> proyectos</span>
-            }
-            <span class="home-hero__stat--dot"></span>
-            <span class="home-hero__stat"><strong>{{ popularProjects().length }}</strong> destacados</span>
+      <!-- BODY: title + carousel side by side -->
+      <div class="home-hero__body">
+
+        <!-- MAIN TITLE BLOCK -->
+        <div class="home-hero__title-block">
+          <h1 class="home-hero__title">
+            <span class="home-hero__title-solid">LOS MEJORES</span>
+            <span class="home-hero__title-outline">TRABAJOS</span>
+            <span class="home-hero__title-accent">DE DISEÑO</span>
+          </h1>
+          <div class="home-hero__sub-row">
+            <p class="home-hero__subtitle">Proyectos reales · Creatividad sin límites · UNIVALLE</p>
+            <div class="home-hero__stats">
+              @if (carouselProjects().length > 0) {
+                <span class="home-hero__stat"><strong>{{ carouselProjects().length + recentProjects().length }}</strong> proyectos</span>
+              }
+              <span class="home-hero__stat--dot"></span>
+              <span class="home-hero__stat"><strong>{{ popularProjects().length }}</strong> destacados</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- COMPACT 3D PREVIEW — only on large screens -->
-      @if (carouselProjects().length > 0) {
-        <div class="home-hero__carousel-preview" (click)="nextSlide()">
-          @for (item of visibleSlides; track item.project.id) {
-            <div class="hcp-card"
+        <!-- 3D CAROUSEL PREVIEW -->
+        @if (carouselProjects().length > 0) {
+          <div class="home-hero__carousel-preview" (click)="nextSlide()">
+            @for (item of visibleSlides; track item.project.id) {
+              <a class="hcp-card"
                  [class.active]="item.offset === 0"
                  [class.left1]="item.offset === -1"
                  [class.left2]="item.offset === -2"
                  [class.right1]="item.offset === 1"
                  [class.right2]="item.offset === 2"
+                 [routerLink]="item.offset === 0 ? ['/proyecto', item.project.id] : null"
                  (click)="$event.stopPropagation(); item.offset !== 0 ? goToSlide(carouselIndex() + item.offset) : null">
-              <img [src]="item.project.cover_image" [alt]="item.project.title" class="hcp-card__img" />
-              @if (item.offset === 0) {
-                <div class="hcp-card__info">
-                  <span class="hcp-card__cat">{{ item.project.category }}</span>
-                  <p class="hcp-card__title">{{ item.project.title }}</p>
-                  <a [routerLink]="['/proyecto', item.project.id]" class="hcp-card__cta" (click)="$event.stopPropagation()">Ver →</a>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      } @else if (loadingCarousel()) {
-        <div class="home-hero__carousel-preview">
-          <div class="hcp-skeleton hcp-skeleton--active"></div>
-          <div class="hcp-skeleton hcp-skeleton--left"></div>
-          <div class="hcp-skeleton hcp-skeleton--right"></div>
-        </div>
-      }
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="hcp-card__img" />
+                @if (item.offset === 0) {
+                  <div class="hcp-card__info">
+                    <span class="hcp-card__cat">{{ item.project.category }}</span>
+                    <p class="hcp-card__title">{{ item.project.title }}</p>
+                    <span class="hcp-card__cta">Ver →</span>
+                  </div>
+                }
+              </a>
+            }
+          </div>
+        } @else if (loadingCarousel()) {
+          <div class="home-hero__carousel-preview">
+            <div class="hcp-skeleton hcp-skeleton--active"></div>
+            <div class="hcp-skeleton hcp-skeleton--left"></div>
+            <div class="hcp-skeleton hcp-skeleton--right"></div>
+          </div>
+        }
+
+      </div>
     </div>
 
     <!-- Ticker -->
@@ -184,26 +190,6 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════
-       MARQUEE DE IMÁGENES
-  ══════════════════════════════════════════════════════════ -->
-  @if (recentProjects().length > 0) {
-    <div class="img-marquee" aria-hidden="true">
-      <div class="img-marquee__track">
-        @for (p of recentProjects(); track p.id) {
-          <div class="img-marquee__item">
-            <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
-          </div>
-        }
-        @for (p of recentProjects(); track p.id + '_dup') {
-          <div class="img-marquee__item">
-            <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
-          </div>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- ══════════════════════════════════════════════════════════
        SPLIT STATEMENT — tipografía masiva con números
   ══════════════════════════════════════════════════════════ -->
   <section class="statement-section">
@@ -230,102 +216,6 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════
-       GRID ASIMÉTRICO — Popular
-  ══════════════════════════════════════════════════════════ -->
-  <section class="asymmetric-section">
-    <div class="asymmetric-section__header">
-      <div class="eyebrow"><span class="eyebrow__dot eyebrow__dot--blue"></span>Más populares</div>
-      <h2 class="section-heading animate-text">Los más<br><em>queridos</em></h2>
-      <p class="asymmetric-section__sub">Los proyectos que más amor han recibido de la comunidad.</p>
-    </div>
-
-    @if (loadingPopular()) {
-      <div class="asym-grid">
-        <div class="asym-skeleton asym-skeleton--hero"></div>
-        <div class="asym-grid__small">
-          <div class="asym-skeleton asym-skeleton--sm"></div>
-          <div class="asym-skeleton asym-skeleton--sm"></div>
-          <div class="asym-skeleton asym-skeleton--sm"></div>
-          <div class="asym-skeleton asym-skeleton--sm"></div>
-        </div>
-      </div>
-    } @else if (popularProjects().length > 0) {
-      <div class="asym-grid">
-        @if (popularProjects()[0]) {
-          <a class="asym-card asym-card--hero" [routerLink]="['/proyecto', popularProjects()[0].id]">
-            <img [src]="popularProjects()[0].cover_image || 'assets/work-1.png'" [alt]="popularProjects()[0].title" />
-            <div class="asym-card__overlay">
-              <span class="asym-card__cat">{{ popularProjects()[0].category }}</span>
-              <h3 class="asym-card__title">{{ popularProjects()[0].title }}</h3>
-              <p class="asym-card__author">{{ popularProjects()[0].author?.name }}</p>
-              <span class="asym-card__likes">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                {{ popularProjects()[0].likes }}
-              </span>
-            </div>
-          </a>
-        }
-        <div class="asym-grid__small">
-          @for (p of popularProjects().slice(1, 5); track p.id) {
-            <a class="asym-card asym-card--sm" [routerLink]="['/proyecto', p.id]">
-              <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
-              <div class="asym-card__overlay asym-card__overlay--sm">
-                <span class="asym-card__cat">{{ p.category }}</span>
-                <h3 class="asym-card__title asym-card__title--sm">{{ p.title }}</h3>
-              </div>
-            </a>
-          }
-        </div>
-      </div>
-    } @else {
-      <div class="home-empty">
-        <p>Sé el primero en publicar un proyecto. <a routerLink="/publicar">Publicar ahora →</a></p>
-      </div>
-    }
-    <div class="asymmetric-section__footer">
-      <a routerLink="/explorar" class="see-more-btn">Ver todos los proyectos →</a>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════
-       RECIENTES — scroll horizontal film strip
-  ══════════════════════════════════════════════════════════ -->
-  <section class="recents-section">
-    <div class="recents-section__header">
-      <div>
-        <div class="eyebrow"><span class="eyebrow__dot eyebrow__dot--pink"></span>Últimas subidas</div>
-        <h2 class="section-heading animate-text">Recién llegados</h2>
-      </div>
-      <a routerLink="/explorar" class="section-link">Ver todos →</a>
-    </div>
-
-    @if (loadingRecent()) {
-      <div class="recents-track">
-        @for (s of skeletonItems; track $index) {
-          <div class="recents-skeleton"></div>
-        }
-      </div>
-    } @else if (recentProjects().length > 0) {
-      <div class="recents-track">
-        @for (p of recentProjects(); track p.id) {
-          <a [routerLink]="['/proyecto', p.id]" class="recents-card">
-            <div class="recents-card__img">
-              <img [src]="p.cover_image || 'assets/work-1.png'" [alt]="p.title" />
-              <span class="recents-card__badge">{{ p.category }}</span>
-            </div>
-            <p class="recents-card__title">{{ p.title }}</p>
-            <p class="recents-card__author">{{ p.author?.name || 'Diseñador' }}</p>
-          </a>
-        }
-      </div>
-    } @else {
-      <div class="home-empty" style="padding: 0 24px 40px">
-        <p>Aún no hay proyectos recientes.</p>
-      </div>
-    }
   </section>
 
   <!-- ══════════════════════════════════════════════════════════

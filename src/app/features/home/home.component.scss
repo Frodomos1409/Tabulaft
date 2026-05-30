@@ -42,7 +42,7 @@
 }
 .home-empty {
   padding: 40px 24px; text-align: center;
-  p { color: rgba(0,0,0,0.40); font-size: 14px; }
+  p { color: var(--text-tertiary); font-size: 14px; }
   a { color: $blue; font-weight: 700; text-decoration: none; }
 }
 
@@ -465,7 +465,7 @@
 // IMAGE MARQUEE
 // ═══════════════════════════════════════════════════════════════════════════════
 .img-marquee {
-  overflow: hidden; background: #fafafe;
+  overflow: hidden; background: var(--bg);
   mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
   border-top: 1px solid rgba($blue, 0.06); border-bottom: 1px solid rgba($blue, 0.06);
@@ -554,7 +554,7 @@
 .see-more-btn {
   display: inline-flex; align-items: center; gap: 6px;
   height: 46px; padding: 0 28px; border-radius: $radius-pill;
-  border: 1.5px solid rgba($blue, 0.18); background: #fff;
+  border: 1.5px solid rgba($blue, 0.18); background: var(--bg-card);
   color: $blue; font-size: 13px; font-weight: 700; text-decoration: none;
   transition: all 0.2s ease; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
   &:hover { background: $blue; color: #fff; border-color: $blue; transform: translateY(-2px); box-shadow: 0 6px 20px rgba($blue, 0.28); }
@@ -573,7 +573,7 @@
     align-items: start; gap: $space-8; margin-bottom: 40px;
     @include mobile { grid-template-columns: 1fr; gap: $space-3; }
   }
-  &__sub { font-size: $text-sm; color: rgba(0,0,0,0.38); margin: 0; max-width: 260px; line-height: 1.55; @include mobile { max-width: 100%; } }
+  &__sub { font-size: $text-sm; color: var(--text-tertiary); margin: 0; max-width: 260px; line-height: 1.55; @include mobile { max-width: 100%; } }
   &__footer { margin-top: 36px; text-align: center; }
 }
 

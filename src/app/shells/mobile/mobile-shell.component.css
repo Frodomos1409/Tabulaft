@@ -2,13 +2,13 @@
 :host {
   --mob-topbar-height: 56px;
   --mob-bottomnav-height: 64px;
-  --mob-topbar-bg: var(--bg-nav, #0a0a0f);
-  --mob-topbar-border: var(--border, rgba(255,255,255,0.08));
-  --mob-bottomnav-bg: var(--bg-nav, #0a0a0f);
-  --mob-drawer-bg: var(--bg-elevated, #1a1a2a);
-  --mob-text: var(--text, #fff);
-  --mob-text-secondary: var(--text-secondary, rgba(255,255,255,0.6));
-  --mob-active-color: #6754f8;
+  --mob-topbar-bg: var(--bg-nav, #ffffff);
+  --mob-topbar-border: var(--border, rgba(40,48,235,0.10));
+  --mob-bottomnav-bg: var(--bg-nav, #ffffff);
+  --mob-drawer-bg: var(--bg-elevated, #f5f5fa);
+  --mob-text: var(--text, #000000);
+  --mob-text-secondary: var(--text-secondary, rgba(0,0,0,0.55));
+  --mob-active-color: #2830eb;
   display: block;
 }
 

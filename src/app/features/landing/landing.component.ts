@@ -6,8 +6,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectCardComponent } from '../../shared/components/project-card/project-card.component';
-import { ProjectRow } from '../../core/services/project.service';
-import { supabase } from '../../core/supabase.client';
+import { ProjectRow, ProjectService } from '../../core/services/project.service';
 
 @Component({
   selector: 'app-landing',
@@ -17,8 +16,9 @@ import { supabase } from '../../core/supabase.client';
   styleUrl: './landing.component.scss'
 })
 export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
-  private zone       = inject(NgZone);
-  private platformId = inject(PLATFORM_ID);
+  private zone           = inject(NgZone);
+  private platformId     = inject(PLATFORM_ID);
+  private projectService = inject(ProjectService);
 
   carouselProjects = signal<ProjectRow[]>([]);
   recentProjects   = signal<ProjectRow[]>([]);
@@ -171,46 +171,27 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadCarousel() {
-    const { data } = await supabase
-      .from('projects')
-      .select('*, author:profiles!projects_author_id_fkey(*)')
-      .eq('status', 'active')
-      .order('views', { ascending: false })
-      .limit(10);
-    const all = (data ?? []) as ProjectRow[];
-    this.carouselProjects.set(all.filter(p => p.cover_image).slice(0, 8));
+    const data = await this.projectService.getFeaturedProjects(8);
+    this.carouselProjects.set(data);
   }
 
   private async loadRecent() {
-    const { data } = await supabase
-      .from('projects')
-      .select('*, author:profiles!projects_author_id_fkey(*)')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    this.recentProjects.set((data ?? []) as ProjectRow[]);
+    const data = await this.projectService.getProjects({ sort: 'recent', limit: 10 });
+    this.recentProjects.set(data);
   }
 
   private async loadStats() {
-    const [{ count: projectCount }, { count: userCount }] = await Promise.all([
-      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    ]);
+    const stats = await this.projectService.getLandingStats();
     this.stats.set([
-      { value: projectCount ? `${projectCount}+` : '0', label: 'Proyectos' },
-      { value: userCount    ? `${userCount}+`    : '0', label: 'Diseñadores' },
+      { value: stats.projectCount ? `${stats.projectCount}+` : '0', label: 'Proyectos' },
+      { value: stats.userCount    ? `${stats.userCount}+`    : '0', label: 'Diseñadores' },
       { value: '15K', label: 'Visitas mensuales' },
       { value: '8',   label: 'Categorías' },
     ]);
   }
 
   private async loadFeatured() {
-    const { data } = await supabase
-      .from('projects')
-      .select('*, author:profiles!projects_author_id_fkey(*)')
-      .eq('status', 'active')
-      .order('likes', { ascending: false })
-      .limit(6);
-    this.featuredProjects.set((data ?? []) as ProjectRow[]);
+    const data = await this.projectService.getProjects({ sort: 'popular', limit: 6 });
+    this.featuredProjects.set(data);
   }
 }

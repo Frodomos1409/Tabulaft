@@ -290,4 +290,11 @@ export class ProjectService {
     if (error) throw error;
     return ((data ?? []) as ProjectRow[]).filter(p => p.cover_image).slice(0, limit);
   }
+
+  async getLandingStats(): Promise<{ projectCount: number; userCount: number }> {
+    const { data, error } = await supabase.rpc('get_landing_stats');
+    if (error) throw error;
+    const s = data as any;
+    return { projectCount: s.project_count ?? 0, userCount: s.user_count ?? 0 };
+  }
 }

@@ -74,7 +74,7 @@ export class AdminService {
   async getAllUsers(search?: string, page = 0, limit = 100): Promise<{ data: any[]; count: number }> {
     let query = supabase
       .from('profiles')
-      .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at', { count: 'exact' })
+      .select('id, name, email, avatar_url, role, bio, is_admin, banned, followers, following, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
     if (search) {

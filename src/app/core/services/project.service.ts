@@ -52,6 +52,29 @@ export class ProjectService {
   private auth = inject(AuthService);
   private toast = inject(ToastService);
 
+  private lastCommentAt = 0;
+  private reportedProjects = new Set<string>();
+
+  private sanitizeFileName(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .replace(/\.\./g, '_')
+      .slice(0, 80);
+  }
+
+  private async validateImageFile(file: File): Promise<boolean> {
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!ALLOWED_TYPES.includes(file.type)) return false;
+    if (file.size > 10 * 1024 * 1024) return false;
+    const buffer = await file.slice(0, 12).arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8;
+    const isPng  = bytes[0] === 0x89 && bytes[1] === 0x50;
+    const isGif  = bytes[0] === 0x47 && bytes[1] === 0x49;
+    const isWebp = bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+    return isJpeg || isPng || isGif || isWebp;
+  }
+
   async getProjects(filters?: {
     category?: string;
     sort?: string;
@@ -66,7 +89,7 @@ export class ProjectService {
 
     let query = supabase
       .from('projects')
-      .select('*, author:profiles!projects_author_id_fkey(*)')
+      .select('id, title, description, cover_image, category, tags, likes, views, featured, status, semester, subject, created_at, author_id, author:profiles!projects_author_id_fkey(id, name, avatar_url, role)')
       .eq('status', 'active');
 
     if (filters?.category && filters.category !== 'Todos') {
@@ -121,9 +144,15 @@ export class ProjectService {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');
 
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) throw new Error('Sesión expirada. Por favor inicia sesión de nuevo.');
+
     const imageUrls: string[] = [];
     for (const file of imageFiles) {
-      const path = `${userId}/${Date.now()}-${file.name}`;
+      const valid = await this.validateImageFile(file);
+      if (!valid) throw new Error('Archivo inválido: solo se permiten imágenes JPEG, PNG, WEBP o GIF de máximo 10MB');
+      const safeName = this.sanitizeFileName(file.name);
+      const path = `${userId}/${Date.now()}-${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('projects')
         .upload(path, file);
@@ -153,42 +182,16 @@ export class ProjectService {
     return project as ProjectRow;
   }
 
-  async toggleLike(projectId: string, userId: string): Promise<boolean> {
-    const { data: existing } = await supabase
-      .from('likes')
-      .select('user_id')
-      .eq('user_id', userId)
-      .eq('project_id', projectId)
-      .maybeSingle();
-
-    if (existing) {
-      await supabase.from('likes').delete().eq('user_id', userId).eq('project_id', projectId);
-      const { data: proj } = await supabase.from('projects').select('likes').eq('id', projectId).single();
-      if (proj) await supabase.from('projects').update({ likes: Math.max(0, proj.likes - 1) }).eq('id', projectId);
-      return false;
-    } else {
-      await supabase.from('likes').insert({ user_id: userId, project_id: projectId });
-      const { data: proj } = await supabase.from('projects').select('likes').eq('id', projectId).single();
-      if (proj) await supabase.from('projects').update({ likes: proj.likes + 1 }).eq('id', projectId);
-      return true;
-    }
+  async toggleLike(projectId: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('toggle_like', { p_project_id: projectId });
+    if (error) throw error;
+    return data as boolean;
   }
 
-  async toggleSave(projectId: string, userId: string): Promise<boolean> {
-    const { data: existing } = await supabase
-      .from('saves')
-      .select('user_id')
-      .eq('user_id', userId)
-      .eq('project_id', projectId)
-      .maybeSingle();
-
-    if (existing) {
-      await supabase.from('saves').delete().eq('user_id', userId).eq('project_id', projectId);
-      return false;
-    } else {
-      await supabase.from('saves').insert({ user_id: userId, project_id: projectId });
-      return true;
-    }
+  async toggleSave(projectId: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('toggle_save', { p_project_id: projectId });
+    if (error) throw error;
+    return data as boolean;
   }
 
   async isLiked(projectId: string, userId: string): Promise<boolean> {
@@ -218,12 +221,14 @@ export class ProjectService {
   async reportProject(projectId: string, reason: string): Promise<void> {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');
+    if (this.reportedProjects.has(projectId)) throw new Error('Ya reportaste este proyecto');
     const { error } = await supabase.from('reports').insert({
       project_id: projectId,
       reporter_id: userId,
       reason,
     });
     if (error) throw error;
+    this.reportedProjects.add(projectId);
   }
 
   async getLikedProjects(userId: string): Promise<ProjectRow[]> {
@@ -259,17 +264,30 @@ export class ProjectService {
   async addComment(projectId: string, text: string): Promise<void> {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');
+    if (Date.now() - this.lastCommentAt < 5000) throw new Error('Espera 5 segundos antes de comentar de nuevo');
     const { error } = await supabase.from('comments').insert({ project_id: projectId, user_id: userId, text });
     if (error) throw error;
+    this.lastCommentAt = Date.now();
   }
 
   async getComments(projectId: string): Promise<any[]> {
     const { data, error } = await supabase
       .from('comments')
-      .select('*, user:profiles(*)')
+      .select('id, text, created_at, user:profiles!comments_user_id_fkey(id, name, avatar_url)')
       .eq('project_id', projectId)
       .order('created_at', { ascending: true });
     if (error) throw error;
     return data ?? [];
+  }
+
+  async getFeaturedProjects(limit = 8): Promise<ProjectRow[]> {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*, author:profiles!projects_author_id_fkey(*)')
+      .eq('status', 'active')
+      .order('views', { ascending: false })
+      .limit(limit + 2);
+    if (error) throw error;
+    return ((data ?? []) as ProjectRow[]).filter(p => p.cover_image).slice(0, limit);
   }
 }

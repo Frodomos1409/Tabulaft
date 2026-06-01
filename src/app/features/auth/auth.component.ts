@@ -38,7 +38,7 @@ export class AuthComponent {
     if (msg.includes('rate limit')) return 'Demasiados intentos. Espera unos minutos.';
     if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) return 'Correo o contraseña incorrectos.';
     if (msg.includes('Email not confirmed')) return 'Confirma tu correo antes de entrar.';
-    if (msg.includes('User already registered')) return 'Ya existe una cuenta con ese correo.';
+    if (msg.includes('User already registered')) return 'Si los datos son correctos, revisa tu correo electrónico.';
     if (msg.includes('Password should be at least')) return 'La contraseña debe tener al menos 6 caracteres.';
     if (msg.includes('Perfil no encontrado')) return 'Perfil no encontrado. Intenta de nuevo.';
     if (msg.includes('Cuenta suspendida')) return 'Tu cuenta ha sido suspendida.';
@@ -64,14 +64,14 @@ export class AuthComponent {
       if (this.isLogin()) {
         await this.auth.signIn(this.email, this.password);
         const dest = this.auth.isAdmin() ? '/admin' : '/inicio';
-        window.location.href = dest;
+        this.router.navigate([dest]);
       } else {
         const { needsConfirmation } = await this.auth.signUp(this.email, this.password, this.name);
         if (needsConfirmation) {
           this.confirmationSent.set(true);
           this.isLoading.set(false);
         } else {
-          window.location.href = '/inicio';
+          this.router.navigate(['/inicio']);
         }
       }
     } catch (e: any) {

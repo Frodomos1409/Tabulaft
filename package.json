@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "build:analyze": "ng build --stats-json && npx webpack-bundle-analyzer dist/tabulaft/browser/stats.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

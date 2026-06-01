@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, inject } from '@angular/core';
+import { Component, Input, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../core/services/toast.service';
@@ -10,7 +10,8 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './project-card.component.html',
-  styleUrl: './project-card.component.scss'
+  styleUrl: './project-card.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectCardComponent implements OnInit {
   @Input() project!: any;
@@ -41,7 +42,7 @@ export class ProjectCardComponent implements OnInit {
     e.stopPropagation();
     const userId = this.auth.currentUser()?.id;
     if (!userId) { this.toast.show('Inicia sesión para dar like', 'info'); return; }
-    const nowLiked = await this.projectService.toggleLike(this.project.id, userId);
+    const nowLiked = await this.projectService.toggleLike(this.project.id);
     this.liked.set(nowLiked);
     this.likeCount.update(n => nowLiked ? n + 1 : Math.max(0, n - 1));
     nowLiked ? this.toast.like() : this.toast.unlike();
@@ -52,7 +53,7 @@ export class ProjectCardComponent implements OnInit {
     e.stopPropagation();
     const userId = this.auth.currentUser()?.id;
     if (!userId) { this.toast.show('Inicia sesión para guardar', 'info'); return; }
-    const nowSaved = await this.projectService.toggleSave(this.project.id, userId);
+    const nowSaved = await this.projectService.toggleSave(this.project.id);
     this.saved.set(nowSaved);
     nowSaved ? this.toast.save() : this.toast.unsave();
   }

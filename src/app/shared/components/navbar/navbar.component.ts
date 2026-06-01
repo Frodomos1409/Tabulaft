@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -11,9 +11,10 @@ import { SearchModalComponent } from '../search-modal/search-modal.component';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule, SearchModalComponent],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   theme = inject(ThemeService);
   auth = inject(AuthService);
   notifService = inject(NotificationService);
@@ -72,6 +73,10 @@ export class NavbarComponent implements OnInit {
   }
 
   markRead(id: string) { this.notifService.markAsRead(id); }
+
+  ngOnDestroy() {
+    this.notifService.unsubscribeRealtime();
+  }
 
   async logout() {
     await this.auth.signOut();

@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeviceService } from '../../core/services/device.service';
 import { ProjectCardComponent } from '../../shared/components/project-card/project-card.component';
@@ -15,7 +15,8 @@ const PAGE_SIZE = 12;
   standalone: true,
   imports: [CommonModule, ProjectCardComponent, ProjectCardSkeletonComponent],
   templateUrl: './feed.component.html',
-  styleUrl: './feed.component.scss'
+  styleUrl: './feed.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedComponent implements OnInit {
   readonly device = inject(DeviceService);
@@ -117,4 +118,6 @@ export class FeedComponent implements OnInit {
     this.sortBy.set(s);
     await this.loadProjects(true);
   }
+
+  trackByProjectId(_: number, p: ProjectRow): string { return p.id; }
 }

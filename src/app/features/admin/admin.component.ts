@@ -151,7 +151,7 @@ export class AdminComponent implements OnInit {
         this.adminService.getActivityLog(30),
       ]);
       this.stats.set(statsData);
-      this.users.set(users);
+      this.users.set(users.data);
       this.projects.set(projects);
       this.reports.set(reports);
       this.config.set(config);

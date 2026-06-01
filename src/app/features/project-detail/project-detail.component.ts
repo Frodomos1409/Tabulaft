@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DeviceService } from '../../core/services/device.service';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,8 @@ import { ToastService } from '../../core/services/toast.service';
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule, ProjectCardComponent],
   templateUrl: './project-detail.component.html',
-  styleUrl: './project-detail.component.scss'
+  styleUrl: './project-detail.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectDetailComponent implements OnInit {
   readonly device = inject(DeviceService);
@@ -79,7 +80,7 @@ export class ProjectDetailComponent implements OnInit {
     }
     const p = this.project();
     if (!p) return;
-    const nowLiked = await this.projectService.toggleLike(p.id, this.auth.currentUser()!.id);
+    const nowLiked = await this.projectService.toggleLike(p.id);
     this.liked.set(nowLiked);
     nowLiked ? this.toast.like() : this.toast.unlike();
     // Update count locally
@@ -93,7 +94,7 @@ export class ProjectDetailComponent implements OnInit {
     }
     const p = this.project();
     if (!p) return;
-    const nowSaved = await this.projectService.toggleSave(p.id, this.auth.currentUser()!.id);
+    const nowSaved = await this.projectService.toggleSave(p.id);
     this.saved.set(nowSaved);
     nowSaved ? this.toast.save() : this.toast.unsave();
   }
@@ -114,6 +115,9 @@ export class ProjectDetailComponent implements OnInit {
       this.sendingReport.set(false);
     }
   }
+
+  trackByProjectId(_: number, p: ProjectRow): string { return p.id; }
+  trackByCommentId(_: number, c: any): string { return c.id; }
 
   async submitComment() {
     if (!this.commentText.trim()) return;

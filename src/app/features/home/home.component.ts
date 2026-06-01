@@ -1,25 +1,26 @@
 import {
   Component, OnInit, inject, signal, computed, effect,
-  NgZone, PLATFORM_ID, AfterViewInit, OnDestroy
+  NgZone, PLATFORM_ID, AfterViewInit, OnDestroy, ChangeDetectionStrategy
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { ProjectRow } from '../../core/services/project.service';
-import { supabase } from '../../core/supabase.client';
+import { ProjectRow, ProjectService } from '../../core/services/project.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
-  readonly auth       = inject(AuthService);
-  private zone        = inject(NgZone);
-  private platformId  = inject(PLATFORM_ID);
+  readonly auth           = inject(AuthService);
+  private projectService  = inject(ProjectService);
+  private zone            = inject(NgZone);
+  private platformId      = inject(PLATFORM_ID);
 
   // Data
   carouselProjects = signal<ProjectRow[]>([]);
@@ -94,9 +95,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Lifecycle ────────────────────────────────────────────────────────────────
   ngOnInit() {
-    this.loadCarousel();
-    this.loadRecent();
-    this.loadPopular();
+    Promise.all([
+      this.loadCarousel(),
+      this.loadRecent(),
+      this.loadPopular(),
+    ]);
   }
 
   ngAfterViewInit() {
@@ -106,6 +109,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.initWordJump();
     });
     this.startCarousel();
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (this.carouselTimer) clearInterval(this.carouselTimer);
+      } else {
+        this.startCarousel();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    this.destroyFns.push(() => document.removeEventListener('visibilitychange', onVisibility));
   }
 
   ngOnDestroy() {
@@ -166,17 +178,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  trackByProjectId(_: number, p: ProjectRow): string { return p.id; }
+
   // ── Data ─────────────────────────────────────────────────────────────────────
   private async loadCarousel() {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*, author:profiles!projects_author_id_fkey(*)')
-        .eq('status', 'active')
-        .order('views', { ascending: false })
-        .limit(10);
-      const all = (data ?? []) as ProjectRow[];
-      this.carouselProjects.set(all.filter(p => p.cover_image).slice(0, 8));
+      this.carouselProjects.set(await this.projectService.getFeaturedProjects(8));
     } finally {
       this.loadingCarousel.set(false);
     }
@@ -184,13 +191,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadRecent() {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*, author:profiles!projects_author_id_fkey(*)')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      this.recentProjects.set((data ?? []) as ProjectRow[]);
+      this.recentProjects.set(await this.projectService.getProjects({ sort: 'recent', limit: 10 }));
     } finally {
       this.loadingRecent.set(false);
     }
@@ -198,13 +199,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadPopular() {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*, author:profiles!projects_author_id_fkey(*)')
-        .eq('status', 'active')
-        .order('likes', { ascending: false })
-        .limit(6);
-      this.popularProjects.set((data ?? []) as ProjectRow[]);
+      this.popularProjects.set(await this.projectService.getProjects({ sort: 'popular', limit: 6 }));
     } finally {
       this.loadingPopular.set(false);
     }

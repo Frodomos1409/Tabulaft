@@ -34,9 +34,9 @@ export class AuthCallbackComponent implements OnInit {
     await this.auth.sessionReady;
 
     if (this.auth.isLoggedIn()) {
-      window.location.href = this.auth.isAdmin() ? '/admin' : '/explorar';
+      this.router.navigate([this.auth.isAdmin() ? '/admin' : '/explorar']);
     } else {
-      window.location.href = '/auth';
+      this.router.navigate(['/auth']);
     }
   }
 }

@@ -14,11 +14,26 @@ export class ProfileService {
     return data as Profile;
   }
 
+  private sanitizeFileName(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .replace(/\.\./g, '_')
+      .slice(0, 80);
+  }
+
   async updateProfile(userId: string, data: Partial<Profile>, avatarFile?: File): Promise<Profile> {
     let avatarUrl = data.avatar_url;
 
     if (avatarFile) {
-      const path = `${userId}/${Date.now()}-${avatarFile.name}`;
+      const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!ALLOWED_AVATAR_TYPES.includes(avatarFile.type)) {
+        throw new Error('Solo se permiten imágenes JPEG, PNG o WEBP para el avatar.');
+      }
+      if (avatarFile.size > 5 * 1024 * 1024) {
+        throw new Error('El avatar no puede superar los 5MB.');
+      }
+      const safeName = this.sanitizeFileName(avatarFile.name);
+      const path = `${userId}/${Date.now()}-${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, avatarFile, { upsert: true });
@@ -48,32 +63,8 @@ export class ProfileService {
   }
 
   async toggleFollow(followerId: string, targetId: string): Promise<boolean> {
-    const following = await this.isFollowing(followerId, targetId);
-
-    if (following) {
-      await supabase.from('follows').delete()
-        .eq('follower_id', followerId).eq('following_id', targetId);
-      // Decrement counts
-      const [{ data: f }, { data: t }] = await Promise.all([
-        supabase.from('profiles').select('following').eq('id', followerId).single(),
-        supabase.from('profiles').select('followers').eq('id', targetId).single(),
-      ]);
-      await Promise.all([
-        supabase.from('profiles').update({ following: Math.max(0, (f?.following ?? 1) - 1) }).eq('id', followerId),
-        supabase.from('profiles').update({ followers: Math.max(0, (t?.followers ?? 1) - 1) }).eq('id', targetId),
-      ]);
-      return false;
-    } else {
-      await supabase.from('follows').insert({ follower_id: followerId, following_id: targetId });
-      const [{ data: f }, { data: t }] = await Promise.all([
-        supabase.from('profiles').select('following').eq('id', followerId).single(),
-        supabase.from('profiles').select('followers').eq('id', targetId).single(),
-      ]);
-      await Promise.all([
-        supabase.from('profiles').update({ following: (f?.following ?? 0) + 1 }).eq('id', followerId),
-        supabase.from('profiles').update({ followers: (t?.followers ?? 0) + 1 }).eq('id', targetId),
-      ]);
-      return true;
-    }
+    const { data, error } = await supabase.rpc('toggle_follow', { p_target_id: targetId });
+    if (error) throw error;
+    return data as boolean;
   }
 }

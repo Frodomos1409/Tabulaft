@@ -34,48 +34,20 @@ export interface AdminStats {
 export class AdminService {
 
   async getStats(): Promise<AdminStats> {
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    const [
-      { count: users },
-      { count: projects },
-      { count: pendingProjects },
-      { count: activeProjects },
-      { count: rejectedProjects },
-      { count: pendingReports },
-      { data: viewsData },
-      { data: likesData },
-      { data: dailyViewsData },
-      { count: newUsers },
-      { count: newProjects },
-    ] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('projects').select('*', { count: 'exact', head: true }),
-      supabase.from('projects').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('projects').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('projects').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
-      supabase.from('reports').select('*', { count: 'exact', head: true }).eq('resolved', false),
-      supabase.from('projects').select('views'),
-      supabase.from('projects').select('likes'),
+    const [{ data: stats }, { data: dailyViewsData }] = await Promise.all([
+      supabase.rpc('get_admin_stats'),
       supabase.from('project_views_daily')
         .select('view_date, views_count')
         .gte('view_date', new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
         .order('view_date', { ascending: true }),
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo),
-      supabase.from('projects').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo),
     ]);
 
-    const totalViews = (viewsData ?? []).reduce((s: number, p: any) => s + (p.views ?? 0), 0);
-    const totalLikes = (likesData ?? []).reduce((s: number, p: any) => s + (p.likes ?? 0), 0);
-
-    // Agrupar views por día
     const viewsByDay: Record<string, number> = {};
     for (const row of dailyViewsData ?? []) {
       const d = (row as any).view_date;
       viewsByDay[d] = (viewsByDay[d] ?? 0) + (row as any).views_count;
     }
 
-    // Generar los últimos 7 días con 0 si no hay datos
     const dailyViews: DailyViewStat[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
@@ -83,31 +55,34 @@ export class AdminService {
       dailyViews.push({ date: key, views: viewsByDay[key] ?? 0 });
     }
 
+    const s = stats as any;
     return {
-      users: users ?? 0,
-      projects: projects ?? 0,
-      pendingProjects: pendingProjects ?? 0,
-      activeProjects: activeProjects ?? 0,
-      rejectedProjects: rejectedProjects ?? 0,
-      pendingReports: pendingReports ?? 0,
-      totalViews,
-      totalLikes,
+      users:               s.total_users       ?? 0,
+      projects:            s.total_projects    ?? 0,
+      pendingProjects:     s.pending_projects  ?? 0,
+      activeProjects:      s.active_projects   ?? 0,
+      rejectedProjects:    s.rejected_projects ?? 0,
+      pendingReports:      s.pending_reports   ?? 0,
+      totalViews:          s.total_views       ?? 0,
+      totalLikes:          s.total_likes       ?? 0,
+      newUsersThisWeek:    s.new_users_week    ?? 0,
+      newProjectsThisWeek: s.new_projects_week ?? 0,
       dailyViews,
-      newUsersThisWeek: newUsers ?? 0,
-      newProjectsThisWeek: newProjects ?? 0,
     };
   }
 
-  async getAllUsers(search?: string): Promise<any[]> {
+  async getAllUsers(search?: string, page = 0, limit = 100): Promise<{ data: any[]; count: number }> {
     let query = supabase
       .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(page * limit, (page + 1) * limit - 1);
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+      query = query.or(`name.ilike.%${search}%`);
     }
-    const { data } = await query;
-    return data ?? [];
+    const { data, count, error } = await query;
+    if (error) throw error;
+    return { data: data ?? [], count: count ?? 0 };
   }
 
   async banUser(userId: string): Promise<void> {

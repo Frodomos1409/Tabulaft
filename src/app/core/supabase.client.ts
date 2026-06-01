@@ -3,5 +3,12 @@ import { environment } from '../../environments/environment';
 
 export const supabase = createClient(
   environment.supabase.url,
-  environment.supabase.anonKey
+  environment.supabase.anonKey,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
 );

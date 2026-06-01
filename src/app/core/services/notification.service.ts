@@ -16,6 +16,15 @@ export class NotificationService {
   notifications = signal<Notification[]>([]);
   unreadCount = computed(() => this.notifications().filter(n => !n.read).length);
 
+  private realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+  unsubscribeRealtime(): void {
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
+      this.realtimeChannel = null;
+    }
+  }
+
   async loadNotifications(userId: string): Promise<void> {
     const { data } = await supabase
       .from('notifications')
@@ -39,7 +48,8 @@ export class NotificationService {
   }
 
   subscribeToRealtime(userId: string): void {
-    supabase.channel('notif-' + userId)
+    this.unsubscribeRealtime();
+    this.realtimeChannel = supabase.channel('notif-' + userId)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -47,7 +57,7 @@ export class NotificationService {
         filter: 'user_id=eq.' + userId
       }, (payload) => {
         this.notifications.update(list => [payload.new as Notification, ...list]);
-      })
-      .subscribe();
+      });
+    this.realtimeChannel.subscribe();
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { supabase } from '../supabase.client';
 import { ToastService } from './toast.service';
+import { NotificationService } from './notification.service';
 import { environment } from '../../../environments/environment';
 
 export interface Profile {
@@ -19,6 +20,11 @@ export interface Profile {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private toast = inject(ToastService);
+  private notifService = inject(NotificationService);
+
+  private _log(...args: unknown[]): void {
+    if (!environment.production) console.log(...args);
+  }
 
   currentUser = signal<Profile | null>(null);
   isLoggedIn  = computed(() => !!this.currentUser());
@@ -35,7 +41,7 @@ export class AuthService {
     // onAuthStateChange fires INITIAL_SESSION synchronously on subscribe
     // which covers both "has session" and "no session" cases
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[Auth]', event, session?.user?.email ?? 'none');
+      this._log('[Auth]', event, session?.user?.email ?? 'none');
 
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
@@ -67,11 +73,11 @@ export class AuthService {
   }
 
   private async _fetchProfile(userId: string): Promise<Profile | null> {
-    console.log('[Auth] _fetchProfile start', userId);
+    this._log('[Auth] _fetchProfile start', userId);
     const timeout = new Promise<null>(r => setTimeout(() => r(null), 5000));
-    const query = supabase.from('profiles').select('*').eq('id', userId).single()
+    const query = supabase.from('profiles').select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at').eq('id', userId).single()
       .then(({ data, error }) => {
-        console.log('[Auth] _fetchProfile done', data?.name ?? null, error?.code ?? 'ok');
+        this._log('[Auth] _fetchProfile done', data?.name ?? null, error?.code ?? 'ok');
         return data as Profile | null;
       });
     const result = await Promise.race([query, timeout]);
@@ -92,21 +98,21 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string): Promise<void> {
-    console.log('[signIn] calling signInWithPassword...');
+    this._log('[signIn] calling signInWithPassword...');
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    console.log('[signIn] result:', data?.user?.email ?? null, 'error:', error?.message ?? null);
+    this._log('[signIn] result:', data?.user?.email ?? null, 'error:', error?.message ?? null);
     if (error) throw error;
 
-    console.log('[signIn] fetching profile for', data.user.id);
+    this._log('[signIn] fetching profile for', data.user.id);
     for (let i = 0; i < 5; i++) {
       const profile = await this._fetchProfile(data.user.id);
-      console.log('[signIn] attempt', i + 1, 'profile:', profile?.name ?? null);
+      this._log('[signIn] attempt', i + 1, 'profile:', profile?.name ?? null);
       if (profile) {
         if (profile.banned) {
           await supabase.auth.signOut();
           throw new Error('Cuenta suspendida');
         }
-        console.log('[signIn] success, navigating...');
+        this._log('[signIn] success, navigating...');
         return;
       }
       await new Promise(r => setTimeout(r, 500));
@@ -130,6 +136,7 @@ export class AuthService {
   }
 
   async signOut(): Promise<void> {
+    this.notifService.unsubscribeRealtime();
     await supabase.auth.signOut();
     this.currentUser.set(null);
   }

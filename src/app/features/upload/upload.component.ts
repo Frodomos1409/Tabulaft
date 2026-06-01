@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, inject, signal, ElementRef, ViewChild, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,8 @@ interface ImagePreview {
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './upload.component.html',
-  styleUrl: './upload.component.scss'
+  styleUrl: './upload.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -57,12 +58,16 @@ export class UploadComponent implements OnInit {
       this.router.navigate(['/auth']);
       return;
     }
-    const [sems, subs]: [AcademicSemester[], AcademicSubject[]] = await Promise.all([
-      this.academicService.getSemesters(true),
-      this.academicService.getSubjects(true),
-    ]);
-    this.semesters.set(sems.map(s => s.name));
-    this.allSubjects.set(subs);
+    try {
+      const [sems, subs]: [AcademicSemester[], AcademicSubject[]] = await Promise.all([
+        this.academicService.getSemesters(true),
+        this.academicService.getSubjects(true),
+      ]);
+      this.semesters.set(sems.map(s => s.name));
+      this.allSubjects.set(subs);
+    } catch {
+      // semestres/materias son opcionales, no bloquear el flujo
+    }
   }
 
   onDragOver(e: DragEvent) { e.preventDefault(); this.isDragOver.set(true); }
@@ -70,19 +75,31 @@ export class UploadComponent implements OnInit {
   onDrop(e: DragEvent) {
     e.preventDefault();
     this.isDragOver.set(false);
-    const files = Array.from(e.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'));
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const files = Array.from(e.dataTransfer?.files ?? []).filter(f => ALLOWED_TYPES.includes(f.type) && f.size <= 10 * 1024 * 1024);
     this.addFiles(files);
   }
   openFilePicker() { this.fileInput.nativeElement.click(); }
   onFileSelect(e: Event) {
     const input = e.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const files = Array.from(input.files ?? []).filter(f => ALLOWED_TYPES.includes(f.type) && f.size <= 10 * 1024 * 1024);
     this.addFiles(files);
     input.value = '';
   }
   private addFiles(files: File[]) {
     const current = this.images();
-    const newPreviews: ImagePreview[] = files.map((file, i) => ({
+    const MAX_IMAGES = 10;
+    const remaining = MAX_IMAGES - current.length;
+    if (remaining <= 0) {
+      this.toast.show('Límite de 10 imágenes alcanzado', 'info');
+      return;
+    }
+    const accepted = files.slice(0, remaining);
+    if (accepted.length < files.length) {
+      this.toast.show(`Solo se agregaron ${accepted.length} imagen(es). Máximo 10 en total.`, 'info');
+    }
+    const newPreviews: ImagePreview[] = accepted.map((file, i) => ({
       file,
       url: URL.createObjectURL(file),
       isCover: current.length === 0 && i === 0
@@ -126,7 +143,7 @@ export class UploadComponent implements OnInit {
   async publish() {
     this.isLoading.set(true);
     try {
-      const project = await this.projectService.createProject(
+      await this.projectService.createProject(
         {
           title:       this.title(),
           description: this.description(),
@@ -140,7 +157,12 @@ export class UploadComponent implements OnInit {
       this.toast.show('Proyecto enviado. Pendiente de revisión por el admin.', 'success');
       this.router.navigate(['/explorar']);
     } catch (e: any) {
-      this.toast.show(e.message ?? 'Error al publicar', 'error');
+      const msg = e?.message ?? '';
+      if (msg === 'Failed to fetch' || e?.name === 'TypeError') {
+        this.toast.show('Error de conexión. Verifica tu internet e intenta de nuevo.', 'error');
+      } else {
+        this.toast.show(msg || 'Error al publicar', 'error');
+      }
     } finally {
       this.isLoading.set(false);
     }

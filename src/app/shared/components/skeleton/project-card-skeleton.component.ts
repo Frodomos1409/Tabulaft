@@ -23,8 +23,8 @@ import { SkeletonComponent } from './skeleton.component';
   `,
   styles: [`
     .card-skeleton {
-      background: #14141F;
-      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
       border-radius: 16px;
       overflow: hidden;
       break-inside: avoid;

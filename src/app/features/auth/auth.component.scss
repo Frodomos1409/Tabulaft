@@ -275,10 +275,12 @@
   }
 
   &__visual-logo-svg {
-    height: 64px;
+    height: 80px;
     width: auto;
+    max-width: 260px;
     display: block;
-    margin: 0 auto $space-3;
+    margin: 0 auto $space-4;
+    overflow: visible;
   }
 
   &__visual-tagline {
@@ -288,24 +290,59 @@
     line-height: 1.5;
   }
 
-  &__mini-grid {
+  &__carousel {
+    width: 280px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  &__carousel-track {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: $space-3;
-    max-width: 280px;
-    margin: 0 auto;
   }
 
   &__mini-card {
     border-radius: $radius-xl;
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.5s ease;
+
+    &.fade-out {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+
+    &.fade-in {
+      animation: cardFadeIn 0.55s ease forwards;
+      animation-delay: var(--delay, 0s);
+      opacity: 0;
+    }
+
+    &:hover {
+      transform: scale(1.04) translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      z-index: 2;
+    }
 
     img {
       width: 100%;
       aspect-ratio: 1;
       object-fit: cover;
       display: block;
+      transition: transform 0.6s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.08);
+    }
+
+    &-shine {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+      pointer-events: none;
     }
   }
 

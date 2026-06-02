@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { ProjectService, ProjectRow } from '../../core/services/project.service';
 
 @Component({
   selector: 'app-auth',
@@ -11,9 +12,10 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit, OnDestroy {
   auth    = inject(AuthService);
   private router = inject(Router);
+  private projectService = inject(ProjectService);
 
   isLogin = signal(true);
   isLoading = signal(false);
@@ -26,12 +28,56 @@ export class AuthComponent {
 
   toggle() { this.isLogin.update(v => !v); this.errorMsg.set(''); }
 
-  heroImages = [
-    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&q=80',
-    'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=300&q=80',
-    'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=300&q=80',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80',
+  projects: ProjectRow[] = [];
+  displayImages = signal<string[]>([]);
+  isFading = signal(false);
+  private allImages: string[] = [];
+  private slotOffset = 0;
+  private rotateInterval: any;
+
+  readonly FALLBACK_IMAGES = [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80',
+    'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&q=80',
+    'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+    'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&q=80',
+    'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=400&q=80',
+    'https://images.unsplash.com/photo-1545987796-200677ee1011?w=400&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
   ];
+
+  private buildPool(): string[] {
+    const imgs = this.projects.filter(p => p.cover_image).map(p => p.cover_image as string);
+    const pool = imgs.length >= 8 ? imgs : [...imgs, ...this.FALLBACK_IMAGES];
+    return pool.slice(0, Math.max(8, pool.length));
+  }
+
+  private getSlice(): string[] {
+    const pool = this.allImages;
+    if (!pool.length) return [];
+    return Array.from({ length: 4 }, (_, i) => pool[(this.slotOffset + i) % pool.length]);
+  }
+
+  private async rotate() {
+    this.isFading.set(true);
+    await new Promise(r => setTimeout(r, 400));
+    this.slotOffset = (this.slotOffset + 4) % this.allImages.length;
+    this.displayImages.set(this.getSlice());
+    this.isFading.set(false);
+  }
+
+  async ngOnInit() {
+    try {
+      this.projects = await this.projectService.getFeaturedProjects(8);
+    } catch { /* silently use fallback */ }
+    this.allImages = this.buildPool();
+    this.displayImages.set(this.getSlice());
+    this.rotateInterval = setInterval(() => this.rotate(), 3500);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.rotateInterval);
+  }
 
   private translateError(msg: string): string {
     if (!msg) return 'Ocurrió un error. Intenta de nuevo.';

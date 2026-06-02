@@ -137,18 +137,13 @@
         <div class="carousel-skeleton carousel-skeleton--side"></div>
       </div>
     } @else if (carouselProjects().length > 0) {
-      <div class="carousel-stage" (click)="nextSlide()">
+      <div class="carousel-stage">
         @for (item of visibleSlides; track item.project.id) {
-          <div class="carousel-card"
-               [class.active]="item.offset === 0"
-               [class.left1]="item.offset === -1"
-               [class.left2]="item.offset === -2"
-               [class.right1]="item.offset === 1"
-               [class.right2]="item.offset === 2"
-               (click)="$event.stopPropagation(); item.offset !== 0 ? goToSlide(carouselIndex() + item.offset) : null">
-            <div class="carousel-card__img-wrap">
-              <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
-              @if (item.offset === 0) {
+          @if (item.offset === 0) {
+            <a class="carousel-card active"
+               [routerLink]="['/proyecto', item.project.id]">
+              <div class="carousel-card__img-wrap">
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
                 <div class="carousel-card__overlay">
                   <span class="carousel-card__cat">{{ item.project.category }}</span>
                   <h3 class="carousel-card__name">{{ item.project.title }}</h3>
@@ -161,11 +156,22 @@
                       {{ item.project.views }}
                     </span>
                   </div>
-                  <a [routerLink]="['/proyecto', item.project.id]" class="carousel-card__cta" (click)="$event.stopPropagation()">Ver proyecto</a>
+                  <span class="carousel-card__cta">Ver proyecto</span>
                 </div>
-              }
+              </div>
+            </a>
+          } @else {
+            <div class="carousel-card"
+                 [class.left1]="item.offset === -1"
+                 [class.left2]="item.offset === -2"
+                 [class.right1]="item.offset === 1"
+                 [class.right2]="item.offset === 2"
+                 (click)="goToSlide(carouselIndex() + item.offset)">
+              <div class="carousel-card__img-wrap">
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
+              </div>
             </div>
-          </div>
+          }
         }
       </div>
 

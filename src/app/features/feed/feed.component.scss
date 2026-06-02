@@ -12,7 +12,7 @@
   position: relative;
   background: $blue;
   padding: calc(#{$navbar-height} + 56px) 0 0;
-  overflow: hidden;
+  overflow: clip;
 
   &__grain {
     position: absolute;
@@ -33,7 +33,7 @@
     z-index: 0;
     &--pink {
       width: 480px; height: 480px;
-      background: rgba(#ee41ba, 0.20);
+      background: rgba($accent-pink, 0.20);
       right: -80px; bottom: -60px;
     }
     &--cyan {
@@ -72,7 +72,7 @@
     width: 6px; height: 6px;
     border-radius: 50%;
     background: $accent-pink;
-    box-shadow: 0 0 8px rgba(#ee41ba, 0.9);
+    box-shadow: 0 0 8px rgba($accent-pink, 0.9);
     flex-shrink: 0;
   }
 
@@ -130,6 +130,8 @@
     padding: 12px 0;
     mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
+
+    @media (prefers-reduced-motion: reduce) { display: none; }
   }
 }
 
@@ -144,7 +146,8 @@
   font-weight: 400;
   letter-spacing: 0.18em;
   color: rgba(255,255,255,0.25);
-  .sep { color: rgba(#ee41ba, 0.50); }
+  .sep { color: rgba($accent-pink, 0.50); }
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 }
 
 // ─── Filtros sticky ───────────────────────────────────────────────────────────
@@ -296,7 +299,20 @@
   @include tablet { columns: 3; }
   @include mobile { columns: 2; column-gap: 12px; }
   @include small  { columns: 1; }
-  > * { break-inside: avoid; margin-bottom: 18px; @include mobile { margin-bottom: 12px; } }
+
+  > * {
+    break-inside: avoid;
+    margin-bottom: 18px;
+    // Entrance animation — fires once when DOM element is first created
+    animation: feedCardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    @include mobile { margin-bottom: 12px; }
+    @media (prefers-reduced-motion: reduce) { animation: none; }
+  }
+}
+
+@keyframes feedCardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 // ─── Empty ────────────────────────────────────────────────────────────────────
@@ -334,51 +350,62 @@
   }
 }
 
-// ─── Cargar más ───────────────────────────────────────────────────────────────
-.feed-load-more {
-  display: flex;
-  justify-content: center;
-  padding-top: $space-12;
+// ─── Infinite scroll sentinel ─────────────────────────────────────────────────
+.feed-sentinel {
+  height: 1px;
+  width: 100%;
+  margin-top: $space-8;
+  pointer-events: none;
 }
 
-.feed-load-btn {
-  display: inline-flex;
+// ─── Loading more indicator ───────────────────────────────────────────────────
+.feed-loading-more {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  height: 48px;
-  padding: 0 32px;
-  border-radius: $radius-pill;
-  border: 1.5px solid var(--border);
-  background: var(--bg-card);
-  color: $blue;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  justify-content: center;
+  gap: $space-3;
+  padding: $space-6 0 $space-10;
+  animation: fadeIn 0.3s ease;
 
-  &:hover:not(:disabled) {
-    background: $blue;
-    color: #fff;
-    border-color: $blue;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba($blue, 0.30);
+  &__label {
+    font-size: $text-sm;
+    color: var(--text-dim);
+    font-weight: 500;
   }
+}
 
-  &:disabled { opacity: 0.55; cursor: not-allowed; }
+// ─── End of results ───────────────────────────────────────────────────────────
+.feed-end {
+  text-align: center;
+  padding: $space-8 0 $space-12;
+  font-size: $text-sm;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease;
+}
+
+.feed-end-m {
+  text-align: center;
+  padding: $space-6 0 $space-8;
+  font-size: $text-xs;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  font-weight: 500;
 }
 
 .feed-spinner {
   display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
+  width: 18px; height: 18px;
+  border: 2.5px solid var(--border);
+  border-top-color: $blue;
   border-radius: 50%;
-  animation: spin .6s linear infinite;
+  animation: spin .65s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+// marquee is defined globally in _animations.scss
 
 // ── MOBILE ────────────────────────────────────────────────────────────────────
 .cat-m__page {
@@ -401,6 +428,7 @@
 .cat-m__cat-btn {
   white-space: nowrap;
   padding: 6px 14px;
+  min-height: 36px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
   background: transparent;

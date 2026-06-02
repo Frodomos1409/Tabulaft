@@ -1,18 +1,13 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 
-// ─── Token locales ────────────────────────────────────────────────────────────
-$nav-bg:          #ffffff;
-$nav-bg-scrolled: #ffffff;
-$nav-border:      rgba(40, 48, 235, 0.10);
-
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
   height: $navbar-height;
-  background: var(--bg-nav, $nav-bg);
-  border-bottom: 1px solid var(--border, $nav-border);
+  background: var(--bg-nav);
+  border-bottom: 1px solid var(--border);
   transition:
     background 0.3s ease,
     box-shadow 0.3s ease,
@@ -39,7 +34,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
   }
 
   &.scrolled {
-    background: var(--bg-nav, $nav-bg-scrolled);
+    background: var(--bg-nav);
     box-shadow: 0 2px 40px rgba(0, 0, 0, 0.15);
     border-color: var(--border);
 
@@ -145,7 +140,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     color: white;
     font-size: 10px; font-weight: 700;
     @include flex-center;
-    border: 2px solid #fff;
+    border: 2px solid var(--bg-nav); // matches navbar background in both themes
     padding: 0 2px;
   }
 
@@ -189,17 +184,17 @@ $nav-border:      rgba(40, 48, 235, 0.10);
 
   // ─── Entrar / botón de auth ────────────────────────────────────────────────
   .btn--primary {
-    background: $blue !important;
-    border-radius: $radius-pill !important;
-    font-size: $text-sm !important;
-    font-weight: 700 !important;
+    background: $blue;
+    border-radius: $radius-pill;
+    font-size: $text-sm;
+    font-weight: 700;
     letter-spacing: 0.04em;
-    box-shadow: 0 4px 16px rgba($blue, 0.30) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    box-shadow: 0 4px 16px rgba($blue, 0.30);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba($blue, 0.45) !important;
+      box-shadow: 0 6px 24px rgba($blue, 0.45);
     }
   }
 
@@ -319,6 +314,9 @@ $nav-border:      rgba(40, 48, 235, 0.10);
     cursor: pointer;
     background: none;
     border: none;
+    // Ensure 44px touch target on mobile
+    min-width: 44px; min-height: 44px;
+    align-items: center; justify-content: center;
     @include mobile { display: flex; }
 
     span {
@@ -361,6 +359,7 @@ $nav-border:      rgba(40, 48, 235, 0.10);
       border: none;
       text-align: left;
       cursor: pointer;
+      min-height: 44px; // touch target
 
       &:hover { background: rgba($blue, 0.05); color: $blue; }
     }

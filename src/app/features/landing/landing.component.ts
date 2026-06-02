@@ -1,6 +1,7 @@
 import {
   Component, OnInit, inject, signal, NgZone,
-  PLATFORM_ID, AfterViewInit, OnDestroy, ElementRef, ViewChild
+  PLATFORM_ID, AfterViewInit, OnDestroy, ElementRef, ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -13,7 +14,8 @@ import { ProjectRow, ProjectService } from '../../core/services/project.service'
   standalone: true,
   imports: [RouterLink, CommonModule, ProjectCardComponent],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss'
+  styleUrl: './landing.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   private zone           = inject(NgZone);

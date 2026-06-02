@@ -12,7 +12,7 @@
   position: relative;
   background: $blue;
   padding: calc(#{$navbar-height} + 48px) 0 56px;
-  overflow: hidden;
+  overflow: clip;
 
   &__grain {
     position: absolute;
@@ -33,7 +33,7 @@
     z-index: 0;
     &--1 {
       width: 500px; height: 500px;
-      background: rgba(#ee41ba, 0.16);
+      background: rgba($accent-pink, 0.16);
       right: -100px; top: -80px;
     }
     &--2 {
@@ -311,7 +311,7 @@
   animation: fadeInFast 0.15s ease;
 }
 
-@keyframes fadeInFast { from { opacity: 0; } to { opacity: 1; } }
+// fadeInFast keyframe is defined globally in _animations.scss
 
 .modal {
   background: var(--bg-card);
@@ -499,8 +499,4 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-// ─── Aurora keyframe ──────────────────────────────────────────────────────────
-@keyframes aurora {
-  0%   { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
+// aurora keyframe is defined globally in _animations.scss

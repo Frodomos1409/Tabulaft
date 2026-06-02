@@ -125,7 +125,7 @@
 .upload-step-connector {
   width: 28px;
   height: 1.5px;
-  background: rgba(0,0,0,0.10);
+  background: var(--border);
   margin: 0 4px;
   flex-shrink: 0;
   transition: background 0.2s ease;
@@ -541,7 +541,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 4/3;
-    background: #f0f0f5;
+    background: var(--bg-elevated);
     overflow: hidden;
     @include flex-center;
 
@@ -638,9 +638,5 @@
 }
 
 // ─── Animate ─────────────────────────────────────────────────────────────────
+// .animate-fade-in uses the global fadeIn keyframe from _animations.scss
 .animate-fade-in { animation: fadeIn 0.35s ease forwards; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}

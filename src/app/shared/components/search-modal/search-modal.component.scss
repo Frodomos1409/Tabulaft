@@ -141,8 +141,8 @@
   font-family: $font-body;
 
   &:hover {
-    background: rgba(0,0,0,0.07);
-    color: rgba(0,0,0,0.50);
+    background: var(--bg-hover);
+    color: var(--text-secondary);
   }
 }
 
@@ -327,7 +327,7 @@
     object-fit: cover;
     border-radius: $radius-sm;
     flex-shrink: 0;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid var(--border-subtle);
   }
 
   &__info {

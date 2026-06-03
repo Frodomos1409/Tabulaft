@@ -125,6 +125,12 @@ export class AdminService {
     return data ?? [];
   }
 
+  async updateProjectAuthor(projectId: string, authorId: string | null): Promise<void> {
+    const { error } = await supabase.from('projects').update({ author_id: authorId }).eq('id', projectId);
+    if (error) throw error;
+    await this.logAction('change_project_author', 'project', projectId, { authorId });
+  }
+
   async featureProject(id: string): Promise<void> {
     await supabase.from('projects').update({ featured: true }).eq('id', id);
     await this.logAction('feature_project', 'project', id);

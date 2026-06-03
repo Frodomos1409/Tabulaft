@@ -191,7 +191,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadRecent() {
     try {
-      this.recentProjects.set(await this.projectService.getProjects({ sort: 'recent', limit: 10 }));
+      this.recentProjects.set((await this.projectService.getProjects({ sort: 'recent', limit: 10 })).data);
     } finally {
       this.loadingRecent.set(false);
     }
@@ -199,7 +199,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadPopular() {
     try {
-      this.popularProjects.set(await this.projectService.getProjects({ sort: 'popular', limit: 6 }));
+      this.popularProjects.set((await this.projectService.getProjects({ sort: 'popular', limit: 6 })).data);
     } finally {
       this.loadingPopular.set(false);
     }

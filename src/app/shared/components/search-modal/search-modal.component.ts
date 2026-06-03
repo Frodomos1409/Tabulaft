@@ -61,7 +61,7 @@ export class SearchModalComponent implements OnInit, OnDestroy {
     if (cached) { this.results.set(cached); return; }
     this.isSearching.set(true);
     try {
-      const data = await this.projectService.getProjects({
+      const { data } = await this.projectService.getProjects({
         search: q || undefined,
         category: cat !== 'Todos' ? cat : undefined,
         sort: 'recent',

@@ -310,7 +310,11 @@
   gap: 16px;
   span { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--text-secondary); }
 }
-.detail-m__btns { display: flex; gap: 6px; }
+.detail-m__btns {
+  display: flex;
+  gap: 8px;
+  .detail-action-btn { min-width: 44px; min-height: 44px; padding: 10px; }
+}
 
 .detail-m__desc {
   margin-bottom: 24px;
@@ -328,12 +332,13 @@
   margin-bottom: 16px;
   input {
     flex: 1;
-    padding: 10px 12px;
+    min-height: 44px;
+    padding: 12px 14px;
     border-radius: $radius-md;
     border: 1px solid var(--border);
     background: var(--bg-input);
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 16px; // 16px prevents iOS auto-zoom
     font-family: $font-body;
     &:focus { outline: none; border-color: $violet; }
   }

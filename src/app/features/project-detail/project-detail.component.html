@@ -19,14 +19,24 @@
       <h1 class="detail-m__title">{{ project()!.title }}</h1>
 
       <!-- Author -->
-      <a [routerLink]="['/perfil', project()!.author_id]" class="detail-m__author">
-        <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name"
-             [alt]="project()!.author?.name" />
-        <div>
-          <span class="detail-m__author-name">{{ project()!.author?.name }}</span>
-          <span class="detail-m__author-role">{{ project()!.author?.role }}</span>
+      @if (project()!.author_id) {
+        <a [routerLink]="['/perfil', project()!.author_id]" class="detail-m__author">
+          <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name"
+               [alt]="project()!.author?.name" />
+          <div>
+            <span class="detail-m__author-name">{{ project()!.author?.name }}</span>
+            <span class="detail-m__author-role">{{ project()!.author?.role }}</span>
+          </div>
+        </a>
+      } @else {
+        <div class="detail-m__author">
+          <img src="/Recurso 2.svg" alt="Tabulaft" />
+          <div>
+            <span class="detail-m__author-name">Tabulaft</span>
+            <span class="detail-m__author-role">Plataforma</span>
+          </div>
         </div>
-      </a>
+      }
 
       <!-- Tags -->
       <div class="detail-m__tags">
@@ -138,12 +148,20 @@
         <div class="detail-meta__left">
           <h1 class="detail-title">{{ project()!.title }}</h1>
           <div class="detail-author">
-            <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name"
-                 [alt]="project()!.author?.name" class="detail-author__avatar" />
-            <div>
-              <a [routerLink]="['/perfil', project()!.author_id]" class="detail-author__name">{{ project()!.author?.name }}</a>
-              <span class="detail-author__role">{{ project()!.author?.role }}</span>
-            </div>
+            @if (project()!.author_id) {
+              <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name"
+                   [alt]="project()!.author?.name" class="detail-author__avatar" />
+              <div>
+                <a [routerLink]="['/perfil', project()!.author_id]" class="detail-author__name">{{ project()!.author?.name }}</a>
+                <span class="detail-author__role">{{ project()!.author?.role }}</span>
+              </div>
+            } @else {
+              <img src="/Recurso 2.svg" alt="Tabulaft" class="detail-author__avatar" />
+              <div>
+                <span class="detail-author__name">Tabulaft</span>
+                <span class="detail-author__role">Plataforma</span>
+              </div>
+            }
           </div>
           <div class="detail-tags">
             <span class="tag active">{{ project()!.category }}</span>

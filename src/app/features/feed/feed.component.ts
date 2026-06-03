@@ -1,6 +1,6 @@
 import {
-  Component, inject, signal, computed, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, NgZone, ChangeDetectionStrategy
+  Component, inject, signal, computed, effect, OnInit, OnDestroy,
+  ElementRef, NgZone, ChangeDetectionStrategy, viewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeviceService } from '../../core/services/device.service';
@@ -21,14 +21,14 @@ const PAGE_SIZE = 12;
   styleUrl: './feed.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
+export class FeedComponent implements OnInit, OnDestroy {
   readonly device = inject(DeviceService);
   private projectService  = inject(ProjectService);
   private academicService = inject(AcademicService);
   private toast           = inject(ToastService);
   private zone            = inject(NgZone);
 
-  @ViewChild('sentinel') sentinelRef?: ElementRef<HTMLElement>;
+  sentinel = viewChild<ElementRef<HTMLElement>>('sentinel');
 
   allCategories  = ['Todos', ...CATEGORIES] as const;
   allSemesters   = signal<string[]>(['Todos']);
@@ -43,6 +43,7 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
   page            = signal(0);
   hasMore         = signal(true);
   projects        = signal<ProjectRow[]>([]);
+  totalCount      = signal(0);
 
   skeletonItems     = Array(8).fill(0);
   skeletonMoreItems = Array(4).fill(0);
@@ -57,29 +58,30 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
       .map(s => s.name);
   });
 
+  constructor() {
+    effect(() => {
+      const el = this.sentinel();
+      if (!el || this.scrollObserver) return;
+      this.zone.runOutsideAngular(() => {
+        this.scrollObserver = new IntersectionObserver(
+          entries => {
+            if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
+              this.zone.run(() => this.loadMore());
+            }
+          },
+          { rootMargin: '500px' }
+        );
+        this.scrollObserver!.observe(el.nativeElement);
+      });
+    });
+  }
+
   async ngOnInit() {
     await Promise.all([this.loadAcademic(), this.loadProjects(true)]);
   }
 
-  ngAfterViewInit() {
-    this.zone.runOutsideAngular(() => this.initInfiniteScroll());
-  }
-
   ngOnDestroy() {
     this.scrollObserver?.disconnect();
-  }
-
-  private initInfiniteScroll() {
-    if (!('IntersectionObserver' in window) || !this.sentinelRef) return;
-    this.scrollObserver = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
-          this.zone.run(() => this.loadMore());
-        }
-      },
-      { rootMargin: '500px' }
-    );
-    this.scrollObserver.observe(this.sentinelRef.nativeElement);
   }
 
   private async loadAcademic() {
@@ -101,7 +103,7 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     try {
-      const data = await this.projectService.getProjects({
+      const { data, count } = await this.projectService.getProjects({
         category: this.activeCategory(),
         sort: this.sortBy(),
         semester: this.activeSemester() !== 'Todos' ? this.activeSemester() : undefined,
@@ -112,6 +114,7 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (reset) {
         this.projects.set(data);
+        this.totalCount.set(count);
       } else {
         this.projects.update(prev => [...prev, ...data]);
       }

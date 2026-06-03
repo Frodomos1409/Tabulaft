@@ -202,3 +202,10 @@ body {
 
 // ─── CSS custom property para accent pink ────────────────────────────────────
 :root { --accent-pink: #ee41ba; }
+
+// ─── Logo glow en dark mode ───────────────────────────────────────────────────
+body[data-theme="dark"] .admin-sidebar__logo-svg,
+body[data-theme="dark"] .navbar__logo-svg {
+  filter: drop-shadow(0 0 8px rgba(40, 48, 235, 0.65)) brightness(1.12);
+  transition: filter 0.3s ease;
+}

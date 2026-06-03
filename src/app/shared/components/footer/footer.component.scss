@@ -17,38 +17,23 @@
 
   &__brand {}
 
-  // Logo con SVG stroke-draw animado al entrar en viewport
   &__logo {
-    font-family: $font-heading;
-    font-size: $text-2xl;
-    font-weight: 800;
-    letter-spacing: -0.03em;
     display: inline-block;
     margin-bottom: $space-3;
-    color: #fff;
     text-decoration: none;
-    position: relative;
+  }
 
-    span { color: #fff; }
+  &__logo-img {
+    height: 44px;
+    width: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
+    transition: opacity 0.2s ease, filter 0.2s ease;
 
-    // El SVG underline stroke se dibuja al aparecer
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: $accent-pink;
-      transform-origin: left;
-      transform: scaleX(0);
-      border-radius: 2px;
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    &.is-visible::after {
-      transform: scaleX(1);
+    &:hover {
+      opacity: 1;
+      filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(255,255,255,0.4));
     }
   }
 

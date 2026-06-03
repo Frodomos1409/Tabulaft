@@ -67,12 +67,17 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    try {
-      this.projects = await this.projectService.getFeaturedProjects(8);
-    } catch { /* silently use fallback */ }
+    // Show fallback images immediately — no network wait
     this.allImages = this.buildPool();
     this.displayImages.set(this.getSlice());
     this.rotateInterval = setInterval(() => this.rotate(), 3500);
+
+    // Swap in real project images once loaded
+    try {
+      this.projects = await this.projectService.getFeaturedProjects(8);
+      this.allImages = this.buildPool();
+      this.slotOffset = 0;
+    } catch { /* silently keep fallback */ }
   }
 
   ngOnDestroy() {

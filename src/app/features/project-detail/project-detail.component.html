@@ -21,8 +21,9 @@
       <!-- Author -->
       @if (project()!.author_id) {
         <a [routerLink]="['/perfil', project()!.author_id]" class="detail-m__author">
-          <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name"
-               [alt]="project()!.author?.name" />
+          <img [src]="project()!.author?.avatar_url || 'https://ui-avatars.com/api/?name=' + project()!.author?.name + '&background=2830eb&color=fff&size=80'"
+               [alt]="project()!.author?.name"
+               (error)="$any($event.target).onerror=null; $any($event.target).src='https://ui-avatars.com/api/?name=' + project()!.author?.name + '&background=2830eb&color=fff&size=80'" />
           <div>
             <span class="detail-m__author-name">{{ project()!.author?.name }}</span>
             <span class="detail-m__author-role">{{ project()!.author?.role }}</span>
@@ -110,7 +111,8 @@
         }
         @for (c of comments(); track c.id) {
           <div class="detail-m__comment">
-            <img [src]="c.user?.avatar_url || 'https://ui-avatars.com/api/?name=' + c.user?.name" />
+            <img [src]="c.user?.avatar_url || 'https://ui-avatars.com/api/?name=' + c.user?.name + '&background=2830eb&color=fff&size=68'"
+                 (error)="$any($event.target).onerror=null; $any($event.target).src='https://ui-avatars.com/api/?name=' + c.user?.name + '&background=2830eb&color=fff&size=68'" />
             <div>
               <strong>{{ c.user?.name }}</strong>
               <p>{{ c.text }}</p>

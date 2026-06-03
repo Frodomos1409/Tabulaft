@@ -64,8 +64,9 @@
               @for (n of notifications(); track n.id) {
                 <div class="navbar__notif-item" [class.unread]="!n.read" (click)="markRead(n.id)">
                   <img class="navbar__notif-avatar"
-                       [src]="n.actor?.avatar_url || 'https://ui-avatars.com/api/?name=' + (n.actor?.name || 'U')"
-                       [alt]="n.actor?.name || ''" />
+                       [src]="n.actor?.avatar_url || 'https://ui-avatars.com/api/?name=' + (n.actor?.name || 'U') + '&background=2830eb&color=fff&size=64'"
+                       [alt]="n.actor?.name || ''"
+                       (error)="$any($event.target).onerror=null; $any($event.target).src='https://ui-avatars.com/api/?name=' + (n.actor?.name || 'U') + '&background=2830eb&color=fff&size=64'" />
                   <div class="navbar__notif-content">
                     <span class="navbar__notif-text">{{ n.text }}</span>
                     <span class="navbar__notif-time">{{ n.created_at | date:'d MMM, HH:mm' }}</span>

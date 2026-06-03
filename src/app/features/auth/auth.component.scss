@@ -281,6 +281,8 @@
     display: block;
     margin: 0 auto $space-4;
     overflow: visible;
+    filter: drop-shadow(0 0 16px rgba(40, 48, 235, 0.55)) brightness(1.08);
+    animation: logoGlow 4s ease-in-out infinite alternate;
   }
 
   &__visual-tagline {
@@ -367,4 +369,9 @@
       animation: rotateSlow 15s linear infinite reverse;
     }
   }
+}
+
+@keyframes logoGlow {
+  from { filter: drop-shadow(0 0 10px rgba(40, 48, 235, 0.45)) brightness(1.05); }
+  to   { filter: drop-shadow(0 0 22px rgba(40, 48, 235, 0.70)) brightness(1.12); }
 }

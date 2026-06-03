@@ -50,11 +50,11 @@ export class ProjectDetailComponent implements OnInit {
       this.project.set(p);
       this.projectService.incrementView(id);
 
-      const [relatedProjects, commentsData] = await Promise.all([
+      const [{ data: relatedProjects }, commentsData] = await Promise.all([
         this.projectService.getProjects({ category: p.category }),
         this.projectService.getComments(id),
       ]);
-      this.related.set(relatedProjects.filter(r => r.id !== id).slice(0, 3));
+      this.related.set(relatedProjects.filter((r: any) => r.id !== id).slice(0, 3));
       this.comments.set(commentsData);
 
       const user = this.auth.currentUser();

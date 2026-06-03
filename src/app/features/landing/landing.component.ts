@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectCardComponent } from '../../shared/components/project-card/project-card.component';
 import { ProjectRow, ProjectService } from '../../core/services/project.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-landing',
@@ -21,6 +22,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   private zone           = inject(NgZone);
   private platformId     = inject(PLATFORM_ID);
   private projectService = inject(ProjectService);
+  theme                  = inject(ThemeService);
 
   carouselProjects = signal<ProjectRow[]>([]);
   recentProjects   = signal<ProjectRow[]>([]);
@@ -178,7 +180,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadRecent() {
-    const data = await this.projectService.getProjects({ sort: 'recent', limit: 10 });
+    const { data } = await this.projectService.getProjects({ sort: 'recent', limit: 10 });
     this.recentProjects.set(data);
   }
 
@@ -193,7 +195,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadFeatured() {
-    const data = await this.projectService.getProjects({ sort: 'popular', limit: 6 });
-    this.featuredProjects.set(data);
+    const { data: featuredData } = await this.projectService.getProjects({ sort: 'popular', limit: 6 });
+    this.featuredProjects.set(featuredData);
   }
 }

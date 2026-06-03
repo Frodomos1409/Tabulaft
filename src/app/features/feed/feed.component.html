@@ -11,9 +11,18 @@
   </div>
 
   <div class="cat-m__sort-bar">
-    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">🔥 Tendencia</button>
-    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'recent'"   (click)="setSort('recent')">🕐 Recientes</button>
-    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'popular'"  (click)="setSort('popular')">⭐ Popular</button>
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      Tendencia
+    </button>
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'recent'" (click)="setSort('recent')">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Recientes
+    </button>
+    <button class="cat-m__sort-btn" [class.active]="sortBy() === 'popular'" (click)="setSort('popular')">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Popular
+    </button>
 
     <select class="cat-m__select" (change)="setSemester($any($event.target).value)">
       @for (sem of allSemesters(); track sem) {
@@ -62,14 +71,14 @@
         }
       }
 
-      <!-- Infinite scroll sentinel -->
-      <div #sentinel class="feed-sentinel"></div>
-
       @if (!hasMore() && projects().length > 0) {
         <p class="feed-end-m">— {{ projects().length }} proyectos —</p>
       }
     }
   </div>
+
+  <!-- Infinite scroll sentinel: always in DOM so viewChild always finds it -->
+  <div #sentinel class="feed-sentinel" aria-hidden="true"></div>
 
 </main>
 } @else {
@@ -92,7 +101,7 @@
         <span class="feed-hero__title-accent">PROYECTOS</span>
       </h1>
       <p class="feed-hero__count">
-        <span class="feed-hero__count-num">{{ projects().length }}</span>
+        <span class="feed-hero__count-num">{{ totalCount() }}</span>
         proyectos encontrados
       </p>
     </div>
@@ -153,13 +162,16 @@
       <div class="feed-filters__divider"></div>
 
       <button class="feed-sort" [class.active]="sortBy() === 'trending'" (click)="setSort('trending')">
-        <span class="feed-sort__icon">🔥</span> Tendencia
+        <svg class="feed-sort__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        Tendencia
       </button>
       <button class="feed-sort" [class.active]="sortBy() === 'recent'" (click)="setSort('recent')">
-        <span class="feed-sort__icon">🕐</span> Recientes
+        <svg class="feed-sort__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recientes
       </button>
       <button class="feed-sort" [class.active]="sortBy() === 'popular'" (click)="setSort('popular')">
-        <span class="feed-sort__icon">⭐</span> Popular
+        <svg class="feed-sort__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Popular
       </button>
     </div>
 
@@ -207,9 +219,6 @@
         }
       </div>
 
-      <!-- Infinite scroll sentinel — always present, observer checks hasMore() -->
-      <div #sentinel class="feed-sentinel" aria-hidden="true"></div>
-
       <!-- Loading more indicator -->
       @if (loadingMore()) {
         <div class="feed-loading-more">
@@ -224,6 +233,9 @@
       }
     }
   </div>
+
+  <!-- Infinite scroll sentinel: always in DOM so viewChild always finds it -->
+  <div #sentinel class="feed-sentinel" aria-hidden="true"></div>
 
 </main>
 } <!-- end @else desktop -->

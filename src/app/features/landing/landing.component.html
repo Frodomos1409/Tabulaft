@@ -5,12 +5,12 @@
          (mousemove)="onHeroMouseMove($event)"
          (mouseleave)="onHeroMouseLeave()">
 
-  <img class="hero__spark hero__spark--1" src="assets/hero-spark-1.svg" alt="" #sparkOne />
-  <img class="hero__spark hero__spark--2" src="assets/hero-spark-2.svg" alt="" #sparkTwo />
   <img class="hero__char hero__char--a" src="assets/hero-character-1.svg" alt="" />
   <img class="hero__char hero__char--b" src="assets/hero-character-2.svg" alt="" />
 
   <div class="hero__card" #heroCard>
+    <img class="hero__spark hero__spark--1" src="assets/hero-spark-1.svg" alt="" #sparkOne />
+    <img class="hero__spark hero__spark--2" src="assets/hero-spark-2.svg" alt="" #sparkTwo />
     <h1 class="hero__title animate-text">
       DESCUBRE LOS<br>MEJORES TRABAJOS
       <span class="hero__title-line3">DE DISEÑO</span>
@@ -138,7 +138,7 @@
 <!-- ═══════════════════════════════════════════════════════════
      UPLOAD / CTA
      ═══════════════════════════════════════════════════════════ -->
-<section class="upload" id="publicar">
+<section class="upload" id="publicar" [class.upload--dark]="theme.isDark()">
   <img class="upload__band" src="assets/blue-band.svg" alt="" />
   <img class="upload__card" src="assets/upload-card.svg" alt="" />
   <div class="upload__content">

@@ -83,13 +83,13 @@ export class ProjectService {
     subject?: string;
     page?: number;
     limit?: number;
-  }): Promise<ProjectRow[]> {
+  }): Promise<{ data: ProjectRow[]; count: number }> {
     const limit = filters?.limit ?? 12;
     const page  = filters?.page  ?? 0;
 
     let query = supabase
       .from('projects')
-      .select('id, title, description, cover_image, category, tags, likes, views, featured, status, semester, subject, created_at, author_id, author:profiles!projects_author_id_fkey(id, name, avatar_url, role)')
+      .select('id, title, description, cover_image, category, tags, likes, views, featured, status, semester, subject, created_at, author_id, author:profiles!projects_author_id_fkey(id, name, avatar_url, role)', { count: 'exact' })
       .eq('status', 'active');
 
     if (filters?.category && filters.category !== 'Todos') {
@@ -114,9 +114,9 @@ export class ProjectService {
 
     query = query.range(page * limit, (page + 1) * limit - 1);
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
     if (error) throw error;
-    return (data ?? []) as ProjectRow[];
+    return { data: (data ?? []) as ProjectRow[], count: count ?? 0 };
   }
 
   async getProjectById(id: string): Promise<ProjectRow | null> {

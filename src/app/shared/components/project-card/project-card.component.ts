@@ -20,9 +20,10 @@ export class ProjectCardComponent implements OnInit {
   private projectService = inject(ProjectService);
   private auth           = inject(AuthService);
 
-  liked   = signal(false);
-  saved   = signal(false);
+  liked     = signal(false);
+  saved     = signal(false);
   likeCount = signal(0);
+  imgLoaded = false;
 
   async ngOnInit() {
     this.likeCount.set(this.project?.likes ?? 0);

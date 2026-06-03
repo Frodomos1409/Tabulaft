@@ -101,6 +101,10 @@ export class AdminComponent implements OnInit {
   rejectingProject = signal<any | null>(null);
   rejectNote       = signal('');
 
+  // ─── Modal cambiar autor ─────────────────────────────────────────────────────
+  editingAuthorProject = signal<any | null>(null);
+  selectedAuthorId     = signal<string>('__tabulaft__');
+
   // ─── Modal detalle proyecto ──────────────────────────────────────────────────
   viewingProject = signal<any | null>(null);
 
@@ -264,6 +268,33 @@ export class AdminComponent implements OnInit {
 
   openEditProject(project: any) { this.editingProject.set({ ...project }); }
   closeEditProject() { this.editingProject.set(null); }
+
+  openEditAuthor(project: any) {
+    this.editingAuthorProject.set(project);
+    this.selectedAuthorId.set(project.author_id ?? '__tabulaft__');
+  }
+  closeEditAuthor() { this.editingAuthorProject.set(null); }
+
+  async saveProjectAuthor() {
+    const p = this.editingAuthorProject();
+    if (!p) return;
+    const rawId = this.selectedAuthorId();
+    const authorId = rawId === '__tabulaft__' ? null : rawId;
+    const newAuthor = authorId
+      ? (this.users().find(u => u.id === authorId) ?? null)
+      : null;
+    try {
+      await this.adminService.updateProjectAuthor(p.id, authorId);
+      this.projects.update(list => list.map(proj => proj.id === p.id
+        ? { ...proj, author_id: authorId, author: newAuthor }
+        : proj
+      ));
+      this.toast.show('Autor actualizado', 'success');
+    } catch {
+      this.toast.show('Error al actualizar el autor', 'error');
+    }
+    this.closeEditAuthor();
+  }
 
   viewProject(project: any) { this.viewingProject.set(project); }
   closeViewProject() { this.viewingProject.set(null); }

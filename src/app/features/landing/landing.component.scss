@@ -62,8 +62,8 @@
     position: absolute; pointer-events: none; z-index: 4;
     animation: heroSparkSpin 8s ease-in-out infinite;
     transition: transform 0.15s ease-out;
-    &--1 { width: clamp(52px, 6vw, 80px); top: 7%; left: 4%; animation-duration: 10s; }
-    &--2 { width: clamp(40px, 4.5vw, 62px); bottom: 14%; left: 36%; animation-duration: 7s; animation-delay: -3s; }
+    &--1 { width: clamp(44px, 5vw, 68px); top: -22px; left: -22px; animation-duration: 10s; }
+    &--2 { width: clamp(34px, 3.8vw, 54px); bottom: -18px; right: -18px; animation-duration: 7s; animation-delay: -3s; }
 
     @media (prefers-reduced-motion: reduce) { animation: none; }
   }
@@ -349,44 +349,73 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // UPLOAD / CTA BANNER — fondo negro (fixed dark, intentional)
 // ═══════════════════════════════════════════════════════════════════════════════
+// ─── Upload — Light mode ──────────────────────────────────────────────────────
 .upload {
   position: relative;
-  background: #000;
+  background: #f2f3ff;
   overflow: hidden;
-  min-height: 380px;
+  min-height: 420px;
   display: flex; align-items: center; justify-content: center;
 
-  &__band {
-    position: absolute; bottom: 0; left: 0; width: 100%; pointer-events: none; opacity: 0.15;
+  // Gradiente azul sutil en la esquina superior izquierda
+  &::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($blue, 0.10) 0%, transparent 70%);
+    pointer-events: none;
   }
 
+  &__band { display: none; }
+
   &__card {
-    position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
-    height: 80%; max-height: 280px; opacity: 0.12; pointer-events: none;
+    position: absolute; right: 6%; top: 50%; transform: translateY(-50%);
+    height: 85%; max-height: 320px;
+    opacity: 0.75;
+    mix-blend-mode: multiply;
+    pointer-events: none;
     @include mobile { display: none; }
   }
 
   &__content {
     position: relative; z-index: 1;
-    text-align: center; padding: 72px $space-6;
-    @include mobile { padding: 56px $space-4; }
+    text-align: center; padding: 80px $space-6;
+    @include mobile { padding: 60px $space-4; }
   }
 
   &__title {
-    font-family: $font-heading; font-size: clamp(28px, 5vw, 68px);
-    font-weight: 400; color: #fff; letter-spacing: 1px; margin: 0 0 32px; line-height: 1.05;
+    font-family: $font-heading; font-size: clamp(28px, 5vw, 72px);
+    font-weight: 400; color: #000; letter-spacing: 1px; margin: 0 0 36px; line-height: 1.05;
     @include small { font-size: clamp(22px, 7vw, 36px); }
   }
 
   &__btn {
     display: inline-flex; align-items: center; gap: 10px;
-    min-height: 56px; padding: 0 40px; border-radius: $radius-pill;
+    min-height: 56px; padding: 0 44px; border-radius: $radius-pill;
     background: $blue; color: #fff; font-size: 15px; font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 0 0 2px rgba($blue, 0.30), 0 8px 24px rgba($blue, 0.40);
+    box-shadow: 0 0 0 2px rgba($blue, 0.35), 0 8px 32px rgba($blue, 0.55);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    &:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px rgba($blue, 0.30), 0 12px 36px rgba($blue, 0.60); }
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 0 3px rgba($blue, 0.45), 0 16px 48px rgba($blue, 0.70);
+    }
     @media (prefers-reduced-motion: reduce) { transition: none; &:hover { transform: none; } }
     @include mobile { padding: 0 28px; font-size: 14px; }
+  }
+
+  // ─── Dark mode — clase añadida desde el componente ─────────────────────────
+  &--dark {
+    background: #000;
+
+    .upload__band {
+      display: block;
+      position: absolute; bottom: 0; left: 0; width: 100%; pointer-events: none;
+    }
+
+    .upload__card { opacity: 0.22; filter: drop-shadow(0 0 24px rgba($blue, 0.4)); }
+    .upload__title { color: #fff; text-shadow: 0 0 60px rgba($blue, 0.4); }
   }
 }

@@ -1,6 +1,12 @@
 <a class="card" [routerLink]="['/proyecto', project.id]">
-  <div class="card__image-wrap" [class.loaded]="imgLoaded">
-    <img class="card__image" [src]="project.cover_image || project.coverImage" [alt]="project.title" loading="lazy" [class.loaded]="imgLoaded" (load)="imgLoaded = true" />
+  <div class="card__image-wrap" [class.loaded]="imgLoaded()">
+    <img class="card__image"
+         [src]="project.cover_image || project.coverImage"
+         [alt]="project.title"
+         loading="lazy"
+         [class.loaded]="imgLoaded()"
+         (load)="imgLoaded.set(true)"
+         (error)="imgLoaded.set(true)" />
 
     <!-- Hover overlay -->
     <div class="card__overlay">

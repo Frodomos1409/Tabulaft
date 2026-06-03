@@ -23,7 +23,7 @@ export class ProjectCardComponent implements OnInit {
   liked     = signal(false);
   saved     = signal(false);
   likeCount = signal(0);
-  imgLoaded = false;
+  imgLoaded = signal(false);
 
   async ngOnInit() {
     this.likeCount.set(this.project?.likes ?? 0);

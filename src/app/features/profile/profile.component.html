@@ -152,51 +152,61 @@
 
 </main>
 
-<!-- ─── Modal Editar Perfil ─────────────────────────────────────────────── -->
-@if (showEditModal()) {
-  <div class="modal-backdrop" (click)="closeEditModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal__header">
-        <h3 class="modal__title">Editar perfil</h3>
-        <button class="modal__close" (click)="closeEditModal()">
+<!-- ─── Editar Perfil Inline ─────────────────────────────────────────────── -->
+@if (isEditing()) {
+  <div class="edit-inline">
+    <div class="edit-inline__inner">
+      <div class="edit-inline__header">
+        <h3 class="edit-inline__title">Editar perfil</h3>
+        <button class="edit-inline__close" (click)="closeEditModal()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
 
-      <div class="modal__body">
+      <div class="edit-inline__body">
+        <!-- Avatar -->
         <div class="edit-avatar-wrap">
           <img class="edit-avatar"
-               [src]="editAvatarPreview() || 'https://ui-avatars.com/api/?name=' + editForm.name + '&background=2830eb&color=fff&size=120'"
+               [src]="editAvatarPreview() || ('https://ui-avatars.com/api/?name=' + editForm.name + '&background=2830eb&color=fff&size=120')"
                alt="avatar" />
           <label class="edit-avatar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
             Cambiar foto
-            <input type="file" accept="image/*" hidden (change)="onAvatarChange($event)" />
+            <input type="file" accept="image/*" class="file-input-sr" (change)="onAvatarChange($event)" />
           </label>
         </div>
 
-        <div class="modal-form">
-          <div class="modal-form__group">
-            <label class="modal-form__label">Nombre</label>
-            <input class="modal-form__input" type="text" [(ngModel)]="editForm.name" placeholder="Tu nombre" />
+        <!-- Campos -->
+        <div class="edit-inline__fields">
+          <div class="edit-field">
+            <label class="edit-field__label">Nombre <span class="edit-field__req">*</span></label>
+            <input class="edit-field__input" type="text" [(ngModel)]="editForm.name" placeholder="Tu nombre completo" />
           </div>
-          <div class="modal-form__group">
-            <label class="modal-form__label">Rol / Especialidad</label>
-            <input class="modal-form__input" type="text" [(ngModel)]="editForm.role" placeholder="Ej. Diseñadora Gráfica" />
+          <div class="edit-field">
+            <label class="edit-field__label">Rol / Especialidad</label>
+            <input class="edit-field__input" type="text" [(ngModel)]="editForm.role" placeholder="Ej. Diseñadora Gráfica" />
           </div>
-          <div class="modal-form__group">
-            <label class="modal-form__label">Bio</label>
-            <textarea class="modal-form__input modal-form__textarea" [(ngModel)]="editForm.bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
+          <div class="edit-field">
+            <label class="edit-field__label">Bio</label>
+            <textarea class="edit-field__input edit-field__textarea" [(ngModel)]="editForm.bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
           </div>
         </div>
       </div>
 
-      <div class="modal__footer">
-        <button class="modal-btn modal-btn--ghost" (click)="closeEditModal()">Cancelar</button>
-        <button class="modal-btn modal-btn--primary" (click)="saveProfile()" [disabled]="savingEdit()">
-          @if (savingEdit()) { <span class="modal-spinner"></span> Guardando… }
-          @else { Guardar cambios }
+      <div class="edit-inline__footer">
+        <button class="edit-inline-btn edit-inline-btn--ghost" (click)="closeEditModal()">Cancelar</button>
+        <button class="edit-inline-btn edit-inline-btn--primary" (click)="saveProfile()" [disabled]="savingEdit() || !editForm.name.trim()">
+          @if (savingEdit()) {
+            <span class="edit-spinner"></span> Guardando…
+          } @else {
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardar cambios
+          }
         </button>
       </div>
     </div>

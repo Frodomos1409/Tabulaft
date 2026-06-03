@@ -183,12 +183,128 @@
   @include mobile { columns: 1; }
 }
 
-// ─── Botón reportar ─────────────────────────────────────────────────────────
+// ─── Variantes botón acción ──────────────────────────────────────────────────
 .detail-action-btn--report {
   opacity: .5;
   font-size: .8rem;
   &:hover { opacity: 1; color: #e53e3e; border-color: #e53e3e; }
 }
+
+.detail-action-btn--edit {
+  color: $blue;
+  border-color: rgba($blue, 0.25);
+  background: rgba($blue, 0.04);
+  &:hover { background: rgba($blue, 0.10); border-color: $blue; }
+}
+
+.detail-action-btn--delete {
+  color: #e53e3e;
+  border-color: rgba(#e53e3e, 0.22);
+  background: rgba(#e53e3e, 0.04);
+  &:hover { background: rgba(#e53e3e, 0.10); border-color: #e53e3e; }
+}
+
+// ─── Botón peligroso ──────────────────────────────────────────────────────────
+.btn--danger {
+  background: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: $radius-pill;
+  padding: 0 20px;
+  height: 40px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  &:hover { background: #c53030; }
+}
+
+// ─── Campos de edición (reutilizados del modal) ────────────────────────────────
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+  }
+
+  &__input {
+    background: var(--bg-input, var(--bg));
+    border: 1.5px solid var(--border);
+    border-radius: $radius-lg;
+    padding: 11px 14px;
+    font-size: $text-base;
+    font-family: $font-body;
+    color: var(--text);
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+    @include mobile { font-size: 16px; }
+    &::placeholder { color: var(--text-dim); }
+    &:focus { outline: none; border-color: $blue; box-shadow: 0 0 0 3px rgba($blue, 0.08); }
+  }
+
+  &__textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+}
+
+// ─── Tags input ────────────────────────────────────────────────────────────────
+.tags-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: $radius-lg;
+  background: var(--bg-input, var(--bg));
+  min-height: 44px;
+  align-items: center;
+  transition: border-color 0.15s ease;
+  &:focus-within { border-color: $blue; }
+  input {
+    flex: 1;
+    min-width: 100px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: $text-sm;
+    font-family: $font-body;
+    &:focus { outline: none; }
+    &::placeholder { color: var(--text-dim); }
+  }
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+  background: rgba($blue, 0.08);
+  border: 1px solid rgba($blue, 0.15);
+  color: $blue;
+  font-size: 12px;
+  font-weight: 600;
+  button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+    opacity: .6;
+    &:hover { opacity: 1; }
+  }
+}
+
+.modal--sm { max-width: 380px; }
 
 // ─── Modal ──────────────────────────────────────────────────────────────────
 .modal-backdrop {

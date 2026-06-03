@@ -62,7 +62,7 @@
                (dragleave)="onDragLeave()"
                (drop)="onDrop($event)"
                (click)="openFilePicker()">
-            <input #fileInput type="file" accept="image/*" multiple (change)="onFileSelect($event)" hidden />
+            <input #fileInput type="file" accept="image/*" multiple (change)="onFileSelect($event)" class="file-input-sr" />
 
             @if (images().length === 0) {
               <div class="dropzone__empty">

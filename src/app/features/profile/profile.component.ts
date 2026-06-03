@@ -27,7 +27,7 @@ export class ProfileComponent implements OnInit {
   following    = signal(false);
   loading      = signal(true);
   savingEdit   = signal(false);
-  showEditModal = signal(false);
+  isEditing    = signal(false);
 
   user          = signal<Profile | null>(null);
   projects      = signal<ProjectRow[]>([]);
@@ -72,10 +72,10 @@ export class ProfileComponent implements OnInit {
     this.editForm = { name: u.name, role: u.role ?? '', bio: u.bio ?? '' };
     this.editAvatarPreview.set(u.avatar_url);
     this.editAvatar = null;
-    this.showEditModal.set(true);
+    this.isEditing.set(true);
   }
 
-  closeEditModal() { this.showEditModal.set(false); }
+  closeEditModal() { this.isEditing.set(false); }
 
   onAvatarChange(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -101,7 +101,7 @@ export class ProfileComponent implements OnInit {
       if (this.auth.currentUser()?.id === u.id) {
         this.auth.currentUser.set(updated);
       }
-      this.showEditModal.set(false);
+      this.isEditing.set(false);
       this.toast.show('Perfil actualizado', 'success', '✅');
     } catch (e: any) {
       this.toast.show(e.message ?? 'Error al guardar', 'error');

@@ -300,90 +300,86 @@
   color: var(--text-dim);
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  background: rgba(5, 5, 20, 0.68);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  @include flex-center;
-  padding: $space-4;
-  animation: fadeInFast 0.15s ease;
-}
+// ─── Edit Inline ─────────────────────────────────────────────────────────────
+.edit-inline {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $space-6 $space-10;
+  animation: fadeIn 0.2s ease;
+  @include mobile { padding: 0 $space-4 $space-8; }
 
-// fadeInFast keyframe is defined globally in _animations.scss
+  &__inner {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 
-.modal {
-  background: var(--bg-card);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.24);
-  animation: modalIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-  overflow: hidden;
-  position: relative;
-
-  // Aurora line top
-  &::before {
-    content: '';
-    display: block;
-    height: 2.5px;
-    background: linear-gradient(90deg, $blue, $accent-pink, #36d7ff);
-    background-size: 200% 100%;
-    animation: aurora 5s linear infinite;
-    flex-shrink: 0;
+    &::before {
+      content: '';
+      display: block;
+      height: 2.5px;
+      background: linear-gradient(90deg, $blue, $accent-pink, #36d7ff);
+      background-size: 200% 100%;
+      animation: aurora 5s linear infinite;
+    }
   }
-}
 
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba($blue, 0.07);
+    @include mobile { padding: 16px 20px 14px; }
+  }
 
-.modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid rgba($blue, 0.07);
-}
+  &__title {
+    font-family: $font-heading;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: 0.5px;
+    @include mobile { font-size: 17px; }
+  }
 
-.modal__title {
-  font-family: $font-heading;
-  font-size: 20px;
-  font-weight: 400;
-  color: var(--text);
-  margin: 0;
-  letter-spacing: 0.5px;
-}
+  &__close {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--hover-surface);
+    border: none;
+    cursor: pointer;
+    @include flex-center;
+    color: var(--text-tertiary);
+    transition: all 0.15s ease;
+    &:hover { background: var(--hover-surface-md); color: var(--text); }
+  }
 
-.modal__close {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--hover-surface);
-  border: none;
-  cursor: pointer;
-  @include flex-center;
-  color: var(--text-tertiary);
-  transition: all 0.15s ease;
-  &:hover { background: var(--hover-surface-md); color: var(--text); }
-}
+  &__body {
+    padding: 24px;
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    @include mobile { flex-direction: column; padding: 20px; gap: 20px; }
+  }
 
-.modal__body {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+  &__fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+  }
 
-.modal__footer {
-  padding: 16px 24px 20px;
-  display: flex;
-  gap: $space-3;
-  justify-content: flex-end;
-  border-top: 1px solid rgba($blue, 0.07);
+  &__footer {
+    padding: 16px 24px 20px;
+    display: flex;
+    gap: $space-3;
+    justify-content: flex-end;
+    border-top: 1px solid rgba($blue, 0.07);
+    @include mobile { padding: 14px 20px 18px; }
+  }
 }
 
 // ─── Edit avatar ──────────────────────────────────────────────────────────────
@@ -420,13 +416,11 @@
   &:hover { background: rgba($blue, 0.05); }
 }
 
-// ─── Modal form ───────────────────────────────────────────────────────────────
-.modal-form {
+// ─── Edit field ───────────────────────────────────────────────────────────────
+.edit-field {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-
-  &__group { display: flex; flex-direction: column; gap: 6px; }
+  gap: 6px;
 
   &__label {
     font-size: 12px;
@@ -435,17 +429,20 @@
     letter-spacing: 0.04em;
   }
 
+  &__req { color: $accent-pink; }
+
   &__input {
     background: var(--bg-input);
     border: 1.5px solid var(--border);
     border-radius: $radius-lg;
-    padding: 10px 14px;
+    padding: 11px 14px;
     font-size: $text-base;
     font-family: $font-body;
     color: var(--text);
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    @include mobile { font-size: 16px; } // evita zoom iOS
 
     &::placeholder { color: var(--text-dim); }
 
@@ -453,16 +450,15 @@
       outline: none;
       border-color: $blue;
       box-shadow: 0 0 0 3px rgba($blue, 0.08);
-      background: var(--bg-card);
     }
   }
 
   &__textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 }
 
-// ─── Modal buttons ────────────────────────────────────────────────────────────
-.modal-btn {
-  height: 40px;
+// ─── Edit inline buttons ──────────────────────────────────────────────────────
+.edit-inline-btn {
+  height: 42px;
   padding: 0 22px;
   border-radius: $radius-pill;
   font-size: 13px;
@@ -471,7 +467,8 @@
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  @include mobile { flex: 1; justify-content: center; height: 48px; }
 
   &--ghost {
     background: transparent;
@@ -490,13 +487,21 @@
   }
 }
 
-.modal-spinner {
+.edit-spinner {
   display: inline-block;
   width: 13px; height: 13px;
   border: 2px solid rgba(255,255,255,0.25);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin .6s linear infinite;
+}
+
+// ─── file input hidden (no display:none para iOS) ─────────────────────────────
+.file-input-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }

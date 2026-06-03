@@ -218,6 +218,22 @@ export class ProjectService {
     await supabase.rpc('increment_project_view', { p_project_id: projectId });
   }
 
+  async updateProject(projectId: string, data: { title?: string; description?: string; category?: string; tags?: string[] }): Promise<ProjectRow> {
+    const { data: updated, error } = await supabase
+      .from('projects')
+      .update(data)
+      .eq('id', projectId)
+      .select('*, author:profiles!projects_author_id_fkey(*)')
+      .single();
+    if (error) throw error;
+    return updated as ProjectRow;
+  }
+
+  async deleteProject(projectId: string): Promise<void> {
+    const { error } = await supabase.from('projects').delete().eq('id', projectId);
+    if (error) throw error;
+  }
+
   async reportProject(projectId: string, reason: string): Promise<void> {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');

@@ -36,6 +36,10 @@ export class ProjectDetailComponent implements OnInit {
   reportReason     = '';
   sendingReport    = signal(false);
   lightboxOpen     = signal(false);
+  showDeleteConfirm = signal(false);
+  isEditing        = signal(false);
+  savingEdit       = signal(false);
+  editForm         = { title: '', description: '', category: '', tags: [] as string[], tagInput: '' };
   isOwnProject     = computed(() =>
     !!this.auth.currentUser() && this.auth.currentUser()!.id === this.project()?.author_id
   );
@@ -113,6 +117,60 @@ export class ProjectDetailComponent implements OnInit {
       this.toast.show(e.message ?? 'Error al enviar reporte', 'error');
     } finally {
       this.sendingReport.set(false);
+    }
+  }
+
+  openEdit() {
+    const p = this.project();
+    if (!p) return;
+    this.editForm = { title: p.title, description: p.description ?? '', category: p.category, tags: [...(p.tags ?? [])], tagInput: '' };
+    this.isEditing.set(true);
+  }
+
+  addEditTag(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = this.editForm.tagInput.trim().toLowerCase().replace(/,/g, '');
+      if (val && !this.editForm.tags.includes(val) && this.editForm.tags.length < 8) {
+        this.editForm.tags = [...this.editForm.tags, val];
+      }
+      this.editForm.tagInput = '';
+    }
+  }
+
+  removeEditTag(tag: string) { this.editForm.tags = this.editForm.tags.filter(t => t !== tag); }
+
+  async saveEdit() {
+    if (!this.editForm.title.trim()) return;
+    const p = this.project();
+    if (!p) return;
+    this.savingEdit.set(true);
+    try {
+      const updated = await this.projectService.updateProject(p.id, {
+        title: this.editForm.title.trim(),
+        description: this.editForm.description.trim(),
+        category: this.editForm.category,
+        tags: this.editForm.tags,
+      });
+      this.project.set(updated);
+      this.isEditing.set(false);
+      this.toast.show('Proyecto actualizado', 'success', '✅');
+    } catch (e: any) {
+      this.toast.show(e.message ?? 'Error al guardar', 'error');
+    } finally {
+      this.savingEdit.set(false);
+    }
+  }
+
+  async confirmDelete() {
+    const p = this.project();
+    if (!p) return;
+    try {
+      await this.projectService.deleteProject(p.id);
+      this.toast.show('Proyecto eliminado', 'success');
+      this.router.navigate(['/perfil', this.auth.currentUser()!.id]);
+    } catch (e: any) {
+      this.toast.show(e.message ?? 'Error al eliminar', 'error');
     }
   }
 

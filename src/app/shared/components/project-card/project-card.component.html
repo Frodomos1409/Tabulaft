@@ -24,7 +24,9 @@
   <div class="card__body">
     <h3 class="card__title">{{ project.title }}</h3>
     <div class="card__author">
-      <img class="card__avatar" [src]="project.author?.avatar_url || project.author?.avatar" [alt]="project.author?.name" />
+      <img class="card__avatar"
+           [src]="project.author?.avatar_url || ('https://ui-avatars.com/api/?name=' + (project.author?.name || 'U') + '&background=2830eb&color=fff&size=56')"
+           [alt]="project.author?.name" />
       <div class="card__author-info">
         <span class="card__author-name">{{ project.author.name }}</span>
         <span class="card__author-role">{{ project.author.role }}</span>

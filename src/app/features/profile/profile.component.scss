@@ -300,197 +300,289 @@
   color: var(--text-dim);
 }
 
-// ─── Edit Inline ─────────────────────────────────────────────────────────────
-.edit-inline {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 $space-6 $space-10;
-  animation: fadeIn 0.2s ease;
-  @include mobile { padding: 0 $space-4 $space-8; }
+// ─── Liquid Glass Modal ───────────────────────────────────────────────────────
+.lg-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+  // Solo un color semitransparente — sin backdrop-filter aquí para no apilar blurs
+  background: rgba(4, 4, 20, 0.65);
+  animation: lgBackdropIn 0.22s ease;
 
-  &__inner {
-    background: var(--bg-card);
-    border-radius: 20px;
-    border: 1px solid var(--border-subtle);
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
 
-    &::before {
-      content: '';
-      display: block;
-      height: 2.5px;
-      background: linear-gradient(90deg, $blue, $accent-pink, #36d7ff);
-      background-size: 200% 100%;
-      animation: aurora 5s linear infinite;
-    }
+@keyframes lgBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lgModalIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lg-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 28px;
+  padding: 28px 28px 24px;
+  animation: lgModalIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  // UNA sola capa de backdrop-filter — GPU solo procesa una vez
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(10, 10, 28, 0.55);
+  border: 1px solid rgba(255,255,255,0.11);
+  box-shadow:
+    0 0 0 1px rgba($blue, 0.10),
+    0 28px 60px rgba(0, 0, 0, 0.50),
+    0 6px 20px rgba($blue, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  // Promueve a compositing layer propio para no afectar el resto de la página
+  transform: translateZ(0);
+  will-change: transform;
+
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @include mobile { border-radius: 22px; padding: 22px 20px 20px; max-width: 100%; }
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+// Orbs: radial-gradient sin filter:blur — cero costo GPU
+.lg-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+
+  &--1 {
+    width: 260px; height: 260px;
+    top: -100px; right: -70px;
+    background: radial-gradient(circle, rgba($blue, 0.18) 0%, transparent 65%);
   }
+  &--2 {
+    width: 200px; height: 200px;
+    bottom: -70px; left: -50px;
+    background: radial-gradient(circle, rgba($accent-pink, 0.13) 0%, transparent 65%);
+  }
+}
 
-  &__header {
+// Header
+.lg-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  &__left {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid rgba($blue, 0.07);
-    @include mobile { padding: 16px 20px 14px; }
+    gap: 10px;
+  }
+
+  &__icon {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba($blue, 0.18);
+    border: 1px solid rgba($blue, 0.28);
+    @include flex-center;
+    color: rgba($blue, 0.90);
   }
 
   &__title {
     font-family: $font-heading;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
-    color: var(--text);
+    color: rgba(255,255,255,0.92);
     margin: 0;
-    letter-spacing: 0.5px;
-    @include mobile { font-size: 17px; }
-  }
-
-  &__close {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: var(--hover-surface);
-    border: none;
-    cursor: pointer;
-    @include flex-center;
-    color: var(--text-tertiary);
-    transition: all 0.15s ease;
-    &:hover { background: var(--hover-surface-md); color: var(--text); }
-  }
-
-  &__body {
-    padding: 24px;
-    display: flex;
-    gap: 32px;
-    align-items: flex-start;
-    @include mobile { flex-direction: column; padding: 20px; gap: 20px; }
-  }
-
-  &__fields {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    min-width: 0;
-  }
-
-  &__footer {
-    padding: 16px 24px 20px;
-    display: flex;
-    gap: $space-3;
-    justify-content: flex-end;
-    border-top: 1px solid rgba($blue, 0.07);
-    @include mobile { padding: 14px 20px 18px; }
+    letter-spacing: 0.3px;
   }
 }
 
-// ─── Edit avatar ──────────────────────────────────────────────────────────────
-.edit-avatar-wrap {
-  display: flex;
-  align-items: center;
-  gap: $space-4;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba($blue, 0.07);
-}
-
-.edit-avatar {
-  width: 72px; height: 72px;
+.lg-close {
+  width: 32px; height: 32px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba($blue, 0.12);
-  flex-shrink: 0;
-}
-
-.edit-avatar-btn {
-  height: 36px;
-  padding: 0 18px;
-  border-radius: $radius-pill;
-  border: 1.5px solid rgba($blue, 0.18);
-  background: transparent;
-  color: $blue;
-  font-size: 12px;
-  font-weight: 700;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  @include flex-center;
+  color: rgba(255,255,255,0.50);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
   transition: all 0.15s ease;
-  &:hover { background: rgba($blue, 0.05); }
+  position: relative; z-index: 1;
+  &:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); }
 }
 
-// ─── Edit field ───────────────────────────────────────────────────────────────
-.edit-field {
+// Avatar section
+.lg-avatar-section {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
-  &__label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    letter-spacing: 0.04em;
-  }
-
-  &__req { color: $accent-pink; }
-
-  &__input {
-    background: var(--bg-input);
-    border: 1.5px solid var(--border);
-    border-radius: $radius-lg;
-    padding: 11px 14px;
-    font-size: $text-base;
-    font-family: $font-body;
-    color: var(--text);
-    width: 100%;
-    box-sizing: border-box;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    @include mobile { font-size: 16px; } // evita zoom iOS
-
-    &::placeholder { color: var(--text-dim); }
-
-    &:focus {
-      outline: none;
-      border-color: $blue;
-      box-shadow: 0 0 0 3px rgba($blue, 0.08);
-    }
-  }
-
-  &__textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
 }
 
-// ─── Edit inline buttons ──────────────────────────────────────────────────────
-.edit-inline-btn {
+.lg-avatar-ring {
+  position: relative;
+  width: 88px; height: 88px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: $aurora-gradient;
+    background-size: 200% 200%;
+    animation: aurora 4s linear infinite;
+    z-index: -1;
+  }
+}
+
+.lg-avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid rgba(0,0,0,0.3);
+}
+
+.lg-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.48);
+  @include flex-center;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  .lg-avatar-ring:hover & { opacity: 1; }
+}
+
+.lg-avatar-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+}
+
+// Fields
+.lg-fields {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    svg { opacity: 0.6; }
+  }
+}
+
+.lg-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: $font-body;
+  color: rgba(255,255,255,0.90);
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  @include mobile { font-size: 16px; }
+
+  &::placeholder { color: rgba(255,255,255,0.22); }
+
+  &:focus {
+    outline: none;
+    border-color: rgba($blue, 0.55);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 3px rgba($blue, 0.14), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+}
+
+.lg-textarea {
+  resize: none;
+  min-height: 84px;
+  line-height: 1.6;
+}
+
+// Footer buttons
+.lg-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  @include mobile { gap: 8px; }
+}
+
+.lg-btn {
   height: 42px;
   padding: 0 22px;
   border-radius: $radius-pill;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  @include mobile { flex: 1; justify-content: center; height: 48px; }
+  @include mobile { flex: 1; justify-content: center; height: 46px; }
 
   &--ghost {
-    background: transparent;
-    border: 1.5px solid var(--border);
-    color: var(--text-secondary);
-    &:hover { border-color: rgba($blue, 0.30); color: $blue; }
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.60);
+    backdrop-filter: blur(8px);
+    &:hover { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.85); }
   }
 
   &--primary {
-    background: $blue;
-    border: none;
+    background: linear-gradient(135deg, $blue 0%, lighten($blue, 8%) 100%);
+    border: 1px solid rgba(255,255,255,0.15);
     color: #fff;
-    box-shadow: 0 3px 12px rgba($blue, 0.28);
-    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 18px rgba($blue, 0.40); }
-    &:disabled { opacity: 0.45; cursor: not-allowed; }
+    box-shadow: 0 4px 18px rgba($blue, 0.40), inset 0 1px 0 rgba(255,255,255,0.18);
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba($blue, 0.55), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    &:disabled { opacity: 0.40; cursor: not-allowed; transform: none; }
   }
 }
 
-.edit-spinner {
+.lg-spinner {
   display: inline-block;
   width: 13px; height: 13px;
-  border: 2px solid rgba(255,255,255,0.25);
+  border: 2px solid rgba(255,255,255,0.20);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin .6s linear infinite;

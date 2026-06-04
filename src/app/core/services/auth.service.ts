@@ -51,16 +51,24 @@ export class AuthService {
 
       if (event === 'INITIAL_SESSION') {
         if (session?.user) {
-          this._fetchProfile(session.user.id).then(() => this._resolveOnce());
+          const providerAvatar =
+            session.user.user_metadata?.['avatar_url'] ||
+            session.user.user_metadata?.['picture'] ||
+            null;
+          this._fetchProfile(session.user.id, providerAvatar).then(() => this._resolveOnce());
         } else {
           this._resolveOnce();
         }
         return;
       }
 
-      // SIGNED_IN / TOKEN_REFRESHED — load profile in background, don't block
+      // SIGNED_IN / TOKEN_REFRESHED — load profile and sync avatar from provider
       if (session?.user) {
-        this._fetchProfile(session.user.id);
+        const providerAvatar =
+          session.user.user_metadata?.['avatar_url'] ||
+          session.user.user_metadata?.['picture'] ||
+          null;
+        this._fetchProfile(session.user.id, providerAvatar);
       }
     });
   }
@@ -72,16 +80,35 @@ export class AuthService {
     }
   }
 
-  private async _fetchProfile(userId: string): Promise<Profile | null> {
+  private async _fetchProfile(userId: string, providerAvatar?: string | null): Promise<Profile | null> {
     this._log('[Auth] _fetchProfile start', userId);
     const timeout = new Promise<null>(r => setTimeout(() => r(null), 5000));
-    const query = supabase.from('profiles').select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at').eq('id', userId).single()
+    const query = supabase
+      .from('profiles')
+      .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
+      .eq('id', userId)
+      .single()
       .then(({ data, error }) => {
         this._log('[Auth] _fetchProfile done', data?.name ?? null, error?.code ?? 'ok');
         return data as Profile | null;
       });
     const result = await Promise.race([query, timeout]);
-    if (result) this.currentUser.set(result);
+    if (!result) return null;
+
+    // Si el perfil no tiene avatar pero el provider (Google) sí, sincronizarlo
+    if (providerAvatar && !result.avatar_url) {
+      const { data: updated } = await supabase
+        .from('profiles')
+        .update({ avatar_url: providerAvatar })
+        .eq('id', userId)
+        .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
+        .single();
+      const profile = (updated ?? result) as Profile;
+      this.currentUser.set(profile);
+      return profile;
+    }
+
+    this.currentUser.set(result);
     return result;
   }
 

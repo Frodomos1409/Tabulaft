@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectCardComponent } from '../../shared/components/project-card/project-card.component';
@@ -11,7 +11,7 @@ import { ToastService } from '../../core/services/toast.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProjectCardComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ProjectCardComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

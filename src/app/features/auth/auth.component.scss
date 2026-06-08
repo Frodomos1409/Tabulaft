@@ -1,10 +1,48 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// KEYFRAMES
+// ═══════════════════════════════════════════════════════════════════════════
+
+@keyframes authSlideRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes authSlideLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes authFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoGlow {
+  from { filter: drop-shadow(0 0 10px rgba(40, 48, 235, 0.45)) brightness(1.05); }
+  to   { filter: drop-shadow(0 0 22px rgba(40, 48, 235, 0.70)) brightness(1.12); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYOUT
+// ═══════════════════════════════════════════════════════════════════════════
+
 .auth {
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 100vh;
+  overflow: hidden;
 
   @include mobile { grid-template-columns: 1fr; }
 
@@ -16,20 +54,28 @@
     flex-direction: column;
     overflow-y: auto;
     @include custom-scrollbar;
+
+    @include mobile {
+      padding: $space-6 $space-4;
+      min-height: 100dvh;
+    }
   }
 
-  &__confirm-box {
-    display: flex;
-    flex-direction: column;
+  // ─── Mobile logo ──────────────────────────────────────────────────────
+  &__mobile-brand {
+    display: none;
+    justify-content: center;
     align-items: center;
-    text-align: center;
-    gap: $space-4;
-    padding: $space-8 $space-4;
+    margin-bottom: $space-6;
+    animation: authFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    svg { opacity: 0.9; }
-    h3 { font-family: $font-heading; font-size: $text-2xl; font-weight: 700; color: var(--text); }
-    p { font-size: $text-md; color: var(--text-secondary); line-height: 1.6; }
-    strong { color: var(--text); }
+    @include mobile { display: flex; }
+
+    img {
+      height: 40px;
+      width: auto;
+      filter: drop-shadow(0 0 10px rgba($violet, 0.3));
+    }
   }
 
   &__back {
@@ -42,22 +88,132 @@
     text-decoration: none;
     transition: color $transition-fast;
     margin-bottom: $space-8;
+    animation: authFadeIn 0.4s ease both;
+
+    &:hover { color: var(--text); }
+
+    @include mobile { margin-bottom: $space-4; }
+  }
+
+  &__back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-secondary);
+    font-size: $text-sm;
+    font-weight: 500;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: $space-6;
+    transition: color $transition-fast;
     &:hover { color: var(--text); }
   }
 
   &__form-inner {
-    max-width: 400px;
+    max-width: 420px;
     width: 100%;
     margin: auto;
+
+    @include mobile {
+      max-width: 100%;
+      margin: 0 auto;
+    }
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // VIEW — contenedor que anima en cada transición de estado
+  // ═══════════════════════════════════════════════════════════════════════
+  &__view {
+    animation: var(--anim-dir, authSlideRight) 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    // Stagger en los hijos directos (título, subtítulo, toggle, form, etc.)
+    > .auth__toggle      { animation-delay: 0ms; }
+    > .auth__title       { animation-delay: 40ms; }
+    > .auth__subtitle    { animation-delay: 70ms; }
+    > .auth__fields      { animation-delay: 100ms; }
+    > .auth__forgot      { animation-delay: 120ms; }
+    > .auth__divider     { animation-delay: 140ms; }
+    > .auth__socials     { animation-delay: 160ms; }
+    > .auth__switch      { animation-delay: 180ms; }
+    > .auth__confirm-box { animation-delay: 0ms; }
+    > .auth__forgot-icon { animation-delay: 0ms; }
+    > .auth__update-pass-icon { animation-delay: 0ms; }
+  }
+
+  // Stagger para los campos del formulario (via :nth-child)
+  &__fields > &__field:nth-child(1) { animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 120ms both; }
+  &__fields > &__field:nth-child(2) { animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 155ms both; }
+  &__fields > &__field:nth-child(3) { animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 190ms both; }
+  &__fields > &__field:nth-child(4) { animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 225ms both; }
+  &__fields > &__field:nth-child(5) { animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 260ms both; }
+
+  // Barra de fortaleza y criterios
+  &__strength { animation: authFadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  &__criteria { animation: authFadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) 40ms both; }
+
+  // Error message
+  &__error { animation: authFadeUp 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  // ─── Confirmation / info boxes ────────────────────────────────────────
+  &__confirm-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: $space-4;
+    padding: $space-8 $space-4;
+
+    h3 { font-family: $font-heading; font-size: $text-2xl; font-weight: 700; color: var(--text); }
+    p  { font-size: $text-md; color: var(--text-secondary); line-height: 1.6; }
+    strong { color: var(--text); }
+  }
+
+  &__confirm-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba($violet, 0.1);
+    border: 1px solid rgba($violet, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $violet;
+    animation: authFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    &--violet { background: rgba($violet, 0.1); border-color: rgba($violet, 0.2); color: $violet; }
+  }
+
+  &__confirm-btn {
+    margin-top: $space-2;
+    width: 100%;
+    justify-content: center;
+  }
+
+  // ─── Forgot/Update password icons ─────────────────────────────────────
+  &__forgot-icon,
+  &__update-pass-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba($violet, 0.1);
+    border: 1px solid rgba($violet, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $violet;
+    margin-bottom: $space-4;
+  }
+
+  // ─── Toggle login/register ────────────────────────────────────────────
   &__toggle {
     display: flex;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: $radius-xl;
     padding: 4px;
-    margin-bottom: $space-8;
+    margin-bottom: $space-6;
 
     button {
       flex: 1;
@@ -70,12 +226,15 @@
       cursor: pointer;
       border: none;
       background: transparent;
+      min-height: 40px;
 
       &.active {
         background: $gradient-primary;
         color: white;
         box-shadow: 0 4px 12px rgba($violet, 0.35);
       }
+
+      @include small { font-size: $text-xs; padding: $space-2; }
     }
   }
 
@@ -86,15 +245,19 @@
     letter-spacing: -0.03em;
     color: var(--text);
     margin-bottom: $space-2;
+
+    @include mobile { font-size: $text-2xl; }
+    @include small  { font-size: $text-xl; }
   }
 
   &__subtitle {
     font-size: $text-sm;
     color: var(--text-secondary);
-    margin-bottom: $space-8;
+    margin-bottom: $space-6;
     line-height: 1.5;
   }
 
+  // ─── Form fields ──────────────────────────────────────────────────────
   &__fields {
     display: flex;
     flex-direction: column;
@@ -119,8 +282,9 @@
       border-radius: $radius-lg;
       color: var(--text);
       font-size: $text-base;
-      transition: border-color $transition-fast;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
       outline: none;
+      width: 100%;
 
       &::placeholder { color: var(--text-tertiary); }
 
@@ -131,19 +295,462 @@
     }
   }
 
+  &__input--invalid {
+    border-color: $error !important;
+    &:focus { box-shadow: 0 0 0 3px rgba($error, 0.12) !important; }
+  }
+
+  &__field-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input { padding-right: 44px; }
+  }
+
+  &__toggle-pass {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-sm;
+    transition: color $transition-fast;
+    flex-shrink: 0;
+
+    &:hover { color: var(--text); }
+  }
+
+  &__field-error {
+    font-size: $text-xs;
+    color: $error;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: -$space-1;
+  }
+
+  &__error {
+    font-size: $text-sm;
+    color: $error;
+    background: rgba($error, 0.08);
+    border: 1px solid rgba($error, 0.2);
+    border-radius: $radius-md;
+    padding: $space-3 $space-4;
+  }
+
+  // ─── Password strength ────────────────────────────────────────────────
+  &__strength {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-top: $space-1;
+
+    &.weak  .auth__strength-bar.active { background: #ef4444; }
+    &.fair  .auth__strength-bar.active { background: #f97316; }
+    &.good  .auth__strength-bar.active { background: #eab308; }
+    &.strong .auth__strength-bar.active { background: #22c55e; }
+
+    &.weak  .auth__strength-label { color: #ef4444; }
+    &.fair  .auth__strength-label { color: #f97316; }
+    &.good  .auth__strength-label { color: #eab308; }
+    &.strong .auth__strength-label { color: #22c55e; }
+  }
+
+  &__strength-bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  &__strength-bar {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s ease;
+  }
+
+  &__strength-label {
+    font-size: $text-xs;
+    font-weight: 600;
+    min-width: 44px;
+    text-align: right;
+    transition: color 0.3s ease;
+    color: var(--text-tertiary);
+  }
+
+  // ─── Password criteria pills ──────────────────────────────────────────
+  &__criteria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: $space-2;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: $text-xs;
+      color: var(--text-tertiary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: $radius-pill;
+      padding: 2px 8px;
+      transition: color $transition-base, background $transition-base, border-color $transition-base;
+
+      svg { opacity: 0.3; transition: opacity $transition-base; }
+
+      &.met {
+        color: #22c55e;
+        border-color: rgba(#22c55e, 0.3);
+        background: rgba(#22c55e, 0.08);
+        svg { opacity: 1; stroke: #22c55e; }
+      }
+    }
+  }
+
+  // ─── Login tabs (password / magic link) ──────────────────────────────
+  &__login-tabs {
+    display: flex;
+    gap: $space-1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    padding: 3px;
+    margin-bottom: $space-5;
+
+    button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $space-2;
+      padding: $space-2 $space-3;
+      border-radius: $radius-md;
+      font-size: $text-xs;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all $transition-base;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+
+      &.active {
+        background: rgba($violet, 0.12);
+        color: $violet;
+        border: 1px solid rgba($violet, 0.25);
+      }
+    }
+  }
+
+  // ─── Login footer (keep session + forgot) ────────────────────────────
+  &__login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    margin-top: -$space-2;
+    flex-wrap: wrap;
+  }
+
+  // ─── Keep session checkbox ────────────────────────────────────────────
+  &__keep-session {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    cursor: pointer;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    user-select: none;
+
+    input[type="checkbox"] { display: none; }
+
+    &-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-input);
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color $transition-fast, background $transition-fast;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 2px;
+        background: $gradient-primary;
+        opacity: 0;
+        transition: opacity $transition-fast;
+      }
+    }
+
+    input:checked + &-box {
+      border-color: $violet;
+      &::after { opacity: 1; }
+    }
+  }
+
+  // ─── Magic link hint ──────────────────────────────────────────────────
+  &__magic-hint {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+    margin-top: -$space-2;
+    padding: $space-3;
+    background: rgba($violet, 0.05);
+    border: 1px dashed rgba($violet, 0.2);
+    border-radius: $radius-md;
+  }
+
+  // ─── Avatar upload ────────────────────────────────────────────────────
+  &__avatar-upload {
+    display: flex;
+    justify-content: center;
+    margin-bottom: $space-5;
+  }
+
+  &__avatar-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-1;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px dashed var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all $transition-fast;
+    color: var(--text-tertiary);
+    font-size: $text-xs;
+    font-weight: 500;
+
+    span { text-align: center; line-height: 1.2; }
+
+    &:hover {
+      border-color: $violet;
+      color: $violet;
+      background: rgba($violet, 0.05);
+    }
+  }
+
+  &__avatar-hint {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-weight: 400 !important;
+  }
+
+  &__avatar-preview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid $violet;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__avatar-remove {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: $error;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: transform $transition-fast;
+
+    &:hover { transform: scale(1.1); }
+  }
+
+  // ─── Username field ───────────────────────────────────────────────────
+  &__username-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+      padding-left: 32px;
+      padding-right: 36px;
+    }
+
+    &.auth__input--taken input { border-color: $error !important; }
+    &.auth__input--available input { border-color: #22c55e !important; }
+  }
+
+  &__username-prefix {
+    position: absolute;
+    left: 12px;
+    font-size: $text-sm;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 1;
+    line-height: 1;
+  }
+
+  &__username-status {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.checking { color: var(--text-tertiary); }
+    &.available { color: #22c55e; }
+    &.taken     { color: $error; }
+    &.invalid   { display: none; }
+  }
+
+  &__field-available {
+    font-size: $text-xs;
+    color: #22c55e;
+    margin-top: -$space-1;
+  }
+
+  &__field-optional {
+    font-weight: 400;
+    color: var(--text-tertiary);
+    font-size: $text-xs;
+    margin-left: $space-2;
+  }
+
+  // ─── Terms row ────────────────────────────────────────────────────────
+  &__terms-row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    cursor: pointer;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    user-select: none;
+    margin-top: -$space-2;
+
+    input[type="checkbox"] { display: none; }
+
+    span:last-child {
+      line-height: 1.4;
+    }
+  }
+
+  &__terms-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-input);
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color $transition-fast, background $transition-fast;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 2px;
+      background: $gradient-primary;
+      opacity: 0;
+      transition: opacity $transition-fast;
+    }
+  }
+
+  &__terms-row input[type="checkbox"]:checked + &__terms-box {
+    border-color: $violet;
+    &::after { opacity: 1; }
+  }
+
+  &__terms-link {
+    color: $violet-light;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    transition: color $transition-fast;
+    &:hover { color: $violet; text-decoration: underline; }
+  }
+
+  // ─── Resend button ────────────────────────────────────────────────────
+  &__resend-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: -$space-2 0 0;
+  }
+
+  &__resend-btn {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $violet-light;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $space-2 $space-4;
+    border-radius: $radius-md;
+    transition: all $transition-fast;
+
+    &:disabled {
+      color: var(--text-tertiary);
+      cursor: default;
+    }
+
+    &:not(:disabled):hover {
+      color: $violet;
+      background: rgba($violet, 0.08);
+    }
+  }
+
+  // ─── Forgot link ──────────────────────────────────────────────────────
   &__forgot {
     font-size: $text-sm;
     color: $violet-light;
-    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
     text-align: right;
-    margin-top: -$space-2;
-    &:hover { text-decoration: underline; }
+    transition: color $transition-fast;
+    &:hover { color: $violet; text-decoration: underline; }
   }
 
+  // ─── Submit button ────────────────────────────────────────────────────
+  &__submit-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    min-height: 48px;
+  }
+
+  // ─── Divider ──────────────────────────────────────────────────────────
   &__divider {
     position: relative;
     text-align: center;
-    margin: $space-6 0;
+    margin: $space-5 0;
 
     &::before {
       content: '';
@@ -166,11 +773,12 @@
     }
   }
 
+  // ─── Social button ────────────────────────────────────────────────────
   &__socials {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: $space-3;
-    margin-bottom: $space-6;
+    margin-bottom: $space-5;
   }
 
   &__social-btn {
@@ -193,6 +801,7 @@
     text-align: center;
     font-size: $text-sm;
     color: var(--text-secondary);
+    margin-bottom: $space-4;
 
     button {
       color: $violet-light;
@@ -206,7 +815,9 @@
     }
   }
 
-  // ─── Visual Side ──────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════
+  // VISUAL SIDE (desktop only)
+  // ═══════════════════════════════════════════════════════════════════════
   &__visual {
     position: relative;
     background: linear-gradient(135deg, #1a0630, #0d0a2e, #0A0A0F);
@@ -240,20 +851,16 @@
     opacity: 0.18;
 
     &--1 {
-      width: 300px;
-      height: 300px;
+      width: 300px; height: 300px;
       background: $violet;
-      top: -60px;
-      right: -40px;
+      top: -60px; right: -40px;
       animation: float 7s ease-in-out infinite;
     }
 
     &--2 {
-      width: 200px;
-      height: 200px;
+      width: 200px; height: 200px;
       background: $hot-pink;
-      bottom: -40px;
-      left: -20px;
+      bottom: -40px; left: -20px;
       animation: float 9s ease-in-out infinite reverse;
     }
   }
@@ -264,16 +871,6 @@
     z-index: 1;
   }
 
-  &__visual-logo {
-    font-family: $font-heading;
-    font-size: 48px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: white;
-    margin-bottom: $space-3;
-    span { color: $hot-pink; }
-  }
-
   &__visual-logo-svg {
     height: 80px;
     width: auto;
@@ -281,7 +878,6 @@
     display: block;
     margin: 0 auto $space-4;
     overflow: visible;
-    filter: drop-shadow(0 0 16px rgba(40, 48, 235, 0.55)) brightness(1.08);
     animation: logoGlow 4s ease-in-out infinite alternate;
   }
 
@@ -311,11 +907,7 @@
     position: relative;
     transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.5s ease;
 
-    &.fade-out {
-      opacity: 0;
-      transform: scale(0.94);
-    }
-
+    &.fade-out { opacity: 0; transform: scale(0.94); }
     &.fade-in {
       animation: cardFadeIn 0.55s ease forwards;
       animation-delay: var(--delay, 0s);
@@ -335,10 +927,7 @@
       display: block;
       transition: transform 0.6s ease;
     }
-
-    &:hover img {
-      transform: scale(1.08);
-    }
+    &:hover img { transform: scale(1.08); }
 
     &-shine {
       position: absolute;
@@ -353,25 +942,173 @@
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.05);
 
-    &--1 {
-      width: 300px;
-      height: 300px;
-      bottom: -100px;
-      right: -100px;
-      animation: rotateSlow 20s linear infinite;
-    }
+    &--1 { width: 300px; height: 300px; bottom: -100px; right: -100px; animation: rotateSlow 20s linear infinite; }
+    &--2 { width: 180px; height: 180px; top: -60px; left: -60px; animation: rotateSlow 15s linear infinite reverse; }
+  }
+}
 
-    &--2 {
-      width: 180px;
-      height: 180px;
-      top: -60px;
-      left: -60px;
-      animation: rotateSlow 15s linear infinite reverse;
+// ═══════════════════════════════════════════════════════════════════════════
+// SPINNER
+// ═══════════════════════════════════════════════════════════════════════════
+.auth__spinner {
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.auth__spinner--sm {
+  animation: spin 0.8s linear infinite;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// USERNAME INPUT STATES
+// ═══════════════════════════════════════════════════════════════════════════
+.auth__input--taken  { border-color: #f87171 !important; }
+.auth__input--available { border-color: #22c55e !important; }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TÉRMINOS MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+.auth__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: authFadeIn 0.2s ease both;
+}
+
+.auth__modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: authFadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+
+    h2 {
+      font-family: $font-heading;
+      font-size: $text-xl;
+      font-weight: 700;
+      color: var(--text);
+    }
+  }
+
+  &-close {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-lg;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all $transition-fast;
+    flex-shrink: 0;
+
+    &:hover { background: var(--bg-hover); color: var(--text); border-color: var(--border-hover); }
+  }
+
+  &-date {
+    font-size: $text-xs;
+    color: var(--text-tertiary);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  &-body {
+    overflow-y: auto;
+    padding: 24px;
+    flex: 1;
+    @include custom-scrollbar;
+
+    section {
+      margin-bottom: 24px;
+
+      &:last-child { margin-bottom: 0; }
+
+      h3 {
+        font-size: $text-base;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: $text-sm;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 8px;
+
+        &:last-child { margin-bottom: 0; }
+      }
+
+      ul {
+        margin: 8px 0 8px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        li {
+          font-size: $text-sm;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          list-style: disc;
+        }
+      }
+
+      strong { color: var(--text); }
+    }
+  }
+
+  &-footer {
+    display: flex;
+    gap: $space-3;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    justify-content: flex-end;
+
+    .btn {
+      min-height: 40px;
+      padding: 8px 20px;
     }
   }
 }
 
-@keyframes logoGlow {
-  from { filter: drop-shadow(0 0 10px rgba(40, 48, 235, 0.45)) brightness(1.05); }
-  to   { filter: drop-shadow(0 0 22px rgba(40, 48, 235, 0.70)) brightness(1.12); }
+// ═══════════════════════════════════════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .auth__view,
+  .auth__title,
+  .auth__subtitle,
+  .auth__field,
+  .auth__strength,
+  .auth__criteria,
+  .auth__error,
+  .auth__confirm-icon,
+  .auth__mobile-brand,
+  .auth__modal,
+  .auth__modal-overlay {
+    animation: none !important;
+  }
 }

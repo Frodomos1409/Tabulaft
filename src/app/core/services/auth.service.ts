@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 export interface Profile {
   id: string;
   name: string;
+  username: string | null;
   avatar_url: string | null;
   role: string;
   bio: string;
@@ -26,9 +27,10 @@ export class AuthService {
     if (!environment.production) console.log(...args);
   }
 
-  currentUser = signal<Profile | null>(null);
-  isLoggedIn  = computed(() => !!this.currentUser());
-  isAdmin     = computed(() => this.currentUser()?.is_admin === true);
+  currentUser        = signal<Profile | null>(null);
+  isLoggedIn         = computed(() => !!this.currentUser());
+  isAdmin            = computed(() => this.currentUser()?.is_admin === true);
+  isPasswordRecovery = signal(false);
 
   // Resolves once we know the initial auth state (has session or not)
   sessionReady: Promise<void>;
@@ -45,6 +47,12 @@ export class AuthService {
 
       if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
+        this._resolveOnce();
+        return;
+      }
+
+      if (event === 'PASSWORD_RECOVERY') {
+        this.isPasswordRecovery.set(true);
         this._resolveOnce();
         return;
       }
@@ -85,7 +93,7 @@ export class AuthService {
     const timeout = new Promise<null>(r => setTimeout(() => r(null), 5000));
     const query = supabase
       .from('profiles')
-      .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
+      .select('id, name, username, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
       .eq('id', userId)
       .single()
       .then(({ data, error }) => {
@@ -101,7 +109,7 @@ export class AuthService {
         .from('profiles')
         .update({ avatar_url: providerAvatar })
         .eq('id', userId)
-        .select('id, name, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
+        .select('id, name, username, avatar_url, role, bio, is_admin, banned, followers, following, created_at')
         .single();
       const profile = (updated ?? result) as Profile;
       this.currentUser.set(profile);
@@ -147,7 +155,7 @@ export class AuthService {
     throw new Error('Perfil no encontrado. Intenta de nuevo.');
   }
 
-  async signUp(email: string, password: string, name: string): Promise<{ needsConfirmation: boolean }> {
+  async signUp(email: string, password: string, name: string, username?: string, avatarFile?: File): Promise<{ needsConfirmation: boolean }> {
     const { data, error } = await supabase.auth.signUp({
       email, password,
       options: { data: { name } }
@@ -156,10 +164,72 @@ export class AuthService {
     if (data.user && !data.session) return { needsConfirmation: true };
     if (data.user) {
       await new Promise(r => setTimeout(r, 800));
+
+      const updates: Record<string, string> = {};
+      if (username) updates['username'] = username.toLowerCase();
+
+      if (avatarFile) {
+        const safeName = avatarFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${data.user.id}/${Date.now()}-${safeName}`;
+        const { error: upErr } = await supabase.storage.from('avatars').upload(path, avatarFile);
+        if (!upErr) {
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+          updates['avatar_url'] = urlData.publicUrl;
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await supabase.from('profiles').update(updates).eq('id', data.user.id);
+      }
+
       await this._fetchProfile(data.user.id);
       this.toast.show('Cuenta creada', 'success', '🎉');
     }
     return { needsConfirmation: false };
+  }
+
+  async resendConfirmation(email: string): Promise<void> {
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    if (error) throw error;
+  }
+
+  async signInWithMagicLink(email: string): Promise<void> {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${environment.appUrl}/auth/callback` }
+    });
+    if (error) throw error;
+  }
+
+  async checkUsernameAvailable(username: string): Promise<boolean> {
+    const { count } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('username', username.toLowerCase());
+    return (count ?? 0) === 0;
+  }
+
+  registerSessionOnlyUnload(): void {
+    window.addEventListener('unload', () => {
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith('sb-') && key.includes('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      }
+    });
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${environment.appUrl}/auth/callback`
+    });
+    if (error) throw error;
+  }
+
+  async updatePassword(newPassword: string): Promise<void> {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    this.isPasswordRecovery.set(false);
   }
 
   async signOut(): Promise<void> {

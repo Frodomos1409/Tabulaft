@@ -33,6 +33,11 @@ export class AuthCallbackComponent implements OnInit {
   async ngOnInit() {
     await this.auth.sessionReady;
 
+    if (this.auth.isPasswordRecovery()) {
+      this.router.navigate(['/auth'], { queryParams: { mode: 'update-password' } });
+      return;
+    }
+
     if (this.auth.isLoggedIn()) {
       this.router.navigate([this.auth.isAdmin() ? '/admin' : '/explorar']);
     } else {

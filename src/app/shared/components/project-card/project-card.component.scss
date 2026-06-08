@@ -57,12 +57,10 @@
   &__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.1) 50%,
-      transparent 100%
-    );
+    // Dual scrim: oscuro arriba (botones) Y abajo (categoría)
+    background:
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.68) 0%, transparent 38%),
+      linear-gradient(to top,    rgba(0, 0, 0, 0.72) 0%, transparent 42%);
     opacity: 0;
     transition: opacity $transition-base;
     display: flex;
@@ -82,26 +80,37 @@
     gap: 5px;
     padding: $space-2 $space-3;
     border-radius: $radius-pill;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(8px);
+    // Dark glass — siempre visible sin importar el color de la imagen
+    background: rgba(0, 0, 0, 0.52);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.92);
     font-size: $text-xs;
     font-weight: 600;
     cursor: pointer;
     transition: all $transition-fast;
 
-    &:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+    &:hover {
+      background: rgba(0, 0, 0, 0.68);
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: scale(1.06);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    }
 
     &.active {
-      background: rgba($hot-pink, 0.8);
+      background: $hot-pink;
       border-color: transparent;
       color: white;
+      box-shadow: 0 3px 12px rgba($hot-pink, 0.5);
     }
 
     &.active-save {
-      background: rgba($violet, 0.8);
+      background: $violet;
       border-color: transparent;
+      color: white;
+      box-shadow: 0 3px 12px rgba($violet, 0.5);
     }
   }
 

@@ -2,82 +2,433 @@
 
   <!-- Left: Form -->
   <div class="auth__form-side">
-    <a routerLink="/" class="auth__back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-      </svg>
-      Volver al inicio
-    </a>
+    @if (!isUpdatePassword()) {
+      <a routerLink="/" class="auth__back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Volver al inicio
+      </a>
+    }
 
-    <div class="auth__form-inner">
+    <!-- Logo visible solo en mobile -->
+    <div class="auth__mobile-brand">
+      <img src="/Recurso 2.svg" alt="Tabulaft" />
+    </div>
 
+    <!-- Aplica --anim-dir para dirección del slide login↔registro -->
+    <div class="auth__form-inner" [style.--anim-dir]="animDir() === 'right' ? 'authSlideRight' : 'authSlideLeft'">
+
+      <!-- ── 1. Confirmación de email ─────────────────────────────── -->
       @if (confirmationSent()) {
-        <div class="auth__confirm-box">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#E91E8C" stroke-width="1.5">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.55 5.55l.97-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-          </svg>
-          <h3>Revisa tu correo</h3>
-          <p>Te enviamos un enlace de confirmación a <strong>{{ email }}</strong>. Ábrelo para activar tu cuenta.</p>
-          <button class="btn btn--outline" style="margin-top:1rem;width:100%;justify-content:center" (click)="confirmationSent.set(false); isLogin.set(true)">
-            Volver al inicio de sesión
-          </button>
-        </div>
-      } @else {
-
-      <!-- Toggle -->
-      <div class="auth__toggle">
-        <button [class.active]="isLogin()" (click)="isLogin.set(true)">Iniciar sesión</button>
-        <button [class.active]="!isLogin()" (click)="isLogin.set(false)">Registrarse</button>
-      </div>
-
-      <h2 class="auth__title">
-        {{ isLogin() ? 'Bienvenido de vuelta' : 'Únete a Tabulaft' }}
-      </h2>
-      <p class="auth__subtitle">
-        {{ isLogin() ? 'Accede a tu cuenta para explorar y publicar' : 'Comparte tu trabajo con la comunidad UNIVALLE' }}
-      </p>
-
-      <form class="auth__fields" (ngSubmit)="onSubmit()">
-        @if (!isLogin()) {
-          <div class="auth__field">
-            <label>Nombre completo</label>
-            <input type="text" placeholder="Tu nombre" [(ngModel)]="name" name="name" />
+        <div class="auth__view">
+          <div class="auth__confirm-box">
+            <div class="auth__confirm-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <h3>Revisa tu correo</h3>
+            <p>Te enviamos un enlace de confirmación a <strong>{{ email }}</strong>. Ábrelo para activar tu cuenta.</p>
+            <div class="auth__resend-row">
+              <button class="auth__resend-btn" (click)="onResendConfirmation()" [disabled]="resendCooldown() > 0 || isLoading()">
+                @if (resendCooldown() > 0) { Reenviar en {{ resendCooldown() }}s }
+                @else if (isLoading()) { Enviando... }
+                @else { Reenviar correo }
+              </button>
+            </div>
+            <button class="btn btn--outline auth__confirm-btn" (click)="confirmationSent.set(false); isLogin.set(true)">
+              Volver al inicio de sesión
+            </button>
           </div>
-        }
-        <div class="auth__field">
-          <label>Correo electrónico</label>
-          <input type="email" placeholder="correo@univalle.edu.co" [(ngModel)]="email" name="email" required />
         </div>
-        <div class="auth__field">
-          <label>Contraseña</label>
-          <input type="password" placeholder="••••••••" [(ngModel)]="password" name="password" required />
+
+      <!-- ── 2. Reset email enviado ──────────────────────────────── -->
+      } @else if (resetSent()) {
+        <div class="auth__view">
+          <div class="auth__confirm-box">
+            <div class="auth__confirm-icon auth__confirm-icon--violet">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h3>Correo enviado</h3>
+            <p>Enviamos un enlace para restablecer tu contraseña a <strong>{{ resetEmail }}</strong>. Revisa también la carpeta de spam.</p>
+            <div class="auth__resend-row">
+              <button class="auth__resend-btn" (click)="onResendResetEmail()" [disabled]="resendCooldown() > 0 || isLoading()">
+                @if (resendCooldown() > 0) { Reenviar en {{ resendCooldown() }}s }
+                @else if (isLoading()) { Enviando... }
+                @else { Reenviar enlace }
+              </button>
+            </div>
+            <button class="btn btn--outline auth__confirm-btn" (click)="resetSent.set(false); isForgotPassword.set(false); isLogin.set(true)">
+              Volver al inicio de sesión
+            </button>
+          </div>
         </div>
-        @if (isLogin()) {
-          <a class="auth__forgot" href="#">¿Olvidaste tu contraseña?</a>
-        }
-        @if (errorMsg()) {
-          <p class="auth__error">{{ errorMsg() }}</p>
-        }
-        <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center;padding:14px" [disabled]="isLoading()">
-          @if (isLoading()) { Cargando... } @else { {{ isLogin() ? 'Iniciar sesión' : 'Crear cuenta' }} }
-        </button>
-      </form>
 
-      <div class="auth__divider"><span>o continúa con</span></div>
+      <!-- ── 3. Actualizar contraseña (desde link de reset) ─────── -->
+      } @else if (isUpdatePassword()) {
+        <div class="auth__view" style="padding-top: 48px">
+          <div class="auth__update-pass-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h2 class="auth__title">Nueva contraseña</h2>
+          <p class="auth__subtitle">Elige una contraseña segura para tu cuenta.</p>
 
-      <div class="auth__socials">
-        <button type="button" class="auth__social-btn" (click)="onGoogleSignIn()" [disabled]="isLoading()">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Google
-        </button>
-      </div>
+          <form class="auth__fields" (ngSubmit)="onUpdatePassword()">
+            <div class="auth__field">
+              <label>Nueva contraseña</label>
+              <div class="auth__field-wrap">
+                <input [type]="showNewPassword() ? 'text' : 'password'" placeholder="••••••••" [(ngModel)]="newPassword" name="newPassword" required />
+                <button type="button" class="auth__toggle-pass" (click)="showNewPassword.update(v => !v)">
+                  @if (showNewPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  }
+                </button>
+              </div>
+              @if (newPassword) {
+                <div class="auth__strength" [ngClass]="newPasswordStrengthClass">
+                  <div class="auth__strength-bars">
+                    <div class="auth__strength-bar" [class.active]="newPasswordStrength >= 1"></div>
+                    <div class="auth__strength-bar" [class.active]="newPasswordStrength >= 2"></div>
+                    <div class="auth__strength-bar" [class.active]="newPasswordStrength >= 3"></div>
+                    <div class="auth__strength-bar" [class.active]="newPasswordStrength >= 4"></div>
+                  </div>
+                  <span class="auth__strength-label">{{ newPasswordStrengthLabel }}</span>
+                </div>
+              }
+            </div>
 
-      <p class="auth__switch">
-        {{ isLogin() ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
-        <button (click)="toggle()">{{ isLogin() ? 'Regístrate' : 'Inicia sesión' }}</button>
-      </p>
+            <div class="auth__field">
+              <label>Confirmar contraseña</label>
+              <div class="auth__field-wrap">
+                <input [type]="showConfirmNewPassword() ? 'text' : 'password'" placeholder="••••••••" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" required />
+                <button type="button" class="auth__toggle-pass" (click)="showConfirmNewPassword.update(v => !v)">
+                  @if (showConfirmNewPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  }
+                </button>
+              </div>
+              @if (confirmNewPassword && newPassword !== confirmNewPassword) {
+                <p class="auth__field-error">Las contraseñas no coinciden</p>
+              }
+            </div>
 
-      } <!-- end @else -->
+            @if (errorMsg()) { <p class="auth__error">{{ errorMsg() }}</p> }
+            <button type="submit" class="btn btn--primary auth__submit-btn" [disabled]="isLoading()">
+              @if (isLoading()) { <svg class="auth__spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Guardando... }
+              @else { Guardar nueva contraseña }
+            </button>
+          </form>
+        </div>
+
+      <!-- ── 4. Olvidé mi contraseña ────────────────────────────── -->
+      } @else if (isForgotPassword()) {
+        <div class="auth__view">
+          <button class="auth__back-link" (click)="isForgotPassword.set(false); errorMsg.set('')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Volver
+          </button>
+          <div class="auth__forgot-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h2 class="auth__title">¿Olvidaste tu contraseña?</h2>
+          <p class="auth__subtitle">Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
+
+          <form class="auth__fields" (ngSubmit)="onForgotPassword()">
+            <div class="auth__field">
+              <label>Correo electrónico</label>
+              <input type="email" placeholder="tu@correo.com" [(ngModel)]="resetEmail" name="resetEmail" required />
+            </div>
+            @if (errorMsg()) { <p class="auth__error">{{ errorMsg() }}</p> }
+            <button type="submit" class="btn btn--primary auth__submit-btn" [disabled]="isLoading()">
+              @if (isLoading()) { <svg class="auth__spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Enviando... }
+              @else { Enviar enlace }
+            </button>
+          </form>
+        </div>
+
+      <!-- ── 5. Magic link enviado ──────────────────────────────── -->
+      } @else if (magicLinkSent()) {
+        <div class="auth__view">
+          <div class="auth__confirm-box">
+            <div class="auth__confirm-icon auth__confirm-icon--magic">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+            </div>
+            <h3>Revisa tu correo</h3>
+            <p>Enviamos un enlace mágico a <strong>{{ email }}</strong>. Solo haz clic en él para entrar, sin contraseña.</p>
+            <div class="auth__resend-row">
+              <button class="auth__resend-btn" (click)="onResendMagicLink()" [disabled]="resendCooldown() > 0 || isLoading()">
+                @if (resendCooldown() > 0) { Reenviar en {{ resendCooldown() }}s }
+                @else if (isLoading()) { Enviando... }
+                @else { Reenviar enlace }
+              </button>
+            </div>
+            <button class="btn btn--outline auth__confirm-btn" (click)="magicLinkSent.set(false); loginMode.set('password')">
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </div>
+
+      <!-- ── 6a. Iniciar sesión ──────────────────────────────────── -->
+      } @else if (isLogin()) {
+        <div class="auth__view">
+          <div class="auth__toggle">
+            <button class="active" (click)="switchToLogin()">Iniciar sesión</button>
+            <button (click)="switchToRegister()">Registrarse</button>
+          </div>
+          <h2 class="auth__title">Bienvenido de vuelta</h2>
+          <p class="auth__subtitle">Accede a tu cuenta para explorar y publicar</p>
+
+          <!-- Tabs: contraseña / magic link -->
+          <div class="auth__login-tabs">
+            <button type="button" [class.active]="loginMode() === 'password'" (click)="loginMode.set('password'); errorMsg.set('')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Contraseña
+            </button>
+            <button type="button" [class.active]="loginMode() === 'magic'" (click)="loginMode.set('magic'); errorMsg.set('')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              Link mágico
+            </button>
+          </div>
+
+          @if (loginMode() === 'password') {
+            <form class="auth__fields" (ngSubmit)="onSubmit()">
+              <div class="auth__field">
+                <label>Correo electrónico</label>
+                <input type="email" placeholder="tu@correo.com" [(ngModel)]="email" name="email" required autocomplete="email" (blur)="emailTouched = true"
+                  [class.auth__input--invalid]="emailTouched && email && !emailValid" />
+                @if (emailTouched && email && !emailValid) {
+                  <p class="auth__field-error">Ingresa un correo válido</p>
+                }
+              </div>
+
+              <div class="auth__field">
+                <label>Contraseña</label>
+                <div class="auth__field-wrap">
+                  <input [type]="showPassword() ? 'text' : 'password'" placeholder="••••••••" [(ngModel)]="password" name="password" required autocomplete="current-password" />
+                  <button type="button" class="auth__toggle-pass" (click)="showPassword.update(v => !v)" [attr.aria-label]="showPassword() ? 'Ocultar' : 'Mostrar'">
+                    @if (showPassword()) {
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    } @else {
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    }
+                  </button>
+                </div>
+              </div>
+
+              <div class="auth__login-footer">
+                <label class="auth__keep-session">
+                  <input type="checkbox" [(ngModel)]="keepSession" name="keepSession" />
+                  <span class="auth__keep-session-box"></span>
+                  Mantener sesión iniciada
+                </label>
+                <button type="button" class="auth__forgot" (click)="showForgotPassword()">
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+
+              @if (errorMsg()) { <p class="auth__error">{{ errorMsg() }}</p> }
+              <button type="submit" class="btn btn--primary auth__submit-btn" [disabled]="isLoading()">
+                @if (isLoading()) { <svg class="auth__spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Cargando... }
+                @else { Iniciar sesión }
+              </button>
+            </form>
+          } @else {
+            <form class="auth__fields" (ngSubmit)="onMagicLink()">
+              <div class="auth__field">
+                <label>Correo electrónico</label>
+                <input type="email" placeholder="tu@correo.com" [(ngModel)]="email" name="emailMagic" required autocomplete="email" (blur)="emailTouched = true"
+                  [class.auth__input--invalid]="emailTouched && email && !emailValid" />
+                @if (emailTouched && email && !emailValid) {
+                  <p class="auth__field-error">Ingresa un correo válido</p>
+                }
+              </div>
+              <p class="auth__magic-hint">Te enviaremos un enlace de un solo uso. No necesitas contraseña.</p>
+              @if (errorMsg()) { <p class="auth__error">{{ errorMsg() }}</p> }
+              <button type="submit" class="btn btn--primary auth__submit-btn" [disabled]="isLoading()">
+                @if (isLoading()) { <svg class="auth__spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Enviando... }
+                @else { Enviar enlace mágico }
+              </button>
+            </form>
+          }
+
+          <div class="auth__divider"><span>o continúa con</span></div>
+          <div class="auth__socials">
+            <button type="button" class="auth__social-btn" (click)="onGoogleSignIn()" [disabled]="isLoading()">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Google
+            </button>
+          </div>
+          <p class="auth__switch">
+            ¿No tienes cuenta? <button (click)="switchToRegister()">Regístrate</button>
+          </p>
+        </div>
+
+      <!-- ── 6b. Registrarse ─────────────────────────────────────── -->
+      } @else {
+        <div class="auth__view">
+          <div class="auth__toggle">
+            <button (click)="switchToLogin()">Iniciar sesión</button>
+            <button class="active" (click)="switchToRegister()">Registrarse</button>
+          </div>
+          <h2 class="auth__title">Únete a Tabulaft</h2>
+          <p class="auth__subtitle">Comparte tu trabajo con la comunidad</p>
+
+          <!-- Avatar upload -->
+          <div class="auth__avatar-upload">
+            @if (avatarPreview()) {
+              <div class="auth__avatar-preview">
+                <img [src]="avatarPreview()" alt="Avatar" />
+                <button type="button" class="auth__avatar-remove" (click)="removeAvatar()" aria-label="Eliminar foto">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            } @else {
+              <label class="auth__avatar-zone" for="avatarInput">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Foto de perfil</span>
+                <span class="auth__avatar-hint">Opcional</span>
+              </label>
+              <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" (change)="onAvatarChange($event)" hidden />
+            }
+          </div>
+
+          <form class="auth__fields" (ngSubmit)="onSubmit()">
+            <div class="auth__field">
+              <label>Nombre completo</label>
+              <input type="text" placeholder="Tu nombre" [(ngModel)]="name" name="name" autocomplete="name" />
+            </div>
+
+            <div class="auth__field">
+              <label>
+                Usuario
+                <span class="auth__field-optional">Opcional</span>
+              </label>
+              <div class="auth__username-wrap">
+                <span class="auth__username-prefix">&#64;</span>
+                <input type="text" placeholder="tunombre" [(ngModel)]="username" name="username" autocomplete="username"
+                  (input)="onUsernameInput()" [class.auth__input--taken]="usernameStatus() === 'taken'" [class.auth__input--available]="usernameStatus() === 'available'" />
+                <span class="auth__username-status" [ngClass]="usernameStatus()">
+                  @if (usernameStatus() === 'checking') {
+                    <svg class="auth__spinner--sm" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                  } @else if (usernameStatus() === 'available') {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  } @else if (usernameStatus() === 'taken') {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  }
+                </span>
+              </div>
+              @if (usernameStatus() === 'taken') {
+                <p class="auth__field-error">Este usuario ya está en uso</p>
+              } @else if (usernameStatus() === 'available') {
+                <p class="auth__field-available">¡Disponible!</p>
+              } @else if (usernameStatus() === 'invalid') {
+                <p class="auth__field-error">3-20 caracteres: letras, números, _, ., -</p>
+              }
+            </div>
+
+            <div class="auth__field">
+              <label>Correo electrónico</label>
+              <input type="email" placeholder="tu@correo.com" [(ngModel)]="email" name="email" required autocomplete="email" (blur)="emailTouched = true"
+                [class.auth__input--invalid]="emailTouched && email && !emailValid" />
+              @if (emailTouched && email && !emailValid) {
+                <p class="auth__field-error">Ingresa un correo válido</p>
+              }
+            </div>
+
+            <div class="auth__field">
+              <label>Contraseña</label>
+              <div class="auth__field-wrap">
+                <input [type]="showPassword() ? 'text' : 'password'" placeholder="••••••••" [(ngModel)]="password" name="password" required autocomplete="new-password" />
+                <button type="button" class="auth__toggle-pass" (click)="showPassword.update(v => !v)">
+                  @if (showPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  }
+                </button>
+              </div>
+              @if (password) {
+                <div class="auth__strength" [ngClass]="passwordStrengthClass">
+                  <div class="auth__strength-bars">
+                    <div class="auth__strength-bar" [class.active]="passwordStrength >= 1"></div>
+                    <div class="auth__strength-bar" [class.active]="passwordStrength >= 2"></div>
+                    <div class="auth__strength-bar" [class.active]="passwordStrength >= 3"></div>
+                    <div class="auth__strength-bar" [class.active]="passwordStrength >= 4"></div>
+                  </div>
+                  <span class="auth__strength-label">{{ passwordStrengthLabel }}</span>
+                </div>
+                <div class="auth__criteria">
+                  <span [class.met]="password.length >= 8"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>8+ caracteres</span>
+                  <span [class.met]="hasUppercase"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Mayúscula</span>
+                  <span [class.met]="hasNumber"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Número</span>
+                  <span [class.met]="hasSymbol"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Símbolo</span>
+                </div>
+              }
+            </div>
+
+            <div class="auth__field">
+              <label>Confirmar contraseña</label>
+              <div class="auth__field-wrap">
+                <input [type]="showConfirmPassword() ? 'text' : 'password'" placeholder="••••••••" [(ngModel)]="confirmPassword" name="confirmPassword" autocomplete="new-password" />
+                <button type="button" class="auth__toggle-pass" (click)="showConfirmPassword.update(v => !v)">
+                  @if (showConfirmPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  }
+                </button>
+              </div>
+              @if (confirmPassword && password !== confirmPassword) {
+                <p class="auth__field-error">Las contraseñas no coinciden</p>
+              }
+            </div>
+
+            <!-- Terms -->
+            <label class="auth__terms-row">
+              <input type="checkbox" [(ngModel)]="termsAccepted" name="termsAccepted" />
+              <span class="auth__terms-box"></span>
+              <span>Acepto los <button type="button" class="auth__terms-link" (click)="showTerms.set(true)">términos y condiciones</button></span>
+            </label>
+
+            @if (errorMsg()) { <p class="auth__error">{{ errorMsg() }}</p> }
+            <button type="submit" class="btn btn--primary auth__submit-btn" [disabled]="isLoading()">
+              @if (isLoading()) { <svg class="auth__spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Cargando... }
+              @else { Crear cuenta }
+            </button>
+          </form>
+
+          <div class="auth__divider"><span>o continúa con</span></div>
+          <div class="auth__socials">
+            <button type="button" class="auth__social-btn" (click)="onGoogleSignIn()" [disabled]="isLoading()">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Google
+            </button>
+          </div>
+          <p class="auth__switch">
+            ¿Ya tienes cuenta? <button (click)="switchToLogin()">Inicia sesión</button>
+          </p>
+        </div>
+      }
+
     </div>
   </div>
 
@@ -110,3 +461,103 @@
   </div>
 
 </div>
+
+<!-- ── Términos y condiciones modal ─────────────────────────────────────── -->
+@if (showTerms()) {
+  <div class="auth__modal-overlay" (click)="showTerms.set(false)">
+    <div class="auth__modal" (click)="$event.stopPropagation()">
+      <div class="auth__modal-header">
+        <h2>Términos y Condiciones</h2>
+        <button class="auth__modal-close" (click)="showTerms.set(false)" aria-label="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="auth__modal-body">
+        <p class="auth__modal-date">Última actualización: junio de 2026</p>
+
+        <section>
+          <h3>1. Acerca de Tabulaft</h3>
+          <p>Tabulaft es una plataforma digital de exhibición y difusión de proyectos académicos de diseño gráfico. Su propósito es visibilizar el trabajo estudiantil universitario, fomentar la creatividad y construir una comunidad de diseñadores en formación. Al registrarte, formas parte de este espacio colectivo.</p>
+        </section>
+
+        <section>
+          <h3>2. Exhibición y difusión de proyectos</h3>
+          <p>Al publicar un proyecto en Tabulaft, autorizas expresamente que este sea:</p>
+          <ul>
+            <li>Mostrado públicamente en la plataforma y accesible para cualquier visitante.</li>
+            <li>Incluido en secciones destacadas, colecciones editoriales o galerías curadas por el equipo de Tabulaft.</li>
+            <li>Presentado en eventos académicos, ferias de diseño, muestras universitarias y actividades de difusión institucional en los que Tabulaft participe.</li>
+            <li>Compartido en los canales de comunicación oficial de Tabulaft (redes sociales, boletines, presentaciones).</li>
+            <li>Referenciado como ejemplo de trabajo estudiantil en materiales educativos o informativos.</li>
+          </ul>
+          <p>Esta autorización no implica transferencia de derechos de propiedad intelectual sobre el contenido. En todo momento se reconocerá públicamente la autoría del proyecto.</p>
+        </section>
+
+        <section>
+          <h3>3. Propiedad intelectual y derechos de autor</h3>
+          <p>Eres el titular de todos los derechos sobre el contenido que publicas. Tabulaft no adquiere ningún derecho de propiedad sobre tus proyectos, imágenes, textos o cualquier otro material que compartas en la plataforma.</p>
+          <p>Al publicar, garantizas que:</p>
+          <ul>
+            <li>El contenido es de tu autoría o tienes los derechos necesarios para publicarlo.</li>
+            <li>No infringe derechos de propiedad intelectual de terceros.</li>
+            <li>Has obtenido el consentimiento necesario para publicar imágenes de personas identificables.</li>
+          </ul>
+          <p>Tabulaft se reserva el derecho de retirar contenido que sea reportado como infractor de derechos de autor, previo proceso de verificación.</p>
+        </section>
+
+        <section>
+          <h3>4. Contenido permitido</h3>
+          <p>Tabulaft es un espacio dedicado exclusivamente a proyectos de diseño gráfico académico. Se permite publicar:</p>
+          <ul>
+            <li>Proyectos de identidad visual, branding, tipografía, ilustración, fotografía, diseño editorial y afines.</li>
+            <li>Trabajos académicos finales, entregas parciales y proyectos personales relacionados con el diseño.</li>
+            <li>Proyectos colaborativos realizados en el contexto de la formación universitaria.</li>
+          </ul>
+          <p>Queda estrictamente prohibido publicar contenido que sea ofensivo, discriminatorio, violento, sexualmente explícito, que vulnere la privacidad de personas, o que promueva actividades ilegales.</p>
+        </section>
+
+        <section>
+          <h3>5. Código de conducta de la comunidad</h3>
+          <p>Tabulaft es una comunidad de aprendizaje y respeto mutuo. Todos los usuarios se comprometen a:</p>
+          <ul>
+            <li>Interactuar con respeto, reconociendo el esfuerzo creativo de cada integrante.</li>
+            <li>No publicar comentarios hirientes, spam, contenido irrelevante o desinformación.</li>
+            <li>No suplantar la identidad de otras personas o instituciones.</li>
+            <li>No utilizar la plataforma para fines comerciales no autorizados.</li>
+            <li>Reportar contenido inapropiado a través de los canales habilitados.</li>
+          </ul>
+          <p>El incumplimiento de estas normas puede resultar en la suspensión o eliminación de la cuenta, sin previo aviso en casos de gravedad.</p>
+        </section>
+
+        <section>
+          <h3>6. Datos personales y privacidad</h3>
+          <p>Tabulaft recopila únicamente los datos necesarios para el funcionamiento de la plataforma: nombre, correo electrónico, foto de perfil y los proyectos publicados. Esta información no será vendida ni cedida a terceros con fines comerciales.</p>
+          <p>El correo electrónico se usa exclusivamente para la autenticación y comunicaciones relacionadas con tu cuenta. Puedes solicitar la eliminación de tu información en cualquier momento contactando al equipo de soporte.</p>
+        </section>
+
+        <section>
+          <h3>7. Suspensión y cancelación de cuentas</h3>
+          <p>Tabulaft se reserva el derecho de suspender o eliminar cuentas que incumplan estos términos, publiquen contenido fraudulento o realicen actividades que perjudiquen a otros usuarios o a la plataforma. Los proyectos publicados por cuentas eliminadas podrán ser retirados de la plataforma.</p>
+        </section>
+
+        <section>
+          <h3>8. Modificaciones a los términos</h3>
+          <p>Tabulaft puede actualizar estos términos y condiciones en cualquier momento. Los cambios serán notificados mediante un aviso visible en la plataforma. El uso continuado de Tabulaft tras la publicación de los cambios implica la aceptación de los nuevos términos.</p>
+        </section>
+
+        <section>
+          <h3>9. Contacto</h3>
+          <p>Para preguntas, reportes o solicitudes relacionadas con estos términos, puedes escribir a <strong>soporte&#64;tabulaft.univalle.edu.co</strong>.</p>
+        </section>
+      </div>
+      <div class="auth__modal-footer">
+        <button class="btn btn--primary" (click)="termsAccepted = true; showTerms.set(false)">
+          Aceptar y cerrar
+        </button>
+        <button class="btn btn--outline" (click)="showTerms.set(false)">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}

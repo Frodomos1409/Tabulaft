@@ -49,7 +49,33 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 $space-6 56px;
-    @include mobile { padding: 0 $space-4 40px; }
+    display: flex;
+    align-items: center;
+    gap: 0;
+    @include mobile { padding: 0 $space-4 40px; flex-direction: column; }
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__visual {
+    flex-shrink: 0;
+    width: clamp(220px, 36vw, 500px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    pointer-events: none;
+    @include mobile { width: clamp(180px, 60vw, 300px); margin-top: 16px; }
+  }
+
+  &__char {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 24px 48px rgba(0,0,0,0.25));
+    @media (prefers-reduced-motion: reduce) { animation: none; }
   }
 
   &__eyebrow {

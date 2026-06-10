@@ -36,6 +36,16 @@
   from { opacity: 0; transform: translateX(-16px); }
   to   { opacity: 0.65; transform: translateX(0); }
 }
+@keyframes btnShimmer {
+  0%, 15%  { transform: translateX(-100%); opacity: 0; }
+  20%      { opacity: 1; }
+  75%      { transform: translateX(100%); opacity: 1; }
+  80%, 100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes btnBorderPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.55); }
+  60%      { box-shadow: 0 0 0 9px rgba(255,255,255,0); }
+}
 
 .hero {
   position: relative;
@@ -74,13 +84,13 @@
     transform-origin: bottom center;
 
     &--a {
-      height: 130%; width: auto;
-      top: -8%; right: -2%; bottom: auto;
+      height: 88%; width: auto;
+      bottom: 0; right: 6%; top: auto;
       animation-duration: 5.5s;
     }
     &--b {
-      height: 58%; width: auto;
-      bottom: 0; right: 25%;
+      height: 88%; width: auto;
+      bottom: 0; right: 2%;
       animation-duration: 4.2s;
       animation-delay: -1.8s;
     }
@@ -107,7 +117,7 @@
     font-family: $font-heading;
     font-size: clamp(24px, 3.5vw, 52px);
     font-weight: 400;
-    line-height: 0.93;
+    line-height: 1.1;
     letter-spacing: 0.5px;
     color: $blue;
     margin: 0;
@@ -133,19 +143,54 @@
   }
 
   &__btn {
+    position: relative;
     display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; padding: 0 22px; border-radius: $radius-pill;
-    font-size: 13px; font-weight: 700; text-decoration: none;
-    background: #fff; color: $blue;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.26); }
-    @media (prefers-reduced-motion: reduce) { transition: none; }
+    min-height: 46px; padding: 0 26px; border-radius: $radius-pill;
+    font-size: 13px; font-weight: 800; text-decoration: none;
+    background: linear-gradient(160deg, #ffffff 0%, #e8eeff 100%);
+    color: $blue;
+    box-shadow: 0 6px 28px rgba($blue, 0.28), 0 2px 8px rgba(0,0,0,0.12);
+    overflow: hidden;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+
+    &::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.72) 50%, transparent 80%);
+      transform: translateX(-100%);
+      animation: btnShimmer 4.5s ease-in-out infinite;
+      animation-delay: 1.4s;
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 18px 48px rgba($blue, 0.38), 0 4px 14px rgba(0,0,0,0.16);
+    }
+    @media (prefers-reduced-motion: reduce) { transition: none; &::after { animation: none; } }
 
     &--outline {
-      background: transparent; color: rgba(255,255,255,0.90);
-      border: 1.5px solid rgba(255,255,255,0.35); box-shadow: none;
-      &:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.6); transform: translateY(-2px); }
+      // fill-from-left via background-position — text siempre visible
+      background: linear-gradient(to right, #fff 50%, rgba(255,255,255,0.16) 50%);
+      background-size: 201% 100%;
+      background-position: right center;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.75); box-shadow: none;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  color 0.30s ease,
+                  border-color 0.22s ease,
+                  background-position 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: btnBorderPulse 2.5s ease-in-out infinite;
+      animation-delay: 0.7s;
+
+      &::after { display: none; }
+
+      &:hover {
+        background-position: left center;
+        color: $blue;
+        border-color: #fff;
+        transform: translateY(-3px) scale(1.05);
+      }
     }
   }
 

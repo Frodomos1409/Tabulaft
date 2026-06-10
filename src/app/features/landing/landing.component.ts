@@ -4,10 +4,11 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectCardComponent } from '../../shared/components/project-card/project-card.component';
 import { ProjectRow, ProjectService } from '../../core/services/project.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -22,6 +23,8 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   private zone           = inject(NgZone);
   private platformId     = inject(PLATFORM_ID);
   private projectService = inject(ProjectService);
+  private auth           = inject(AuthService);
+  private router         = inject(Router);
   theme                  = inject(ThemeService);
 
   carouselProjects = signal<ProjectRow[]>([]);
@@ -112,6 +115,11 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async ngOnInit() {
+    await this.auth.sessionReady;
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate(['/inicio'], { replaceUrl: true });
+      return;
+    }
     await Promise.all([this.loadCarousel(), this.loadRecent(), this.loadFeatured(), this.loadStats()]);
   }
 

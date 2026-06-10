@@ -6,6 +6,7 @@
     <!-- Cover image full width -->
     <div class="detail-m__cover">
       <img [src]="project()!.cover_image" [alt]="project()!.title"
+           loading="eager"
            (click)="lightboxOpen.set(true)" style="cursor:zoom-in" />
       <a routerLink="/explorar" class="detail-m__back">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -112,6 +113,7 @@
         @for (c of comments(); track c.id) {
           <div class="detail-m__comment">
             <img [src]="c.user?.avatar_url || 'https://ui-avatars.com/api/?name=' + c.user?.name + '&background=2830eb&color=fff&size=68'"
+                 loading="lazy"
                  (error)="$any($event.target).onerror=null; $any($event.target).src='https://ui-avatars.com/api/?name=' + c.user?.name + '&background=2830eb&color=fff&size=68'" />
             <div>
               <strong>{{ c.user?.name }}</strong>
@@ -157,6 +159,7 @@
     @if (project()) {
       <div class="detail-hero">
         <img [src]="project()!.cover_image" [alt]="project()!.title"
+             loading="eager"
              (click)="lightboxOpen.set(true)" style="cursor:zoom-in" />
       </div>
 
@@ -255,6 +258,7 @@
         @for (c of comments(); track c.id) {
           <div class="detail-comment" style="display:flex;gap:.75rem;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
             <img [src]="c.user?.avatar_url || 'https://ui-avatars.com/api/?name=' + c.user?.name"
+                 loading="lazy"
                  style="width:36px;height:36px;border-radius:50%;object-fit:cover" />
             <div>
               <strong style="font-size:.9rem">{{ c.user?.name }}</strong>

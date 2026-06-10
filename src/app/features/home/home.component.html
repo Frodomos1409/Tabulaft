@@ -52,7 +52,9 @@
           <div class="home-hero__sub-row">
             <p class="home-hero__subtitle">Proyectos reales · Creatividad sin límites · UNIVALLE</p>
             <div class="home-hero__stats">
-              @if (carouselProjects().length > 0) {
+              @if (totalProjects() !== null) {
+                <span class="home-hero__stat"><strong>{{ totalProjects() }}</strong> proyectos</span>
+              } @else if (carouselProjects().length > 0) {
                 <span class="home-hero__stat"><strong>{{ carouselProjects().length + recentProjects().length }}</strong> proyectos</span>
               }
               <span class="home-hero__stat--dot"></span>
@@ -73,7 +75,7 @@
                  [class.right2]="item.offset === 2"
                  [routerLink]="item.offset === 0 ? ['/proyecto', item.project.id] : null"
                  (click)="$event.stopPropagation(); item.offset !== 0 ? goToSlide(carouselIndex() + item.offset) : null">
-                <img [src]="item.project.cover_image" [alt]="item.project.title" class="hcp-card__img" />
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="hcp-card__img" loading="lazy" />
                 @if (item.offset === 0) {
                   <div class="hcp-card__info">
                     <span class="hcp-card__cat">{{ item.project.category }}</span>
@@ -143,7 +145,7 @@
             <a class="carousel-card active"
                [routerLink]="['/proyecto', item.project.id]">
               <div class="carousel-card__img-wrap">
-                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" loading="lazy" />
                 <div class="carousel-card__overlay">
                   <span class="carousel-card__cat">{{ item.project.category }}</span>
                   <h3 class="carousel-card__name">{{ item.project.title }}</h3>
@@ -168,7 +170,7 @@
                  [class.right2]="item.offset === 2"
                  (click)="goToSlide(carouselIndex() + item.offset)">
               <div class="carousel-card__img-wrap">
-                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
+                <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" loading="lazy" />
               </div>
             </div>
           }
@@ -209,7 +211,7 @@
       </div>
       <div class="statement-section__right">
         <div class="statement-stat">
-          <span class="statement-stat__num">{{ (carouselProjects().length + recentProjects().length) || '—' }}</span>
+          <span class="statement-stat__num">{{ (totalProjects() ?? (carouselProjects().length + recentProjects().length)) || '—' }}</span>
           <span class="statement-stat__label">Proyectos publicados</span>
         </div>
         <div class="statement-stat statement-stat--accent">

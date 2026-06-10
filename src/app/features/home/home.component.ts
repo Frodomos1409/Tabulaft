@@ -29,6 +29,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   loadingCarousel  = signal(true);
   loadingRecent    = signal(true);
   loadingPopular   = signal(true);
+  totalProjects    = signal<number | null>(null);
+  totalDesigners   = signal<number | null>(null);
 
   // Carrusel 3D
   carouselIndex = signal(0);
@@ -46,7 +48,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroyFns: (() => void)[] = [];
 
   constructor() {
-    // Re-observe reveal elements whenever any data signal changes
+    // Re-observe reveal elements after data loads (observer is disconnected + recreated internally)
     effect(() => {
       this.carouselProjects(); this.recentProjects(); this.popularProjects();
       if (isPlatformBrowser(this.platformId)) {
@@ -99,6 +101,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loadCarousel(),
       this.loadRecent(),
       this.loadPopular(),
+      this.loadStats(),
     ]);
   }
 
@@ -108,6 +111,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.initScrollReveal();
       this.initWordJump();
     });
+    this.destroyFns.push(() => this.revealObserver?.disconnect());
     this.startCarousel();
     const onVisibility = () => {
       if (document.hidden) {
@@ -142,7 +146,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     document.querySelectorAll('.reveal').forEach(el => {
       this.revealObserver!.observe(el);
     });
-    this.destroyFns.push(() => this.revealObserver?.disconnect());
+    // Cleanup registered once in ngAfterViewInit; revealObserver is disconnected on recreate above
   }
 
   // ── Word jump ────────────────────────────────────────────────────────────────
@@ -203,5 +207,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     } finally {
       this.loadingPopular.set(false);
     }
+  }
+
+  private async loadStats() {
+    try {
+      const stats = await this.projectService.getLandingStats();
+      this.totalProjects.set(stats.projectCount);
+      this.totalDesigners.set(stats.userCount);
+    } catch { /* silencioso — los conteos no son críticos */ }
   }
 }

@@ -170,7 +170,7 @@ export class AuthService {
 
       if (avatarFile) {
         const safeName = avatarFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `${data.user.id}/${Date.now()}-${safeName}`;
+        const path = `${data.user.id}/${crypto.randomUUID()}-${safeName}`;
         const { error: upErr } = await supabase.storage.from('avatars').upload(path, avatarFile);
         if (!upErr) {
           const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);

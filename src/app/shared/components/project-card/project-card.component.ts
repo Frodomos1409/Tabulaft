@@ -15,6 +15,9 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class ProjectCardComponent implements OnInit {
   @Input() project!: any;
+  /** Pre-resolved by parent to avoid N+1 queries. Falls back to individual query if absent. */
+  @Input() initialLiked?: boolean;
+  @Input() initialSaved?: boolean;
 
   private toast          = inject(ToastService);
   private projectService = inject(ProjectService);
@@ -27,14 +30,25 @@ export class ProjectCardComponent implements OnInit {
 
   async ngOnInit() {
     this.likeCount.set(this.project?.likes ?? 0);
-    const userId = this.auth.currentUser()?.id;
-    if (userId && this.project?.id) {
-      const [isLiked, isSaved] = await Promise.all([
-        this.projectService.isLiked(this.project.id, userId),
-        this.projectService.isSaved(this.project.id, userId),
-      ]);
-      this.liked.set(isLiked);
-      this.saved.set(isSaved);
+
+    if (this.initialLiked !== undefined) {
+      this.liked.set(this.initialLiked);
+    }
+    if (this.initialSaved !== undefined) {
+      this.saved.set(this.initialSaved);
+    }
+
+    // Only hit the DB when the parent didn't resolve state in batch
+    if (this.initialLiked === undefined || this.initialSaved === undefined) {
+      const userId = this.auth.currentUser()?.id;
+      if (userId && this.project?.id) {
+        const [isLiked, isSaved] = await Promise.all([
+          this.initialLiked === undefined ? this.projectService.isLiked(this.project.id, userId) : Promise.resolve(this.initialLiked),
+          this.initialSaved === undefined ? this.projectService.isSaved(this.project.id, userId) : Promise.resolve(this.initialSaved),
+        ]);
+        this.liked.set(isLiked);
+        this.saved.set(isSaved);
+      }
     }
   }
 

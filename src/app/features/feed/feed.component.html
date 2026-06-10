@@ -61,7 +61,7 @@
       </div>
     } @else {
       @for (project of projects(); track project.id) {
-        <app-project-card [project]="project" />
+        <app-project-card [project]="project" [initialLiked]="likedIds().has(project.id)" [initialSaved]="savedIds().has(project.id)" />
       }
 
       <!-- Append skeletons while loading more -->
@@ -213,7 +213,7 @@
     } @else {
       <div class="masonry-grid">
         @for (project of projects(); track project.id) {
-          <app-project-card [project]="project" />
+          <app-project-card [project]="project" [initialLiked]="likedIds().has(project.id)" [initialSaved]="savedIds().has(project.id)" />
         }
 
         <!-- Append skeleton cards inside the grid while loading more -->

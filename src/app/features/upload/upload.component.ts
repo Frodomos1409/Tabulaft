@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, ViewChild, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ElementRef, ViewChild, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +22,7 @@ interface ImagePreview {
   styleUrl: './upload.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UploadComponent implements OnInit {
+export class UploadComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private projectService  = inject(ProjectService);
@@ -111,10 +111,15 @@ export class UploadComponent implements OnInit {
   }
   removeImage(index: number) {
     this.images.update(imgs => {
+      URL.revokeObjectURL(imgs[index].url);
       const updated = imgs.filter((_, i) => i !== index);
       if (updated.length > 0 && !updated.some(i => i.isCover)) updated[0].isCover = true;
       return updated;
     });
+  }
+
+  ngOnDestroy() {
+    this.images().forEach(img => URL.revokeObjectURL(img.url));
   }
 
   addTag(e: KeyboardEvent) {

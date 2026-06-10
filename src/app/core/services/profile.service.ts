@@ -33,7 +33,7 @@ export class ProfileService {
         throw new Error('El avatar no puede superar los 5MB.');
       }
       const safeName = this.sanitizeFileName(avatarFile.name);
-      const path = `${userId}/${Date.now()}-${safeName}`;
+      const path = `${userId}/${crypto.randomUUID()}-${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, avatarFile, { upsert: true });

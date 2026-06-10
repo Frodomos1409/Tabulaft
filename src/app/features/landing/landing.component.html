@@ -55,7 +55,7 @@
            [class.right2]="item.offset === 2"
            (click)="$event.stopPropagation(); item.offset === 0 ? null : goToSlide(carouselIndex() + item.offset)">
         <div class="carousel-card__img-wrap">
-          <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" />
+          <img [src]="item.project.cover_image" [alt]="item.project.title" class="carousel-card__img" loading="lazy" />
           @if (item.offset === 0) {
             <div class="carousel-card__overlay">
               <span class="carousel-card__cat">{{ item.project.category }}</span>

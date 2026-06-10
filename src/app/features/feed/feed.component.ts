@@ -9,6 +9,7 @@ import { ProjectCardSkeletonComponent } from '../../shared/components/skeleton/p
 import { CATEGORIES } from '../../core/models/models';
 import { ProjectService, ProjectRow } from '../../core/services/project.service';
 import { AcademicService, AcademicSubject } from '../../core/services/academic.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 
 const PAGE_SIZE = 12;
@@ -25,6 +26,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   readonly device = inject(DeviceService);
   private projectService  = inject(ProjectService);
   private academicService = inject(AcademicService);
+  private auth            = inject(AuthService);
   private toast           = inject(ToastService);
   private zone            = inject(NgZone);
 
@@ -44,6 +46,8 @@ export class FeedComponent implements OnInit, OnDestroy {
   hasMore         = signal(true);
   projects        = signal<ProjectRow[]>([]);
   totalCount      = signal(0);
+  likedIds        = signal<Set<string>>(new Set());
+  savedIds        = signal<Set<string>>(new Set());
 
   skeletonItems     = Array(8).fill(0);
   skeletonMoreItems = Array(4).fill(0);
@@ -119,6 +123,18 @@ export class FeedComponent implements OnInit, OnDestroy {
         this.projects.update(prev => [...prev, ...data]);
       }
       this.hasMore.set(data.length === PAGE_SIZE);
+
+      // Batch-resolve liked/saved state for all visible projects in 2 queries
+      const userId = this.auth.currentUser()?.id;
+      if (userId) {
+        const allIds = this.projects().map(p => p.id);
+        const [liked, saved] = await Promise.all([
+          this.projectService.getLikedIds(allIds, userId),
+          this.projectService.getSavedIds(allIds, userId),
+        ]);
+        this.likedIds.set(liked);
+        this.savedIds.set(saved);
+      }
     } catch (e: any) {
       this.toast.show(e.message ?? 'Error al cargar proyectos', 'error');
       if (!reset) this.page.update(p => Math.max(0, p - 1));

@@ -152,7 +152,7 @@ export class ProjectService {
       const valid = await this.validateImageFile(file);
       if (!valid) throw new Error('Archivo inválido: solo se permiten imágenes JPEG, PNG, WEBP o GIF de máximo 10MB');
       const safeName = this.sanitizeFileName(file.name);
-      const path = `${userId}/${Date.now()}-${safeName}`;
+      const path = `${userId}/${crypto.randomUUID()}-${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('projects')
         .upload(path, file);
@@ -214,6 +214,26 @@ export class ProjectService {
     return !!data;
   }
 
+  async getLikedIds(projectIds: string[], userId: string): Promise<Set<string>> {
+    if (!projectIds.length) return new Set();
+    const { data } = await supabase
+      .from('likes')
+      .select('project_id')
+      .eq('user_id', userId)
+      .in('project_id', projectIds);
+    return new Set((data ?? []).map((r: any) => r.project_id));
+  }
+
+  async getSavedIds(projectIds: string[], userId: string): Promise<Set<string>> {
+    if (!projectIds.length) return new Set();
+    const { data } = await supabase
+      .from('saves')
+      .select('project_id')
+      .eq('user_id', userId)
+      .in('project_id', projectIds);
+    return new Set((data ?? []).map((r: any) => r.project_id));
+  }
+
   async incrementView(projectId: string): Promise<void> {
     await supabase.rpc('increment_project_view', { p_project_id: projectId });
   }
@@ -238,12 +258,26 @@ export class ProjectService {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');
     if (this.reportedProjects.has(projectId)) throw new Error('Ya reportaste este proyecto');
+
+    const { count } = await supabase
+      .from('reports')
+      .select('*', { count: 'exact', head: true })
+      .eq('project_id', projectId)
+      .eq('reporter_id', userId);
+    if ((count ?? 0) > 0) {
+      this.reportedProjects.add(projectId);
+      throw new Error('Ya reportaste este proyecto');
+    }
+
     const { error } = await supabase.from('reports').insert({
       project_id: projectId,
       reporter_id: userId,
       reason,
     });
-    if (error) throw error;
+    if (error) {
+      if (error.code === '23505') throw new Error('Ya reportaste este proyecto');
+      throw error;
+    }
     this.reportedProjects.add(projectId);
   }
 
@@ -280,9 +314,15 @@ export class ProjectService {
   async addComment(projectId: string, text: string): Promise<void> {
     const userId = this.auth.currentUser()?.id;
     if (!userId) throw new Error('No autenticado');
+    const trimmed = text.trim();
+    if (!trimmed) throw new Error('El comentario no puede estar vacío');
+    if (trimmed.length > 1000) throw new Error('El comentario es demasiado largo (máximo 1000 caracteres)');
     if (Date.now() - this.lastCommentAt < 5000) throw new Error('Espera 5 segundos antes de comentar de nuevo');
-    const { error } = await supabase.from('comments').insert({ project_id: projectId, user_id: userId, text });
-    if (error) throw error;
+    const { error } = await supabase.from('comments').insert({ project_id: projectId, user_id: userId, text: trimmed });
+    if (error) {
+      if (error.code === '23514') throw new Error('Espera unos segundos antes de comentar de nuevo');
+      throw error;
+    }
     this.lastCommentAt = Date.now();
   }
 

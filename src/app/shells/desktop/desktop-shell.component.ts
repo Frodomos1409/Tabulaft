@@ -251,7 +251,10 @@ export class DesktopShellComponent implements AfterViewInit, OnDestroy {
     let progress = 0;
     const timer = setInterval(() => {
       progress += 1;
-      this.zone.run(() => this.loaderProgress.set(progress));
+      // Batch UI updates: only trigger change detection every 5% to reduce zone.run() calls
+      if (progress % 5 === 0 || progress >= 100) {
+        this.zone.run(() => this.loaderProgress.set(progress));
+      }
 
       if (progress >= 100) {
         clearInterval(timer);
@@ -264,24 +267,33 @@ export class DesktopShellComponent implements AfterViewInit, OnDestroy {
   }
 
   private initCursor() {
+    let trailRafId = 0;
+    let pendingTrailX = 0;
+    let pendingTrailY = 0;
+
     const onMove = (e: MouseEvent) => {
       this.zone.run(() => {
         this.cursorX.set(e.clientX);
         this.cursorY.set(e.clientY);
       });
-      setTimeout(() => {
-        this.zone.run(() => {
-          this.trailX.set(e.clientX);
-          this.trailY.set(e.clientY);
+
+      pendingTrailX = e.clientX;
+      pendingTrailY = e.clientY;
+
+      if (!trailRafId) {
+        trailRafId = requestAnimationFrame(() => {
+          this.zone.run(() => {
+            this.trailX.set(pendingTrailX);
+            this.trailY.set(pendingTrailY);
+          });
+          trailRafId = 0;
         });
-      }, 80);
+      }
     };
 
     const onOver = (e: MouseEvent) => {
       const el = e.target as HTMLElement;
       const isInteractive = !!el.closest('a, button, [role="button"], input, select, label');
-
-      // Detectar si el cursor está sobre una imagen de proyecto
       const isProjectImg = !!el.closest(
         'app-project-card img, .work, .gallery__marquee-img, [data-cursor="project"]'
       );
@@ -297,6 +309,7 @@ export class DesktopShellComponent implements AfterViewInit, OnDestroy {
     this.destroyFns.push(
       () => document.removeEventListener('mousemove', onMove),
       () => document.removeEventListener('mouseover', onOver),
+      () => { if (trailRafId) cancelAnimationFrame(trailRafId); },
     );
   }
 }

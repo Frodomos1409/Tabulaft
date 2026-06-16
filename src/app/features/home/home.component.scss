@@ -97,7 +97,7 @@
     max-width: 1360px; margin: 0 auto; width: 100%;
     padding: calc(#{$navbar-height} + 40px) $space-6 0;
     display: flex; flex-direction: column; justify-content: space-between;
-    @include mobile { padding: calc(#{$navbar-height} + 28px) $space-4 0; }
+    @include mobile { padding: calc(56px + 28px) $space-4 0; } // 56px = mobile shell topbar
   }
 
   // TOP ROW: avatar + greeting + quick actions

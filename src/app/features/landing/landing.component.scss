@@ -198,6 +198,9 @@
   @include mobile {
     height: auto;
     min-height: clamp(420px, 80vw, 600px);
+    padding-top: 56px; // mobile shell topbar = 56px
+    padding-left: 20px;
+    padding-right: 20px;
     padding-bottom: 40px;
   }
 }

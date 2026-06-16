@@ -6,6 +6,7 @@
   padding-bottom: $space-20;
   background: var(--bg);
   min-height: 100vh;
+  @include mobile { padding-top: calc(56px + #{$space-5}); padding-bottom: $space-16; } // mobile shell topbar
 }
 
 .detail-back {

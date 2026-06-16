@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { SearchModalComponent } from '../../shared/components/search-modal/search-modal.component';
 
@@ -13,6 +14,8 @@ import { SearchModalComponent } from '../../shared/components/search-modal/searc
 })
 export class MobileShellComponent {
   readonly theme = inject(ThemeService);
+  readonly auth  = inject(AuthService);
+  private router = inject(Router);
 
   searchOpen = signal(false);
   drawerOpen = signal(false);
@@ -36,5 +39,11 @@ export class MobileShellComponent {
 
   closeSearchModal() {
     this.searchModalOpen.set(false);
+  }
+
+  async signOut() {
+    this.closeDrawer();
+    await this.auth.signOut();
+    this.router.navigate(['/']);
   }
 }

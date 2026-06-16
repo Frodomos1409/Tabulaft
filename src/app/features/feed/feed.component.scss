@@ -436,7 +436,7 @@
 // ── MOBILE ────────────────────────────────────────────────────────────────────
 .cat-m__page {
   overflow-x: hidden;
-  padding-top: $navbar-height;
+  padding-top: 56px; // mobile shell topbar height
   background: var(--bg);
 }
 

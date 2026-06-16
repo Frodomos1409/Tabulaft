@@ -15,12 +15,14 @@
   min-height: 100vh;
   background: var(--bg);
   padding-top: $navbar-height;
+  @include mobile { padding-top: 56px; } // mobile shell topbar
 }
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 .upload-header {
   position: sticky;
   top: $navbar-height;
+  @include mobile { top: 56px; } // mobile shell topbar
   z-index: 90;
   background: var(--bg-nav);
   backdrop-filter: blur(20px);

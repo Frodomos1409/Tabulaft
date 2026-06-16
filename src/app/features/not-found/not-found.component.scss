@@ -5,6 +5,7 @@
   position: relative;
   min-height: calc(100vh - #{$navbar-height});
   margin-top: $navbar-height;
+  @include mobile { margin-top: 56px; min-height: calc(100vh - 56px); } // mobile shell topbar
   @include flex-center;
   flex-direction: column;
   background: var(--bg);
